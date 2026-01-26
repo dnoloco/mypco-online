@@ -49,22 +49,6 @@ abstract class MyPCO_Module_Base {
     }
 
     /**
-     * Add an admin page for this module.
-     */
-    protected function add_admin_page($parent_slug, $page_title, $menu_title, $capability, $menu_slug, $callback) {
-        $this->loader->add_action('admin_menu', $this, function() use ($parent_slug, $page_title, $menu_title, $capability, $menu_slug, $callback) {
-            add_submenu_page(
-                $parent_slug,
-                $page_title,
-                $menu_title,
-                $capability,
-                $menu_slug,
-                [$this, $callback]
-            );
-        });
-    }
-
-    /**
      * Enqueue module-specific styles.
      */
     protected function enqueue_style($handle, $file, $dependencies = [], $version = null) {
@@ -96,9 +80,9 @@ abstract class MyPCO_Module_Base {
      */
     protected function render_template($template_name, $variables = []) {
         extract($variables);
-        
+
         $template_path = MYPCO_PLUGIN_DIR . "modules/{$this->module_key}/templates/{$template_name}.php";
-        
+
         if (file_exists($template_path)) {
             include $template_path;
         }
