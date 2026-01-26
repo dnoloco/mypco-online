@@ -50,7 +50,7 @@ function mypco_get_services_sort_url($column, $current_orderby, $current_order, 
     <?php
     // Display success messages
     if ($success_message):
-        if (is_array($success_message)) {
+        if (is_array($success_message)):
             $count = $success_message['count'] ?? 0;
             $status = $success_message['status'] ?? 'sent';
             $scheduled_at = $success_message['scheduled_at'] ?? null;
@@ -59,40 +59,39 @@ function mypco_get_services_sort_url($column, $current_orderby, $current_order, 
                 $formatted_time = date('M j, Y \a\t g:i A', strtotime($scheduled_at));
                 ?>
                 <div class="notice notice-success is-dismissible">
-                    <p><strong><?php _e('Success!', 'mypco-online'); ?></strong> 
-                    <?php printf(__('Message scheduled for %s to %d recipients via Clearstream.', 'mypco-online'), 
-                        esc_html($formatted_time), intval($count)); ?></p>
+                    <p><strong><?php _e('Success!', 'mypco-online'); ?></strong>
+                        <?php printf(__('Message scheduled for %s to %d recipients via Clearstream.', 'mypco-online'),
+                                esc_html($formatted_time), intval($count)); ?></p>
                 </div>
             <?php else: ?>
                 <div class="notice notice-success is-dismissible">
-                    <p><strong><?php _e('Success!', 'mypco-online'); ?></strong> 
-                    <?php printf(__('Message sent to %d recipients via Clearstream.', 'mypco-online'), intval($count)); ?></p>
+                    <p><strong><?php _e('Success!', 'mypco-online'); ?></strong>
+                        <?php printf(__('Message sent to %d recipients via Clearstream.', 'mypco-online'), intval($count)); ?></p>
                 </div>
-            <?php endif;
-        } else {
-            // Old format
-            ?>
+            <?php endif; ?>
+        <?php else: ?>
+            <!-- Old format (single number) -->
             <div class="notice notice-success is-dismissible">
-                <p><strong><?php _e('Success!', 'mypco-online'); ?></strong> 
-                <?php printf(__('Message sent to %d recipients via Clearstream.', 'mypco-online'), intval($success_message)); ?></p>
+                <p><strong><?php _e('Success!', 'mypco-online'); ?></strong>
+                    <?php printf(__('Message sent to %d recipients via Clearstream.', 'mypco-online'), intval($success_message)); ?></p>
             </div>
-        <?php endif;
-    endif;
+        <?php endif; ?>
+    <?php endif;
 
     // Display error messages
     if ($error_message): ?>
         <div class="notice notice-error is-dismissible">
-            <p><strong><?php printf(__('Clearstream API Error (Code %d):', 'mypco-online'), intval($error_message['code'])); ?></strong> 
-            <?php echo esc_html($error_message['message']); ?></p>
+            <p><strong><?php printf(__('Clearstream API Error (Code %d):', 'mypco-online'), intval($error_message['code'])); ?></strong>
+                <?php echo esc_html($error_message['message']); ?></p>
         </div>
     <?php endif; ?>
 
     <!-- SERVICE TYPE FILTER TABS -->
     <ul class="subsubsub">
         <li class="all">
-            <a href="<?php echo esc_url(admin_url('admin.php?page=mypco-services')); ?>" 
-               <?php echo $filter_type === 'all' ? 'class="current"' : ''; ?>>
-                <?php _e('All', 'mypco-online'); ?> 
+            <a href="<?php echo esc_url(admin_url('admin.php?page=mypco-services')); ?>"
+                    <?php echo $filter_type === 'all' ? 'class="current"' : ''; ?>>
+                <?php _e('All', 'mypco-online'); ?>
                 <span class="count">(<?php echo intval($type_counts['all']); ?>)</span>
             </a>
             <?php if (!empty($service_types)): ?> | <?php endif; ?>
@@ -104,8 +103,8 @@ function mypco_get_services_sort_url($column, $current_orderby, $current_order, 
             ?>
             <li class="type-<?php echo esc_attr($type_id); ?>">
                 <a href="<?php echo esc_url(add_query_arg('filter_type', $type_id, admin_url('admin.php?page=mypco-services'))); ?>"
-                   <?php echo $filter_type === $type_id ? 'class="current"' : ''; ?>>
-                    <?php echo esc_html($type_name); ?> 
+                        <?php echo $filter_type === $type_id ? 'class="current"' : ''; ?>>
+                    <?php echo esc_html($type_name); ?>
                     <span class="count">(<?php echo intval($count); ?>)</span>
                 </a>
                 <?php if ($index < count($service_types) - 1): ?> | <?php endif; ?>
@@ -120,7 +119,7 @@ function mypco_get_services_sort_url($column, $current_orderby, $current_order, 
         <!-- FILTERS -->
         <div class="tablenav top">
             <div class="alignleft actions">
-                <select name="filter_month" id="filter-month" 
+                <select name="filter_month" id="filter-month"
                         onchange="window.location.href='<?php echo esc_js(admin_url('admin.php?page=mypco-services')); ?>' + (this.value !== 'all' ? '&filter_month=' + encodeURIComponent(this.value) : '') + '<?php echo $filter_type !== 'all' ? '&filter_type=' . esc_js($filter_type) : ''; ?>' + '<?php echo '&orderby=' . esc_js($orderby) . '&order=' . esc_js($order); ?>';">
                     <option value="all"><?php _e('All Dates', 'mypco-online'); ?></option>
                     <?php foreach ($available_months as $month): ?>
@@ -195,13 +194,13 @@ function mypco_get_services_sort_url($column, $current_orderby, $current_order, 
                         <?php if ($plan['series'] !== '—'): ?>
                             <br><small style="color: #666;"><?php _e('Series:', 'mypco-online'); ?> <?php echo esc_html($plan['series']); ?></small>
                         <?php endif; ?>
-                        
+
                         <!-- Row Actions -->
                         <div class="row-actions">
                             <span class="view">
                                 <a href="<?php echo esc_url($details_url); ?>">
                                     <?php _e('View Details', 'mypco-online'); ?>
-                                </a> | 
+                                </a> |
                             </span>
                             <span class="edit">
                                 <a href="<?php echo esc_url($plan['pco_edit_link']); ?>" target="_blank" rel="noopener">
@@ -209,7 +208,7 @@ function mypco_get_services_sort_url($column, $current_orderby, $current_order, 
                                 </a>
                             </span>
                         </div>
-                        
+
                         <button type="button" class="toggle-row">
                             <span class="screen-reader-text"><?php _e('Show more details', 'mypco-online'); ?></span>
                         </button>
