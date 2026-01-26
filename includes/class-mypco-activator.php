@@ -1,12 +1,17 @@
 <?php
 /**
  * Fired during plugin activation.
+ *
+ * This class defines all code necessary to run during the plugin's activation.
  */
 
 class MyPCO_Activator {
 
     /**
      * Plugin activation tasks.
+     *
+     * Sets up default options, creates database tables, and performs
+     * initial setup tasks when the plugin is activated.
      */
     public static function activate() {
         // Set default options
@@ -15,14 +20,20 @@ class MyPCO_Activator {
         // Create database tables
         self::create_tables();
 
-        // Generate webhook secret
+        // Generate webhook secret for signups
         self::generate_webhook_secret();
 
         // Clear all PCO caches
         self::clear_caches();
 
+        // Check PHP requirements
+        self::check_requirements();
+
         // Flush rewrite rules
         flush_rewrite_rules();
+
+        // Log activation
+        error_log('MyPCO Online: Plugin activated successfully');
     }
 
     /**
@@ -33,13 +44,22 @@ class MyPCO_Activator {
         add_option('mypco_module_calendar_enabled', true);
         add_option('mypco_module_groups_enabled', true);
 
-        // Premium modules enabled by default (can be changed to require license)
+        // Premium modules disabled by default (enable after license validation)
         add_option('mypco_module_services_enabled', true);
         add_option('mypco_module_messages_enabled', true);
         add_option('mypco_module_signups_enabled', true);
 
         // Set plugin version
         add_option('mypco_version', MYPCO_VERSION);
+
+        // Set default timezone if not set
+        if (!get_option('timezone_string')) {
+            update_option('timezone_string', 'America/Chicago');
+        }
+
+        // License options (placeholder for future licensing system)
+        add_option('mypco_license_services', '');
+        add_option('mypco_license_messages', '');
     }
 
     /**
@@ -48,6 +68,8 @@ class MyPCO_Activator {
     private static function create_tables() {
         global $wpdb;
         $charset_collate = $wpdb->get_charset_collate();
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
         // Table for signup events
         $table_signups = $wpdb->prefix . 'mypco_signups';
@@ -66,7 +88,11 @@ class MyPCO_Activator {
             minimum_payment decimal(10,2) DEFAULT 0.00,
             is_active tinyint(1) DEFAULT 1,
             created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY  (id)
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY event_id (event_id),
+            KEY event_date (event_date),
+            KEY is_active (is_active)
         ) $charset_collate;";
 
         // Table for registrations
@@ -78,17 +104,21 @@ class MyPCO_Activator {
             last_name varchar(100) NOT NULL,
             email varchar(100) NOT NULL,
             phone varchar(20) DEFAULT NULL,
-            registration_data text DEFAULT NULL,
-            payment_status varchar(20) DEFAULT 'pending',
+            registration_date datetime DEFAULT CURRENT_TIMESTAMP,
+            form_data text DEFAULT NULL,
+            payment_status varchar(50) DEFAULT 'pending',
             payment_amount decimal(10,2) DEFAULT 0.00,
             payment_date datetime DEFAULT NULL,
-            stripe_payment_intent_id varchar(255) DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            stripe_payment_id varchar(255) DEFAULT NULL,
+            notes text DEFAULT NULL,
             PRIMARY KEY  (id),
-            KEY signup_id (signup_id)
+            KEY signup_id (signup_id),
+            KEY email (email),
+            KEY payment_status (payment_status),
+            KEY registration_date (registration_date)
         ) $charset_collate;";
 
-        // Table for Clearstream message log
+        // Table for Clearstream message logs
         $table_clearstream = $wpdb->prefix . 'mypco_clearstream_log';
         $sql_clearstream = "CREATE TABLE IF NOT EXISTS $table_clearstream (
             id mediumint(9) NOT NULL AUTO_INCREMENT,
@@ -100,34 +130,122 @@ class MyPCO_Activator {
             status varchar(20) DEFAULT 'sent',
             scheduled_at datetime DEFAULT NULL,
             sent_at datetime DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY  (id)
+            PRIMARY KEY  (id),
+            KEY sender_id (sender_id),
+            KEY sent_at (sent_at),
+            KEY status (status)
         ) $charset_collate;";
 
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        // Execute table creation
         dbDelta($sql_signups);
         dbDelta($sql_registrations);
         dbDelta($sql_clearstream);
     }
 
     /**
-     * Generate Google Forms webhook secret.
+     * Generate a secure webhook secret for Google Forms integration.
      */
     private static function generate_webhook_secret() {
-        if (empty(get_option('mypco_google_forms_secret'))) {
-            $secret = bin2hex(random_bytes(32));
-            update_option('mypco_google_forms_secret', $secret);
+        if (!get_option('mypco_webhook_secret')) {
+            $secret = wp_generate_password(32, false);
+            add_option('mypco_webhook_secret', $secret);
         }
     }
 
     /**
-     * Clear all PCO-related transients.
+     * Clear all PCO-related caches.
      */
     private static function clear_caches() {
         global $wpdb;
-        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '%_transient_mypco_%'");
-        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '%_transient_timeout_mypco_%'");
-        // Also clear old pco_ transients if they exist
-        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '%_transient_pco_%'");
-        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '%_transient_timeout_pco_%'");
+
+        // Clear all transients starting with 'pco_' or 'mypco_'
+        $wpdb->query(
+            "DELETE FROM {$wpdb->options} 
+             WHERE option_name LIKE '_transient_pco_%' 
+             OR option_name LIKE '_transient_timeout_pco_%'
+             OR option_name LIKE '_transient_mypco_%' 
+             OR option_name LIKE '_transient_timeout_mypco_%'"
+        );
+    }
+
+    /**
+     * Check if server meets plugin requirements.
+     */
+    private static function check_requirements() {
+        $errors = [];
+
+        // Check PHP version
+        if (version_compare(PHP_VERSION, '7.4', '<')) {
+            $errors[] = 'PHP 7.4 or higher is required. Current version: ' . PHP_VERSION;
+        }
+
+        // Check WordPress version
+        global $wp_version;
+        if (version_compare($wp_version, '5.0', '<')) {
+            $errors[] = 'WordPress 5.0 or higher is required. Current version: ' . $wp_version;
+        }
+
+        // Check required PHP extensions
+        if (!extension_loaded('openssl')) {
+            $errors[] = 'OpenSSL extension is required for credential encryption';
+        }
+
+        if (!extension_loaded('curl')) {
+            $errors[] = 'cURL extension is required for API communication';
+        }
+
+        if (!extension_loaded('json')) {
+            $errors[] = 'JSON extension is required';
+        }
+
+        // Check if WordPress salts are defined
+        if (!defined('AUTH_KEY') || !defined('SECURE_AUTH_SALT')) {
+            $errors[] = 'WordPress security salts (AUTH_KEY, SECURE_AUTH_SALT) must be defined in wp-config.php';
+        }
+
+        // Log errors
+        if (!empty($errors)) {
+            error_log('MyPCO Online Activation Warnings:');
+            foreach ($errors as $error) {
+                error_log('  - ' . $error);
+            }
+        }
+
+        // Store requirement check results
+        update_option('mypco_requirements_check', [
+            'passed' => empty($errors),
+            'errors' => $errors,
+            'checked_at' => current_time('mysql')
+        ]);
+    }
+
+    /**
+     * Migrate old data if upgrading from previous version.
+     */
+    private static function maybe_migrate_data() {
+        $current_version = get_option('mypco_version');
+
+        // First time activation
+        if (!$current_version) {
+            return;
+        }
+
+        // Perform version-specific migrations
+        if (version_compare($current_version, '2.0.0', '<')) {
+            // Migrate from 1.x to 2.0
+            self::migrate_from_v1();
+        }
+
+        // Update version
+        update_option('mypco_version', MYPCO_VERSION);
+    }
+
+    /**
+     * Migrate data from version 1.x to 2.0.
+     */
+    private static function migrate_from_v1() {
+        // Placeholder for any data migrations needed
+        // Example: rename old options, update database schema, etc.
+        error_log('MyPCO Online: Migrating from version 1.x to 2.0');
     }
 }
