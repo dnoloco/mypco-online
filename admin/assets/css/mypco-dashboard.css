@@ -1,0 +1,256 @@
+/**
+ * MyPCO Admin Dashboard Styles
+ * 
+ * Dashboard-style layout for the main settings page
+ * Uses WordPress's native dashboard widget system
+ */
+
+/* ===========================
+   Dashboard Widget Layout
+   =========================== */
+
+#dashboard-widgets-wrap {
+    margin-top: 20px;
+}
+
+/* Three-column layout */
+#dashboard-widgets.columns-3 .postbox-container {
+    width: 33.33%;
+}
+
+#postbox-container-1 {
+    float: left;
+    padding-right: 10px;
+}
+
+#postbox-container-2 {
+    float: left;
+    padding: 0 5px;
+}
+
+#postbox-container-3 {
+    float: left;
+    padding-left: 10px;
+}
+
+/* Clear floats */
+#dashboard-widgets::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* ===========================
+   Widget Styling
+   =========================== */
+
+/* Quick Links widget */
+#mypco_quick_links ul {
+    margin: 0;
+    padding: 0;
+}
+
+#mypco_quick_links li {
+    margin: 0 0 10px 0;
+    list-style: none;
+}
+
+#mypco_quick_links a {
+    text-decoration: none;
+    padding-left: 5px;
+    display: inline-block;
+}
+
+#mypco_quick_links a:hover {
+    color: #2271b1;
+}
+
+#mypco_quick_links .dashicons {
+    vertical-align: middle;
+}
+
+/* Connection Status widget */
+.mypco-status-box {
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.mypco-status-box:last-child {
+    margin-bottom: 0;
+}
+
+.mypco-status-connected {
+    background: #d4edda;
+    border-left: 4px solid #28a745;
+}
+
+.mypco-status-connected strong {
+    color: #155724;
+}
+
+.mypco-status-connected p {
+    margin: 5px 0 0 0;
+    font-size: 13px;
+    color: #155724;
+}
+
+.mypco-status-warning {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+}
+
+.mypco-status-warning strong {
+    color: #856404;
+}
+
+.mypco-status-warning p {
+    margin: 5px 0 0 0;
+    font-size: 13px;
+    color: #856404;
+}
+
+.mypco-status-info {
+    background: #e7f3ff;
+    border-left: 4px solid #2196f3;
+}
+
+.mypco-status-info strong {
+    color: #014361;
+}
+
+.mypco-status-info p {
+    margin: 5px 0 0 0;
+    font-size: 13px;
+    color: #014361;
+}
+
+/* Welcome widget */
+#mypco_welcome h4 {
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+#mypco_welcome ol {
+    margin-left: 20px;
+}
+
+#mypco_welcome ol li {
+    margin-bottom: 8px;
+}
+
+/* Modules overview widget */
+#mypco_modules_overview .wp-list-table {
+    margin-bottom: 10px;
+}
+
+#mypco_modules_overview .button-primary {
+    float: right;
+}
+
+.mypco-modules-actions {
+    text-align: right;
+    margin-top: 10px;
+    clear: both;
+}
+
+/* Support widget */
+#mypco_support h4 {
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+#mypco_support ul {
+    margin-left: 20px;
+}
+
+#mypco_support ul li {
+    margin-bottom: 8px;
+}
+
+/* ===========================
+   Responsive Layout
+   =========================== */
+
+/* Tablet: 2 columns + 1 below */
+@media screen and (max-width: 1280px) {
+    #dashboard-widgets.columns-3 #postbox-container-1,
+    #dashboard-widgets.columns-3 #postbox-container-2 {
+        width: 49%;
+    }
+    
+    #dashboard-widgets.columns-3 #postbox-container-3 {
+        width: 100%;
+        clear: both;
+        float: none;
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
+/* Mobile: Stack all */
+@media screen and (max-width: 768px) {
+    #dashboard-widgets.columns-3 #postbox-container-1,
+    #dashboard-widgets.columns-3 #postbox-container-2,
+    #dashboard-widgets.columns-3 #postbox-container-3 {
+        width: 100%;
+        float: none;
+        padding: 0;
+    }
+}
+
+/* ===========================
+   Postbox Enhancements
+   =========================== */
+
+/* Smooth transitions on collapse/expand */
+.postbox .inside {
+    transition: opacity 0.2s ease-in-out;
+}
+
+/* Dragging cursor */
+.postbox.ui-sortable-helper {
+    opacity: 0.8;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Drag handle cursor */
+.postbox .hndle {
+    cursor: move;
+}
+
+/* Placeholder while dragging */
+.ui-sortable-placeholder {
+    border: 2px dashed #ccc;
+    background-color: #f9f9f9;
+    visibility: visible !important;
+    height: auto !important;
+    margin: 10px 0;
+}
+
+/* ===========================
+   Loading State
+   =========================== */
+
+.mypco-dashboard-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.mypco-dashboard-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #ccc;
+    border-top-color: #000;
+    border-radius: 50%;
+    animation: mypco-spin 0.6s linear infinite;
+}
+
+@keyframes mypco-spin {
+    to { transform: rotate(360deg); }
+}
