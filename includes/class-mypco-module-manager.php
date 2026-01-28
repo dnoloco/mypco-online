@@ -54,28 +54,48 @@ class MyPCO_Module_Manager {
      * Initialize all enabled modules.
      */
     public function init_modules() {
-        foreach ($this->modules as $key => &$module) {
-            if ($module['enabled'] && file_exists($module['file'])) {
-                require_once $module['file'];
+        // 1. Fetch what is actually enabled in the database
+        $active_settings = get_option('mypco_active_modules', []);
 
-                if (class_exists($module['class'])) {
-                    // Instantiate the module with dependencies
-                    $module['instance'] = new $module['class']($this->loader, $this->api_model);
-                    
-                    // Call module's init method if it exists
-                    if (method_exists($module['instance'], 'init')) {
-                        $module['instance']->init();
-                    }
-                }
-            }
+        // 2. Define the available modules
+        $available = $this->get_modules();
+
+        foreach ($available as $key => $data) {
+            // Check if this specific key is enabled in our saved settings
+            $is_enabled = isset($active_settings[$key]['enabled']) && $active_settings[$key]['enabled'] === true;
+
+            $this->modules[$key] = [
+                'enabled' => $is_enabled,
+                'name'    => $data['name'],
+                'file'    => MYPCO_PLUGIN_DIR . "modules/{$key}/admin/class-{$key}-admin.php",
+                'class'   => 'MyPCO_' . ucfirst($key) . '_Admin'
+            ];
         }
     }
+
+
 
     /**
      * Get all registered modules.
      */
     public function get_modules() {
-        return $this->modules;
+        return [
+            'services' => [
+                'name'        => 'Services',
+                'description' => 'Manage service plans, teams, and volunteer scheduling.',
+                'premium'     => false // Free module
+            ],
+            'messages' => [
+                'name'        => 'Messages',
+                'description' => 'Send mass SMS via Clearstream integration.',
+                'premium'     => true // Requires license
+            ],
+            'calendars' => [
+                'name'        => 'Calendars',
+                'description' => 'Sync Planning Center events with your website.',
+                'premium'     => true
+            ]
+        ];
     }
 
     /**
@@ -89,19 +109,21 @@ class MyPCO_Module_Manager {
      * Check if a module is enabled.
      */
     public function is_module_enabled($key) {
-        return isset($this->modules[$key]) && $this->modules[$key]['enabled'];
+        // Check the actual database option saved by the AJAX toggle
+        $active_modules = get_option('mypco_active_modules', []);
+        return isset($active_modules[$key]['enabled']) && $active_modules[$key]['enabled'] === true;
     }
 
     /**
      * Enable a module.
      */
     public function enable_module($key) {
-        if (isset($this->modules[$key])) {
-            $this->modules[$key]['enabled'] = true;
-            update_option("mypco_module_{$key}_enabled", true);
-            return true;
-        }
-        return false;
+        $active_modules = get_option('mypco_active_modules', []);
+        $active_modules[$key] = [
+            'enabled' => true,
+            'installed_at' => time()
+        ];
+        update_option('mypco_active_modules', $active_modules);
     }
 
     /**
