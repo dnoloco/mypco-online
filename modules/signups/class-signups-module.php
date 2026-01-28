@@ -18,7 +18,28 @@ class MyPCO_Signups_Module extends MyPCO_Module_Base {
 
     protected $module_key = 'signups';
     protected $module_name = 'Signups';
-    
+    protected $module_description = 'Event registrations with Google Forms and Stripe integration.';
+
+    /**
+     * Module tier: premium (requires Professional or higher license)
+     */
+    protected $tier = 'premium';
+    protected $requires_license = true;
+    protected $min_license_tier = 'professional';
+
+    /**
+     * Features available in this module
+     */
+    protected $features = [
+        'free' => [],
+        'premium' => [
+            'event_signups',
+            'payment_processing',
+            'registration_management',
+            'attendee_tracking'
+        ]
+    ];
+
     /**
      * Admin component instance
      */

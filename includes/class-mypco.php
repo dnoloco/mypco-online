@@ -27,17 +27,32 @@ class MyPCO {
         require_once MYPCO_PLUGIN_DIR . 'includes/class-mypco-loader.php';
         require_once MYPCO_PLUGIN_DIR . 'includes/class-mypco-i18n.php';
         require_once MYPCO_PLUGIN_DIR . 'includes/class-mypco-credentials-manager.php';
+
+        // License and Update Managers (load early as other components depend on them)
+        require_once MYPCO_PLUGIN_DIR . 'includes/class-mypco-license-manager.php';
+        require_once MYPCO_PLUGIN_DIR . 'includes/class-mypco-update-manager.php';
+
+        // Module system
+        require_once MYPCO_PLUGIN_DIR . 'includes/class-mypco-module-base.php';
         require_once MYPCO_PLUGIN_DIR . 'includes/class-mypco-module-manager.php';
-        // Load the Module Manager logic
-        require_once MYPCO_PLUGIN_DIR . 'includes/class-mypco-module-manager.php';
-        // Load the new Modules UI Controller
         require_once MYPCO_PLUGIN_DIR . 'modules/class-mypco-modules.php';
+
+        // API and core functionality
         require_once MYPCO_PLUGIN_DIR . 'includes/class-mypco-api-model.php';
+
+        // Admin pages
         require_once MYPCO_PLUGIN_DIR . 'admin/class-mypco-admin.php';
         require_once MYPCO_PLUGIN_DIR . 'admin/class-mypco-settings-page.php';
+        require_once MYPCO_PLUGIN_DIR . 'admin/class-mypco-license-page.php';
+
+        // Public functionality
         require_once MYPCO_PLUGIN_DIR . 'public/class-mypco-public.php';
 
         $this->loader = new MyPCO_Loader();
+
+        // Initialize update manager for automatic updates
+        $update_manager = MyPCO_Update_Manager::get_instance();
+        $update_manager->init();
     }
 
     private function set_locale() {
@@ -61,36 +76,33 @@ class MyPCO {
         $module_manager = new MyPCO_Module_Manager($this->loader, $this->api_model);
         $module_manager->init_modules();
 
-        // Initialize UI Controller
+        // Initialize UI Controller for module management page
         $modules_ui = new MyPCO_Modules($this->loader, $this->api_model);
-        $modules_ui->init(); // <--- THIS must run to register wp_ajax_mypco_toggle_module
-
-        // --- START DEBUG ---
-        $status = $module_manager->is_module_enabled('services') ? 'ENABLED' : 'DISABLED';
-        add_action('admin_notices', function() use ($status) {
-            echo '<div class="notice notice-info"><p>DEBUG: Services Module is currently: <strong>' . $status . '</strong></p></div>';
-
-            if (defined('MYPCO_PLUGIN_DIR')) {
-                $path = MYPCO_PLUGIN_DIR . 'modules/services/admin/class-services-admin.php';
-                $exists = file_exists($path) ? 'FOUND' : 'NOT FOUND';
-                echo '<div class="notice notice-info"><p>DEBUG: File Path (' . $path . ') is: <strong>' . $exists . '</strong></p></div>';
-            }
-        });
-        // --- END DEBUG ---
+        $modules_ui->init();
 
         $this->modules = $module_manager->get_modules();
 
-        // ... your existing module loading logic ...
-        if ( $module_manager->is_module_enabled('services') ) {
-            require_once MYPCO_PLUGIN_DIR . 'modules/services/admin/class-services-admin.php';
-            $services_admin = new MyPCO_Services_Admin($this->loader, $this->api_model);
-            $services_admin->init();
+        // Load enabled modules dynamically
+        $available_modules = $module_manager->get_modules();
+
+        foreach ($available_modules as $key => $config) {
+            if ($module_manager->is_module_enabled($key) && $module_manager->can_enable_module($key)) {
+                $module_file = MYPCO_PLUGIN_DIR . 'modules/' . $config['file'];
+
+                if (file_exists($module_file)) {
+                    require_once $module_file;
+
+                    if (class_exists($config['class'])) {
+                        $module_instance = new $config['class']($this->loader, $this->api_model);
+                        $module_instance->init();
+                    }
+                }
+            }
         }
     }
 
     private function define_admin_hooks() {
         // 1. Initialize the main Admin class
-        // Note: I added $this->loader and $this->api_model so it can pass them to the Modules UI
         $plugin_admin = new MyPCO_Admin($this->plugin_name, $this->version, $this->loader, $this->api_model);
 
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
@@ -102,7 +114,11 @@ class MyPCO {
         $this->loader->add_action('admin_menu', $plugin_settings, 'add_settings_menu');
         $this->loader->add_action('admin_init', $plugin_settings, 'handle_settings_save');
 
-        // 3. IMPORTANT: Run the Module Loader logic
+        // 3. Initialize the License Page
+        $license_page = new MyPCO_License_Page($this->plugin_name, $this->version);
+        $license_page->init($this->loader);
+
+        // 4. Load the Module system
         // This starts the Modules UI and any active feature modules (Services, etc.)
         $this->load_modules();
     }

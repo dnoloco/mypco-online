@@ -11,6 +11,31 @@ class MyPCO_Calendar_Module extends MyPCO_Module_Base {
 
     protected $module_key = 'calendar';
     protected $module_name = 'Calendar';
+    protected $module_description = 'Display and sync Planning Center events on your website.';
+
+    /**
+     * Module tier: freemium (basic display free, sync/templates premium)
+     */
+    protected $tier = 'freemium';
+    protected $requires_license = false;
+    protected $min_license_tier = 'starter';
+
+    /**
+     * Features available in this module
+     */
+    protected $features = [
+        'free' => [
+            'display_events',
+            'basic_shortcode',
+            'event_list_widget'
+        ],
+        'premium' => [
+            'calendar_sync',
+            'custom_templates',
+            'ical_export',
+            'event_filtering'
+        ]
+    ];
 
     /**
      * Admin component instance

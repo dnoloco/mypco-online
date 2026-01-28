@@ -26,6 +26,15 @@ define('MYPCO_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('MYPCO_INCLUDES', MYPCO_PLUGIN_DIR . 'includes/');
 
 /**
+ * License Server API URL
+ * IMPORTANT: Update this to your actual license server URL after deployment
+ * Example: https://your-site.com/mypco-license/api.php
+ */
+if (!defined('MYPCO_LICENSE_API_URL')) {
+    define('MYPCO_LICENSE_API_URL', 'https://your-site.com/mypco-license/api.php');
+}
+
+/**
  * The code that runs during plugin activation.
  */
 function activate_mypco_online() {
