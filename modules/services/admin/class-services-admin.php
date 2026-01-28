@@ -41,9 +41,9 @@ class MyPCO_Services_Admin
      */
     public function add_admin_pages()
     {
-        // Main Services Plans page
+        // Change 'mypco-settings' to 'mypco-dashboard'
         add_submenu_page(
-            'mypco-settings',
+            'mypco-dashboard',
             __('Service Plans', 'mypco-online'),
             __('Service Plans', 'mypco-online'),
             'edit_posts',
@@ -51,9 +51,8 @@ class MyPCO_Services_Admin
             [$this, 'render_services_page']
         );
 
-        // Team Reports page
         add_submenu_page(
-            'mypco-settings',
+            'mypco-dashboard',
             __('Team Reports', 'mypco-online'),
             __('Team Reports', 'mypco-online'),
             'edit_posts',
