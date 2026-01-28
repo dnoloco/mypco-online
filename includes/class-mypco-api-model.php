@@ -59,6 +59,19 @@ class MyPCO_API_Model {
     }
 
     /**
+     * Test the connection by fetching the root organization data.
+     */
+    public function get_organization() {
+        // The root of the services API returns organization info
+        $endpoint = "/v2/";
+        $key = 'mypco_org_test';
+
+        // We call your existing caching function
+        // Services app domain, root endpoint, no extra params
+        return $this->get_data_with_caching('services', $endpoint, [], $key);
+    }
+
+    /**
      * Retrieves the WordPress configured timezone string.
      * Used for display purposes.
      */
