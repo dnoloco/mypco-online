@@ -28,6 +28,46 @@ abstract class MyPCO_Module_Base {
     protected $module_name;
 
     /**
+     * Module description.
+     */
+    protected $module_description = '';
+
+    /**
+     * Module tier: 'core', 'free', 'freemium', or 'premium'
+     *
+     * - core: Always active, cannot be disabled
+     * - free: Free module, can be enabled/disabled
+     * - freemium: Has free features + premium features requiring license
+     * - premium: Requires active license to use
+     */
+    protected $tier = 'free';
+
+    /**
+     * Whether this module requires a license to function.
+     * For 'freemium' modules, this applies to premium features only.
+     */
+    protected $requires_license = false;
+
+    /**
+     * Minimum license tier required: 'starter', 'professional', 'agency'
+     */
+    protected $min_license_tier = 'starter';
+
+    /**
+     * Array of module keys this module depends on.
+     */
+    protected $dependencies = [];
+
+    /**
+     * Features this module provides.
+     * Used to check if premium features are available.
+     */
+    protected $features = [
+        'free' => [],    // Features available without license
+        'premium' => []  // Features requiring license
+    ];
+
+    /**
      * Initialize the module.
      */
     public function __construct($loader, $api_model) {
@@ -100,5 +140,99 @@ abstract class MyPCO_Module_Base {
      */
     public function get_module_name() {
         return $this->module_name;
+    }
+
+    /**
+     * Get module description.
+     */
+    public function get_module_description() {
+        return $this->module_description;
+    }
+
+    /**
+     * Get module tier.
+     */
+    public function get_tier() {
+        return $this->tier;
+    }
+
+    /**
+     * Check if module requires a license.
+     */
+    public function requires_license() {
+        return $this->requires_license;
+    }
+
+    /**
+     * Get minimum license tier required.
+     */
+    public function get_min_license_tier() {
+        return $this->min_license_tier;
+    }
+
+    /**
+     * Get module dependencies.
+     */
+    public function get_dependencies() {
+        return $this->dependencies;
+    }
+
+    /**
+     * Get module features.
+     */
+    public function get_features() {
+        return $this->features;
+    }
+
+    /**
+     * Check if a specific feature is available.
+     *
+     * @param string $feature Feature name to check
+     * @return bool
+     */
+    public function is_feature_available($feature) {
+        // Free features are always available
+        if (in_array($feature, $this->features['free'])) {
+            return true;
+        }
+
+        // Premium features require license check
+        if (in_array($feature, $this->features['premium'])) {
+            return $this->has_premium_access();
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if user has premium access for this module.
+     *
+     * @return bool
+     */
+    public function has_premium_access() {
+        if (!class_exists('MyPCO_License_Manager')) {
+            return false;
+        }
+
+        $license_manager = MyPCO_License_Manager::get_instance();
+        return $license_manager->has_module_access($this->module_key);
+    }
+
+    /**
+     * Get module configuration array for registration.
+     *
+     * @return array
+     */
+    public function get_module_config() {
+        return [
+            'key' => $this->module_key,
+            'name' => $this->module_name,
+            'description' => $this->module_description,
+            'tier' => $this->tier,
+            'requires_license' => $this->requires_license,
+            'min_license_tier' => $this->min_license_tier,
+            'dependencies' => $this->dependencies,
+            'features' => $this->features
+        ];
     }
 }

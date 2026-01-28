@@ -11,6 +11,32 @@ class MyPCO_Messages_Module extends MyPCO_Module_Base {
 
     protected $module_key = 'messages';
     protected $module_name = 'Messages';
+    protected $module_description = 'Send mass SMS via Clearstream integration.';
+
+    /**
+     * Module tier: premium (requires Professional or higher license)
+     */
+    protected $tier = 'premium';
+    protected $requires_license = true;
+    protected $min_license_tier = 'professional';
+
+    /**
+     * Module dependencies
+     */
+    protected $dependencies = ['services'];
+
+    /**
+     * Features available in this module
+     */
+    protected $features = [
+        'free' => [],
+        'premium' => [
+            'send_sms',
+            'message_templates',
+            'scheduled_messages',
+            'message_history'
+        ]
+    ];
 
     /**
      * Initialize the Messages module.

@@ -17,7 +17,31 @@ class MyPCO_Services_Module extends MyPCO_Module_Base {
 
     protected $module_key = 'services';
     protected $module_name = 'Services';
-    
+    protected $module_description = 'Manage service plans, teams, and volunteer scheduling.';
+
+    /**
+     * Module tier: freemium (basic features free, advanced features premium)
+     */
+    protected $tier = 'freemium';
+    protected $requires_license = false;
+    protected $min_license_tier = 'starter';
+
+    /**
+     * Features available in this module
+     */
+    protected $features = [
+        'free' => [
+            'view_service_types',
+            'view_plans',
+            'view_team_members'
+        ],
+        'premium' => [
+            'bulk_messaging',
+            'advanced_reports',
+            'schedule_management'
+        ]
+    ];
+
     /**
      * Admin component instance
      */

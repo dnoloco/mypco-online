@@ -16,7 +16,28 @@ class MyPCO_Groups_Module extends MyPCO_Module_Base {
 
     protected $module_key = 'groups';
     protected $module_name = 'Groups';
-    
+    protected $module_description = 'Display and manage Planning Center groups.';
+
+    /**
+     * Module tier: premium (requires Professional or higher license)
+     */
+    protected $tier = 'premium';
+    protected $requires_license = true;
+    protected $min_license_tier = 'professional';
+
+    /**
+     * Features available in this module
+     */
+    protected $features = [
+        'free' => [],
+        'premium' => [
+            'display_groups',
+            'group_finder',
+            'group_registration',
+            'leader_tools'
+        ]
+    ];
+
     /**
      * Admin component instance
      */
