@@ -1,0 +1,18 @@
+# Compiled/built files
+*.zip
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Node modules (if any frontend build tools are added)
+node_modules/
+
+# Logs
+*.log
