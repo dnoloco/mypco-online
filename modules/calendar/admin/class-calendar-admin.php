@@ -34,7 +34,7 @@ class MyPCO_Calendar_Admin {
      */
     public function add_settings_page() {
         add_submenu_page(
-            'mypco-settings',
+            'mypco-dashboard',
             __('Calendar Settings', 'mypco-online'),
             __('Calendar', 'mypco-online'),
             'manage_options',
@@ -48,7 +48,7 @@ class MyPCO_Calendar_Admin {
      */
     public function enqueue_admin_assets($hook) {
         // Only load on our settings page
-        if ($hook !== 'mypco_page_mypco-calendar') {
+        if (strpos($hook, 'mypco-calendar') === false) {
             return;
         }
 
