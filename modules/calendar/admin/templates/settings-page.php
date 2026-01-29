@@ -6,7 +6,10 @@
  * - $shortcode (string)
  * - $old_shortcode (string)
  * - $cache_cleared (bool)
+ * - $settings_saved (bool)
  * - $module_status (string)
+ * - $featured_count (int)
+ * - $featured_mode (string)
  * - $features (array)
  */
 
@@ -19,6 +22,12 @@ defined('ABSPATH') || exit;
     <?php if ($cache_cleared): ?>
         <div class="notice notice-success is-dismissible">
             <p><?php _e('Calendar cache cleared successfully!', 'mypco-online'); ?></p>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($settings_saved): ?>
+        <div class="notice notice-success is-dismissible">
+            <p><?php _e('Settings saved successfully!', 'mypco-online'); ?></p>
         </div>
     <?php endif; ?>
 
@@ -42,6 +51,56 @@ defined('ABSPATH') || exit;
 
         <h3><?php _e('Module Status', 'mypco-online'); ?></h3>
         <p><strong><?php _e('Status:', 'mypco-online'); ?></strong> <span style="color: green;">✓ <?php _e('Active (Free Module)', 'mypco-online'); ?></span></p>
+    </div>
+
+    <div class="card">
+        <h2><?php _e('Featured Events Settings', 'mypco-online'); ?></h2>
+        <p><?php _e('Configure how featured events are displayed in the list view.', 'mypco-online'); ?></p>
+
+        <form method="post" action="">
+            <?php wp_nonce_field('mypco_calendar_settings'); ?>
+            <input type="hidden" name="mypco_save_calendar_settings" value="1">
+
+            <table class="form-table">
+                <tr>
+                    <th scope="row">
+                        <label for="featured_count"><?php _e('Number of Featured Events', 'mypco-online'); ?></label>
+                    </th>
+                    <td>
+                        <input type="number" id="featured_count" name="featured_count"
+                               value="<?php echo esc_attr($featured_count); ?>"
+                               min="0" max="10" step="1" class="small-text">
+                        <p class="description">
+                            <?php _e('Maximum number of featured events to display in the list view. Set to 0 to hide featured events.', 'mypco-online'); ?>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="featured_mode"><?php _e('Display Mode', 'mypco-online'); ?></label>
+                    </th>
+                    <td>
+                        <select id="featured_mode" name="featured_mode">
+                            <option value="upcoming" <?php selected($featured_mode, 'upcoming'); ?>>
+                                <?php _e('Closest Upcoming', 'mypco-online'); ?>
+                            </option>
+                            <option value="random" <?php selected($featured_mode, 'random'); ?>>
+                                <?php _e('Random', 'mypco-online'); ?>
+                            </option>
+                        </select>
+                        <p class="description">
+                            <?php _e('Choose how featured events are selected when there are more than the display limit.', 'mypco-online'); ?>
+                        </p>
+                    </td>
+                </tr>
+            </table>
+
+            <p class="submit">
+                <button type="submit" class="button button-primary">
+                    <?php _e('Save Settings', 'mypco-online'); ?>
+                </button>
+            </p>
+        </form>
     </div>
 
     <div class="card">

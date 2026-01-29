@@ -147,7 +147,7 @@ class MyPCO_Calendar_Public {
         });
 
         // Separate featured and regular events
-        $featured_events = [];
+        $featured_events_raw = [];
         $regular_events = [];
 
         foreach ($event_instances as $instance) {
@@ -157,14 +157,17 @@ class MyPCO_Calendar_Public {
             $formatted = $this->format_event_instance($instance, $parent);
 
             if ($parent && !empty($parent['featured'])) {
-                $featured_events[] = $formatted;
+                $featured_events_raw[] = $formatted;
             } else {
                 $regular_events[] = $formatted;
             }
         }
 
+        // Deduplicate featured events (show only one per parent event for recurring)
+        $featured_events = $this->deduplicate_featured_events($featured_events_raw);
+
         // Build expanded events for month view JavaScript
-        $expanded_events = $this->build_expanded_events($regular_events, $featured_events);
+        $expanded_events = $this->build_expanded_events($regular_events, $featured_events_raw);
 
         // Group events by parent for gallery view
         $grouped_events = $this->group_events_for_gallery($event_instances, $event_map);
@@ -172,13 +175,82 @@ class MyPCO_Calendar_Public {
         return [
             'featured_events' => $featured_events,
             'regular_events' => $regular_events,
-            'all_events' => array_merge($featured_events, $regular_events),
+            'all_events' => array_merge($featured_events_raw, $regular_events),
             'grouped_events' => $grouped_events,
             'event_map' => $event_map,
             'expanded_events' => $expanded_events,
             'current_month' => date('F Y'),
             'timezone' => $this->timezone,
         ];
+    }
+
+    /**
+     * Deduplicate featured events for recurring events.
+     * Shows only one entry per parent event with date range info.
+     */
+    private function deduplicate_featured_events($featured_events) {
+        // Get settings
+        $settings = get_option('mypco_calendar_settings', []);
+        $max_featured = isset($settings['featured_count']) ? (int) $settings['featured_count'] : 2;
+        $display_mode = isset($settings['featured_mode']) ? $settings['featured_mode'] : 'upcoming';
+
+        // Group by parent event
+        $grouped = [];
+        foreach ($featured_events as $event) {
+            $parent_id = $event['parent_id'];
+            if (!isset($grouped[$parent_id])) {
+                $grouped[$parent_id] = [
+                    'event' => $event,
+                    'instances' => [],
+                ];
+            }
+            $grouped[$parent_id]['instances'][] = $event;
+        }
+
+        // Process each group - take first instance but mark as recurring if multiple
+        $deduplicated = [];
+        foreach ($grouped as $parent_id => $data) {
+            $event = $data['event'];
+            $instances = $data['instances'];
+            $is_recurring = count($instances) > 1;
+
+            // Calculate date display for featured event
+            if ($is_recurring) {
+                // Show first instance date with recurring indicator
+                $event['is_recurring'] = true;
+                $event['instance_count'] = count($instances);
+            } else {
+                $event['is_recurring'] = false;
+                // Check if it's a multi-day event
+                if ($event['ends_at']) {
+                    try {
+                        $start = new DateTime($event['starts_at'], new DateTimeZone('UTC'));
+                        $end = new DateTime($event['ends_at'], new DateTimeZone('UTC'));
+                        $start->setTimezone(new DateTimeZone($this->timezone));
+                        $end->setTimezone(new DateTimeZone($this->timezone));
+
+                        if ($start->format('Y-m-d') !== $end->format('Y-m-d')) {
+                            $event['is_multi_day'] = true;
+                            // Format as "Apr 23, 2026 - Apr 26, 2026"
+                            $event['featured_date_display'] = $start->format('M j, Y') . ' - ' . $end->format('M j, Y');
+                        }
+                    } catch (Exception $e) {
+                        // Use default date display
+                    }
+                }
+            }
+
+            $deduplicated[] = $event;
+        }
+
+        // Apply display mode
+        if ($display_mode === 'random') {
+            shuffle($deduplicated);
+        }
+        // 'upcoming' is already sorted by date
+
+        // Limit to max featured count
+        return array_slice($deduplicated, 0, $max_featured);
     }
 
     /**
