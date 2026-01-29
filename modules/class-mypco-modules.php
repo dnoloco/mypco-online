@@ -23,6 +23,7 @@ class MyPCO_Modules {
 
         if (class_exists('MyPCO_Module_Manager')) {
             $this->module_manager = new MyPCO_Module_Manager($this->loader, $this->api_model);
+            $this->module_manager->init_modules(); // Initialize to populate modules array
         }
 
         if (class_exists('MyPCO_License_Manager')) {

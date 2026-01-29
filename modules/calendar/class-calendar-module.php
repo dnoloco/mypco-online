@@ -22,18 +22,25 @@ class MyPCO_Calendar_Module extends MyPCO_Module_Base {
 
     /**
      * Features available in this module
+     *
+     * Free: Basic shortcode display with all views (list, month, gallery)
+     * Premium: CSS customization, widgets, templates, sync, exports
      */
     protected $features = [
         'free' => [
             'display_events',
             'basic_shortcode',
-            'event_list_widget'
+            'list_view',
+            'month_view',
+            'gallery_view'
         ],
         'premium' => [
-            'calendar_sync',
+            'custom_css',
+            'calendar_widgets',
             'custom_templates',
             'ical_export',
-            'event_filtering'
+            'event_filtering',
+            'calendar_sync'
         ]
     ];
 
