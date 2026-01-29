@@ -88,13 +88,17 @@ class MyPCO_Module_Manager {
                     'free' => [
                         'display_events',
                         'basic_shortcode',
-                        'event_list_widget'
+                        'list_view',
+                        'month_view',
+                        'gallery_view'
                     ],
                     'premium' => [
-                        'calendar_sync',
+                        'custom_css',
+                        'calendar_widgets',
                         'custom_templates',
                         'ical_export',
-                        'event_filtering'
+                        'event_filtering',
+                        'calendar_sync'
                     ]
                 ],
                 'file' => 'calendar/class-calendar-module.php',
