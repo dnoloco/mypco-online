@@ -68,8 +68,9 @@ if (!function_exists('mypco_get_location_name')) {
                 <?php _e('Featured Events', 'mypco-online'); ?>
             </h2>
             
-            <?php foreach ($featured_events as $event): 
-                $date_display = mypco_format_event_date($event['starts_at'], $event['ends_at'], $event['all_day']);
+            <?php foreach ($featured_events as $event):
+                $is_all_day = $event['is_all_day'] ?? false;
+                $date_display = mypco_format_event_date($event['starts_at'], $event['ends_at'], $is_all_day);
                 $location_name = mypco_get_location_name($event['location']);
                 $event_data_json = json_encode([
                     'name' => $event['name'],
@@ -77,7 +78,7 @@ if (!function_exists('mypco_get_location_name')) {
                     'summary' => $event['summary'],
                     'image_url' => $event['image_url'],
                     'date' => $date_display,
-                    'time' => $event['all_day'] ? 'All Day' : date('g:i a', strtotime($event['starts_at'])),
+                    'time' => $is_all_day ? 'All Day' : date('g:i a', strtotime($event['starts_at'])),
                     'location' => $event['location'],
                     'location_name' => $location_name,
                     'registration_url' => $event['registration_url']
@@ -151,8 +152,9 @@ if (!function_exists('mypco_get_location_name')) {
             </p>
         <?php else: ?>
             
-            <?php foreach ($regular_events as $event): 
-                $date_display = mypco_format_event_date($event['starts_at'], $event['ends_at'], $event['all_day']);
+            <?php foreach ($regular_events as $event):
+                $is_all_day = $event['is_all_day'] ?? false;
+                $date_display = mypco_format_event_date($event['starts_at'], $event['ends_at'], $is_all_day);
                 $location_name = mypco_get_location_name($event['location']);
                 $event_data_json = json_encode([
                     'name' => $event['name'],
@@ -160,7 +162,7 @@ if (!function_exists('mypco_get_location_name')) {
                     'summary' => $event['summary'],
                     'image_url' => $event['image_url'],
                     'date' => $date_display,
-                    'time' => $event['all_day'] ? 'All Day' : date('g:i a', strtotime($event['starts_at'])),
+                    'time' => $is_all_day ? 'All Day' : date('g:i a', strtotime($event['starts_at'])),
                     'location' => $event['location'],
                     'location_name' => $location_name,
                     'registration_url' => $event['registration_url']
