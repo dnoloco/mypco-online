@@ -44,14 +44,19 @@ body.pco-view-detail-active .pco-header {
 
 body.pco-view-month-active .pco-sidebar,
 body.pco-view-gallery-active .pco-sidebar,
-body.pco-view-detail-active .pco-sidebar {
+body.pco-detail-active .pco-sidebar {
     display: none !important;
 }
 
 body.pco-view-month-active .pco-layout-grid,
 body.pco-view-gallery-active .pco-layout-grid,
-body.pco-view-detail-active .pco-layout-grid {
+body.pco-detail-active .pco-layout-grid {
     grid-template-columns: 1fr !important;
+}
+
+/* Also hide header controls in detail view */
+body.pco-detail-active .pco-header {
+    display: none !important;
 }
 
 /* ============================================
@@ -901,60 +906,36 @@ button.pco-badge-signup:active {
 }
 
 /* ============================================
-   EVENT DETAIL VIEW - PLANNING CENTER STYLE
+   EVENT DETAIL VIEW
    ============================================ */
 
-/* EVENT DETAIL VIEW - WITH SIGNUP BUTTON */
-
-.pco-detail-navigation {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #eee;
-}
-
+/* Breadcrumb */
 .pco-detail-breadcrumb {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 14px;
+    font-size: 0.9rem;
     color: #666;
+    margin-bottom: 40px;
 }
 
 .pco-breadcrumb-link {
-    color: #007bff;
+    color: #333;
     text-decoration: none;
     transition: color 0.2s;
 }
 
 .pco-breadcrumb-link:hover {
-    color: #0056b3;
-    text-decoration: underline;
+    color: #000;
 }
 
 .pco-breadcrumb-separator {
     color: #999;
 }
 
-.pco-detail-nav-arrows {
-    display: flex;
-    gap: 10px;
-}
-
-.pco-nav-arrow {
-    background: none;
-    border: none;
-    color: #007bff;
-    font-size: 14px;
-    cursor: pointer;
-    padding: 5px 10px;
-    transition: all 0.2s;
-}
-
-.pco-nav-arrow:hover {
-    color: #0056b3;
+.pco-breadcrumb-current {
+    color: #333;
+    font-weight: 500;
 }
 
 /* Two-column layout */
@@ -962,6 +943,7 @@ button.pco-badge-signup:active {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 60px;
+    align-items: start;
 }
 
 .pco-detail-left {
@@ -971,29 +953,72 @@ button.pco-badge-signup:active {
 .pco-detail-right {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 25px;
 }
 
+/* Event Title */
 .pco-detail-title {
-    font-size: 36px;
-    font-weight: 700;
-    margin: 0 0 15px 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
     color: #000;
+    line-height: 1.3;
 }
 
-.pco-detail-meta-line {
-    font-size: 18px;
-    color: #666;
+/* Date/Time */
+.pco-detail-datetime {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+/* Add bookmark button */
+.pco-detail-actions-top {
     margin-bottom: 30px;
 }
 
-.pco-detail-meta-line span + span::before {
-    content: ", ";
+.pco-detail-btn-bookmark {
+    padding: 8px 16px;
+    border: 1px solid #333;
+    border-radius: 20px;
+    background: white;
+    color: #333;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
+.pco-detail-btn-bookmark:hover {
+    background: #f5f5f5;
+}
+
+/* Details Section */
+.pco-detail-section {
+    margin-bottom: 30px;
+}
+
+.pco-detail-section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+    color: #333;
+}
+
+.pco-detail-description {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #333;
+}
+
+.pco-detail-description p {
+    margin: 0 0 12px 0;
+}
+
+/* Event Image */
 .pco-detail-image-container {
     width: 100%;
-    border-radius: 12px;
+    border-radius: 8px;
     overflow: hidden;
 }
 
@@ -1003,173 +1028,139 @@ button.pco-badge-signup:active {
     display: block;
 }
 
-.pco-detail-section {
-    margin-bottom: 30px;
+/* Info boxes (Categories, Location) */
+.pco-detail-info-box {
+    padding: 0;
 }
 
-.pco-detail-section h2 {
-    font-size: 24px;
-    font-weight: 700;
-    margin: 0 0 15px 0;
+.pco-detail-info-heading {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #666;
+    margin: 0 0 10px 0;
 }
 
-.pco-detail-description {
-    font-size: 16px;
-    line-height: 1.6;
+/* Categories */
+.pco-detail-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pco-detail-category-badge {
+    padding: 6px 12px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    font-size: 0.85rem;
     color: #333;
 }
 
-.pco-detail-description p {
-    margin: 0 0 15px 0;
-}
-
-.pco-detail-location-box {
-    background: #f9f9f9;
-    padding: 20px;
-    border-radius: 8px;
-}
-
-.pco-detail-location-box h3 {
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    color: #666;
-    margin: 0 0 15px 0;
-}
-
-.pco-location-name {
-    font-size: 18px;
-    font-weight: 600;
+/* Location */
+.pco-detail-location-name {
+    font-size: 1rem;
+    font-weight: 500;
     color: #000;
-    margin: 0 0 5px 0;
+    margin: 0 0 4px 0;
 }
 
-.pco-location-address {
-    font-size: 14px;
+.pco-detail-location-address {
+    font-size: 0.9rem;
     color: #666;
     margin: 0 0 15px 0;
+    line-height: 1.5;
 }
 
+/* Location Buttons */
 .pco-detail-location-buttons {
     display: flex;
     gap: 10px;
-}
-
-#pco-detail-signup-container {
-    flex: 1;
-}
-
-
-.pco-detail-btn {
-    flex: 1;
-    padding: 10px 16px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    border: none;
+    flex-wrap: wrap;
 }
 
 .pco-detail-btn-outline {
-    background: white;
+    padding: 8px 16px;
     border: 1px solid #333;
+    border-radius: 20px;
+    background: white;
     color: #333;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .pco-detail-btn-outline:hover {
     background: #f5f5f5;
 }
 
+/* Primary button (Register) */
 .pco-detail-btn-primary {
+    display: block;
+    padding: 12px 20px;
     background: #000;
     color: #fff;
-    width: 100%;
+    border: none;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
 .pco-detail-btn-primary:hover {
     background: #333;
+    color: #fff;
 }
 
-#pco-detail-signup-container {
-    flex: 1;
-    display: flex;  /* Must be flex container for button inside to size properly */
+/* Signup box */
+.pco-detail-signup-box {
+    margin-top: 10px;
 }
 
-#pco-detail-signup-container .pco-detail-btn {
-    flex: none;  /* Override flex:1 from .pco-detail-btn base style */
-    width: 100%;
-}
-
-#pco-detail-signup-container .pco-detail-btn > div {
-    pointer-events: none;  /* Allow clicks to pass through to button */
+/* Map container */
+.pco-detail-map-container {
+    margin-top: 15px;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 /* Responsive */
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
     .pco-detail-container {
         grid-template-columns: 1fr;
         gap: 30px;
     }
+
+    .pco-detail-right {
+        order: -1;
+    }
 }
 
-@media (max-width: 768px) {
-    .pco-detail-navigation {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-    }
-
+@media (max-width: 600px) {
     .pco-detail-title {
-        font-size: 28px;
-    }
-
-    .pco-detail-meta-line {
-        font-size: 16px;
+        font-size: 1.5rem;
     }
 
     .pco-detail-location-buttons {
         flex-direction: column;
+    }
+
+    .pco-detail-btn-outline {
+        text-align: center;
     }
 }
 
 /* ============================================
-   RESPONSIVE
+   RESPONSIVE - GENERAL
    ============================================ */
 
-@media (max-width: 1024px) {
-    .pco-detail-container,
-    .pco-detail-container.no-signup {
-        grid-template-columns: 1fr;
-    }
-
-    .pco-detail-sidebar {
-        position: static;
-    }
-}
-
 @media (max-width: 768px) {
-    .pco-detail-navigation {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-    }
-
-    .pco-detail-title {
-        font-size: 28px;
-    }
-
-    .pco-detail-meta-line {
-        font-size: 16px;
-    }
-
-    .pco-detail-location-buttons {
-        flex-direction: column;
-    }
-
     .pco-gallery-grid {
         grid-template-columns: 1fr;
     }
@@ -1183,24 +1174,25 @@ button.pco-badge-signup:active {
         font-size: 20px;
     }
 
-    .pco-event-title {
-        font-size: 16px;
+    .pco-event-name {
+        font-size: 1rem;
     }
 
     .pco-event-time {
-        font-size: 13px;
+        font-size: 0.85rem;
     }
 
     .pco-event-location {
-        font-size: 12px;
+        font-size: 0.7rem;
     }
 
     .pco-featured-card {
         flex-direction: column;
     }
 
-    .pco-featured-img {
+    .pco-featured-image {
         width: 100%;
+        aspect-ratio: 16 / 9;
     }
 
     .pco-signup-btn {
