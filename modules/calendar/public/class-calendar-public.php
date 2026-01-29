@@ -172,6 +172,7 @@ class MyPCO_Calendar_Public {
         return [
             'featured_events' => $featured_events,
             'regular_events' => $regular_events,
+            'all_events' => array_merge($featured_events, $regular_events),
             'grouped_events' => $grouped_events,
             'event_map' => $event_map,
             'expanded_events' => $expanded_events,
