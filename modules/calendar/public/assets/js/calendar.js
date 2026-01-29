@@ -74,6 +74,13 @@
         }
         state.currentView = viewName;
 
+        // Toggle body class for detail view (hides sidebar)
+        if (viewName === 'detail') {
+            $('body').addClass('pco-detail-active');
+        } else {
+            $('body').removeClass('pco-detail-active');
+        }
+
         // Render month calendar if switching to month view
         if (viewName === 'month') {
             renderMonthCalendar();
@@ -366,8 +373,18 @@
         // Populate detail view
         $('#pco-detail-title').text(eventData.name || '');
         $('#pco-breadcrumb-event-name').text(eventData.name || '');
-        $('#pco-detail-date').text(eventData.date || '');
-        $('#pco-detail-time').text(eventData.time ? ' at ' + eventData.time : '');
+
+        // Format date/time display (e.g., "Sunday, February 1, 10–11:15am")
+        var dateTimeDisplay = '';
+        if (eventData.date) {
+            dateTimeDisplay = eventData.date;
+            if (eventData.time && eventData.time !== 'All Day') {
+                dateTimeDisplay += ', ' + eventData.time;
+            } else if (eventData.time === 'All Day') {
+                dateTimeDisplay += ' (All Day)';
+            }
+        }
+        $('#pco-detail-datetime').text(dateTimeDisplay);
 
         // Description - use description or summary
         var description = eventData.description || eventData.summary || 'No description available.';
@@ -381,20 +398,38 @@
             $('#pco-detail-image-container').hide();
         }
 
+        // Categories (if available)
+        if (eventData.categories && eventData.categories.length > 0) {
+            var categoriesHtml = '';
+            eventData.categories.forEach(function(cat) {
+                categoriesHtml += '<span class="pco-detail-category-badge">' + escapeHtml(cat) + '</span>';
+            });
+            $('#pco-detail-categories').html(categoriesHtml);
+            $('#pco-detail-categories-container').show();
+        } else {
+            $('#pco-detail-categories-container').hide();
+        }
+
         // Location
         if (eventData.location) {
-            $('#pco-detail-location-text').text(eventData.location_name || eventData.location);
-
-            // Parse address if available
+            var locationName = eventData.location_name || eventData.location;
             var address = '';
+
+            // Parse address if available (format: "Location Name - Address")
             if (eventData.location.indexOf(' - ') !== -1) {
                 address = eventData.location.substring(eventData.location.indexOf(' - ') + 3);
             }
-            $('#pco-detail-address').text(address);
 
-            // Google Maps link
-            var mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(eventData.location);
-            $('#pco-detail-location-link').attr('href', mapsUrl).data('maps-url', mapsUrl);
+            $('#pco-detail-location-name').text(locationName);
+            $('#pco-detail-location-address').html(address.replace(/, /g, '<br>'));
+
+            // Google Maps links
+            var mapsQuery = encodeURIComponent(eventData.location);
+            var mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + mapsQuery;
+            var directionsUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + mapsQuery;
+
+            $('#pco-detail-show-map').show();
+            $('#pco-detail-directions').attr('href', directionsUrl).show();
 
             $('#pco-detail-location-container').show();
         } else {
@@ -403,7 +438,7 @@
 
         // Registration button
         if (eventData.registration_url) {
-            $('#pco-detail-signup-btn').data('signup-url', eventData.registration_url);
+            $('#pco-detail-signup-btn').attr('href', eventData.registration_url);
             $('#pco-detail-signup-container').show();
         } else {
             $('#pco-detail-signup-container').hide();
@@ -411,6 +446,9 @@
 
         // Switch to detail view
         switchView('detail');
+
+        // Scroll to top
+        window.scrollTo(0, 0);
     }
 
     /**
