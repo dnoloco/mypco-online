@@ -146,9 +146,9 @@ class MyPCO_Calendar_Public {
             return strcmp($a['attributes']['starts_at'], $b['attributes']['starts_at']);
         });
 
-        // Separate featured and regular events
+        // Process all events and separate featured ones
         $featured_events_raw = [];
-        $regular_events = [];
+        $all_events_list = [];
 
         foreach ($event_instances as $instance) {
             $parent_id = $instance['relationships']['event']['data']['id'] ?? null;
@@ -156,10 +156,12 @@ class MyPCO_Calendar_Public {
 
             $formatted = $this->format_event_instance($instance, $parent);
 
+            // Add to all events list (for Upcoming section)
+            $all_events_list[] = $formatted;
+
+            // Also track featured events separately (for Featured section)
             if ($parent && !empty($parent['featured'])) {
                 $featured_events_raw[] = $formatted;
-            } else {
-                $regular_events[] = $formatted;
             }
         }
 
@@ -167,15 +169,15 @@ class MyPCO_Calendar_Public {
         $featured_events = $this->deduplicate_featured_events($featured_events_raw);
 
         // Build expanded events for month view JavaScript
-        $expanded_events = $this->build_expanded_events($regular_events, $featured_events_raw);
+        $expanded_events = $this->build_expanded_events($all_events_list, []);
 
         // Group events by parent for gallery view
         $grouped_events = $this->group_events_for_gallery($event_instances, $event_map);
 
         return [
             'featured_events' => $featured_events,
-            'regular_events' => $regular_events,
-            'all_events' => array_merge($featured_events_raw, $regular_events),
+            'regular_events' => $all_events_list,  // All events for Upcoming section
+            'all_events' => $all_events_list,
             'grouped_events' => $grouped_events,
             'event_map' => $event_map,
             'expanded_events' => $expanded_events,
