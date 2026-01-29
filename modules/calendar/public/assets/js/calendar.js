@@ -68,8 +68,8 @@
         // Show target view
         $('#pco-view-' + viewName).addClass('active');
 
-        // Track view state
-        if (viewName !== 'detail') {
+        // Track view state - save where we came from when going to detail view
+        if (viewName === 'detail' && state.currentView !== 'detail') {
             state.previousView = state.currentView;
         }
         state.currentView = viewName;
