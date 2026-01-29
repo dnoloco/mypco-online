@@ -226,8 +226,8 @@ class MyPCO_Calendar_Public {
                     try {
                         $start = new DateTime($event['starts_at'], new DateTimeZone('UTC'));
                         $end = new DateTime($event['ends_at'], new DateTimeZone('UTC'));
-                        $start->setTimezone(new DateTimeZone($this->timezone));
-                        $end->setTimezone(new DateTimeZone($this->timezone));
+                        $start->setTimezone($this->timezone);
+                        $end->setTimezone($this->timezone);
 
                         if ($start->format('Y-m-d') !== $end->format('Y-m-d')) {
                             $event['is_multi_day'] = true;
