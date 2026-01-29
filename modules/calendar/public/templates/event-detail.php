@@ -41,13 +41,6 @@ defined('ABSPATH') || exit;
                 <!-- Date/time populated by JavaScript, e.g., "Sunday, February 1, 10–11:15am" -->
             </div>
 
-            <!-- Add Bookmark Button -->
-            <div class="pco-detail-actions-top">
-                <button id="pco-detail-bookmark" class="pco-detail-btn-bookmark">
-                    <?php _e('Add bookmark', 'mypco-online'); ?>
-                </button>
-            </div>
-
             <!-- Event Description Section -->
             <div class="pco-detail-section">
                 <h2 class="pco-detail-section-title">
