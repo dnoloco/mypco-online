@@ -3,16 +3,26 @@
  * Calendar Public Component
  *
  * Handles all frontend/public functionality for the Calendar module.
+ * Provides shortcode for displaying PCO Calendar events with multiple views.
  */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 class MyPCO_Calendar_Public {
 
     private $loader;
     private $api_model;
+    private $timezone;
 
     public function __construct($loader, $api_model) {
         $this->loader = $loader;
         $this->api_model = $api_model;
+
+        // Load date helper
+        require_once MYPCO_PLUGIN_DIR . 'includes/class-mypco-date-helper.php';
+        $this->timezone = MyPCO_Date_Helper::get_timezone();
     }
 
     /**
@@ -43,14 +53,14 @@ class MyPCO_Calendar_Public {
 
         wp_enqueue_style(
             'mypco-calendar-public',
-            MYPCO_PLUGIN_URL . 'modules/calendar/public/assets/css/calendar-public.css',
+            MYPCO_PLUGIN_URL . 'modules/calendar/public/assets/css/calendar.css',
             [],
             MYPCO_VERSION
         );
 
         wp_enqueue_script(
             'mypco-calendar-public',
-            MYPCO_PLUGIN_URL . 'modules/calendar/public/assets/js/calendar-public.js',
+            MYPCO_PLUGIN_URL . 'modules/calendar/public/assets/js/calendar.js',
             ['jquery'],
             MYPCO_VERSION,
             true
@@ -59,16 +69,19 @@ class MyPCO_Calendar_Public {
 
     /**
      * Render the calendar shortcode.
-     * NO HTML HERE - just fetch data, process it, and pass to template.
+     *
+     * @param array $atts Shortcode attributes
+     * @return string HTML output
      */
     public function render_calendar_shortcode($atts) {
-        // Parse shortcode attributes
-        $atts = shortcode_atts(['count' => 100], $atts, 'mypco_calendar');
+        $atts = shortcode_atts([
+            'count' => 100,
+            'view' => 'list', // Default view: list, month, gallery
+        ], $atts, 'mypco_calendar');
 
         // Fetch data from API
         $events_data = $this->fetch_calendar_data($atts);
 
-        // Check for errors
         if (isset($events_data['error'])) {
             return $this->render_error($events_data['error']);
         }
@@ -76,21 +89,34 @@ class MyPCO_Calendar_Public {
         // Process the data
         $processed_data = $this->process_calendar_data($events_data);
 
+        // Pass expanded events to JavaScript
+        wp_localize_script('mypco-calendar-public', 'mypcoCalendarData', [
+            'expandedEvents' => $processed_data['expanded_events'],
+            'currentMonth' => date('n'),
+            'currentYear' => date('Y'),
+        ]);
+
         // Pass to template and return output
-        return $this->load_template('calendar-display', $processed_data);
+        return $this->load_template('calendar-main', array_merge($processed_data, [
+            'default_view' => $atts['view'],
+        ]));
     }
 
     /**
      * Fetch calendar data from PCO API.
      */
     private function fetch_calendar_data($atts) {
+        if (!$this->api_model) {
+            return ['error' => 'API not configured. Please set up your Planning Center credentials.'];
+        }
+
         $params = [
             'filter' => 'future',
-            'per_page' => (int) $atts['count'],
+            'per_page' => min((int) $atts['count'], 100),
             'include' => 'event'
         ];
 
-        $transient_key = 'mypco_calendar_v12_' . md5(serialize($atts));
+        $transient_key = 'mypco_calendar_v2_' . md5(serialize($params));
 
         return $this->api_model->get_data_with_caching(
             'calendar',
@@ -128,24 +154,29 @@ class MyPCO_Calendar_Public {
             $parent_id = $instance['relationships']['event']['data']['id'] ?? null;
             $parent = $event_map[$parent_id] ?? null;
 
+            $formatted = $this->format_event_instance($instance, $parent);
+
             if ($parent && !empty($parent['featured'])) {
-                $featured_events[] = $this->format_event_instance($instance, $parent);
+                $featured_events[] = $formatted;
             } else {
-                $regular_events[] = $this->format_event_instance($instance, $parent);
+                $regular_events[] = $formatted;
             }
         }
 
-        // Build expanded events for JavaScript
-        $expanded_events = $this->build_expanded_events($event_instances, $event_map);
+        // Build expanded events for month view JavaScript
+        $expanded_events = $this->build_expanded_events($regular_events, $featured_events);
+
+        // Group events by parent for gallery view
+        $grouped_events = $this->group_events_for_gallery($event_instances, $event_map);
 
         return [
             'featured_events' => $featured_events,
             'regular_events' => $regular_events,
-            'all_events' => array_merge($featured_events, $regular_events),
+            'grouped_events' => $grouped_events,
             'event_map' => $event_map,
             'expanded_events' => $expanded_events,
             'current_month' => date('F Y'),
-            'timezone' => $this->api_model->get_timezone()
+            'timezone' => $this->timezone,
         ];
     }
 
@@ -154,47 +185,152 @@ class MyPCO_Calendar_Public {
      */
     private function format_event_instance($instance, $parent) {
         $attr = $instance['attributes'];
+        $starts_at = $attr['starts_at'];
+        $ends_at = $attr['ends_at'] ?? null;
+        $is_all_day = $attr['all_day_event'] ?? false;
+
+        // Parse location
+        $location_full = $attr['location'] ?? '';
+        $location_name = $this->parse_location_name($location_full);
+
+        // Get registration URL
+        $registration_url = $attr['registration_url']
+            ?? $attr['signup_url']
+            ?? ($parent['registration_url'] ?? null)
+            ?? ($parent['signup_url'] ?? null)
+            ?? '';
+
+        // Parse dates using helper
+        try {
+            $start_dt = MyPCO_Date_Helper::parse_event_date($starts_at, $is_all_day, $this->timezone, false);
+            $date_display = MyPCO_Date_Helper::get_date_display($starts_at, $ends_at, $is_all_day, $this->timezone);
+            $time_display = MyPCO_Date_Helper::get_time_display($starts_at, $is_all_day, $this->timezone);
+            $date_key = $start_dt->format('Y-m-d');
+            $month_header = $start_dt->format('F Y');
+            $day_header = $start_dt->format('l, M j');
+        } catch (Exception $e) {
+            $date_display = 'Date Error';
+            $time_display = '';
+            $date_key = '';
+            $month_header = 'Date Error';
+            $day_header = 'Date Error';
+        }
 
         return [
             'id' => $instance['id'],
+            'parent_id' => $instance['relationships']['event']['data']['id'] ?? null,
             'name' => $parent['name'] ?? 'Untitled Event',
-            'starts_at' => $attr['starts_at'],
-            'ends_at' => $attr['ends_at'] ?? null,
-            'all_day' => $attr['all_day_event'] ?? false,
-            'location' => $attr['location'] ?? '',
             'description' => $parent['description'] ?? '',
             'summary' => $parent['summary'] ?? '',
             'image_url' => $parent['image_url'] ?? '',
-            'featured' => !empty($parent['featured']),
-            'registration_url' => $attr['registration_url'] ?? $attr['signup_url'] ?? $parent['registration_url'] ?? $parent['signup_url'] ?? ''
+            'starts_at' => $starts_at,
+            'ends_at' => $ends_at,
+            'is_all_day' => $is_all_day,
+            'is_featured' => !empty($parent['featured']),
+            'date_display' => $date_display,
+            'time_display' => $time_display,
+            'date_key' => $date_key,
+            'month_header' => $month_header,
+            'day_header' => $day_header,
+            'location' => $location_full,
+            'location_name' => $location_name,
+            'registration_url' => $registration_url,
+            // For JavaScript event data
+            'event_data' => json_encode([
+                'name' => $parent['name'] ?? '',
+                'description' => $parent['description'] ?? '',
+                'summary' => $parent['summary'] ?? '',
+                'image_url' => $parent['image_url'] ?? '',
+                'time' => $time_display,
+                'date' => $date_display,
+                'dateKey' => $date_key,
+                'location' => $location_full,
+                'location_name' => $location_name,
+                'registration_url' => $registration_url,
+            ]),
         ];
     }
 
     /**
-     * Build expanded events array for JavaScript (multi-day events).
+     * Build expanded events array for month view JavaScript.
      */
-    private function build_expanded_events($event_instances, $event_map) {
+    private function build_expanded_events($regular_events, $featured_events) {
         $expanded = [];
+        $all_events = array_merge($regular_events, $featured_events);
 
-        foreach ($event_instances as $instance) {
-            $parent_id = $instance['relationships']['event']['data']['id'] ?? null;
-            $parent = $event_map[$parent_id] ?? null;
+        foreach ($all_events as $event) {
+            $starts_at = $event['starts_at'];
+            $ends_at = $event['ends_at'];
+            $is_all_day = $event['is_all_day'];
 
-            if (!$parent) continue;
-
-            $event_id = $parent['id'] ?? '';
-
-            if (!isset($expanded[$event_id])) {
-                $expanded[$event_id] = [
-                    'name' => $parent['name'] ?? '',
-                    'instances' => []
-                ];
+            // Get all dates this event spans
+            if ($ends_at) {
+                $event_dates = MyPCO_Date_Helper::expand_multi_day_event($starts_at, $ends_at, $is_all_day, $this->timezone);
+            } else {
+                $event_dates = [$event['date_key']];
             }
 
-            $expanded[$event_id]['instances'][] = $instance;
+            $event_data = [
+                'name' => $event['name'],
+                'description' => $event['description'],
+                'summary' => $event['summary'],
+                'image_url' => $event['image_url'],
+                'time' => $event['time_display'],
+                'date' => $event['date_display'],
+                'location' => $event['location'],
+                'location_name' => $event['location_name'],
+                'registration_url' => $event['registration_url'],
+            ];
+
+            foreach ($event_dates as $date_key) {
+                if (!isset($expanded[$date_key])) {
+                    $expanded[$date_key] = [];
+                }
+                $event_data['dateKey'] = $date_key;
+                $expanded[$date_key][] = $event_data;
+            }
         }
 
         return $expanded;
+    }
+
+    /**
+     * Group events by parent ID for gallery view.
+     */
+    private function group_events_for_gallery($instances, $event_map) {
+        $grouped = [];
+
+        foreach ($instances as $instance) {
+            $parent_id = $instance['relationships']['event']['data']['id'] ?? null;
+            if (!$parent_id) continue;
+
+            if (!isset($grouped[$parent_id])) {
+                $parent = $event_map[$parent_id] ?? [];
+                $grouped[$parent_id] = [
+                    'parent' => $parent,
+                    'instances' => [],
+                ];
+            }
+
+            $grouped[$parent_id]['instances'][] = $this->format_event_instance($instance, $event_map[$parent_id] ?? []);
+        }
+
+        return $grouped;
+    }
+
+    /**
+     * Parse location name from full location string.
+     */
+    private function parse_location_name($location_full) {
+        if (empty($location_full)) {
+            return '';
+        }
+
+        if (strpos($location_full, ' - ') !== false) {
+            return trim(substr($location_full, 0, strpos($location_full, ' - ')));
+        }
+
+        return $location_full;
     }
 
     /**
@@ -216,6 +352,8 @@ class MyPCO_Calendar_Public {
 
         if (file_exists($template_path)) {
             include $template_path;
+        } else {
+            echo '<!-- Template not found: ' . esc_html($template_name) . ' -->';
         }
 
         return ob_get_clean();
