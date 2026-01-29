@@ -389,33 +389,53 @@ button.pco-badge-signup:active {
 }
 
 /* ============================================
-   EVENT LIST VIEW
+   EVENT LIST VIEW - UPCOMING SECTION
    ============================================ */
 
-.pco-month-header {
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin: 30px 0 15px 0;
+.pco-events-section {
+    margin-top: 20px;
+}
+
+.pco-section-title.pco-upcoming-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+    color: #333;
     border-bottom: 1px solid #eee;
-    padding-bottom: 5px;
+    padding-bottom: 15px;
+}
+
+.pco-month-group {
+    margin-bottom: 30px;
+}
+
+.pco-month-header {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 25px 0 15px 0;
+    color: #333;
+}
+
+.pco-month-group:first-child .pco-month-header {
+    margin-top: 15px;
+}
+
+.pco-day-group {
+    margin-bottom: 20px;
 }
 
 .pco-day-header {
-    font-size: 0.85rem;
-    font-weight: 700;
+    font-size: 0.75rem;
+    font-weight: 600;
     text-transform: uppercase;
     color: #666;
-    margin: 20px 0 10px 0;
+    margin: 0 0 10px 0;
     letter-spacing: 0.5px;
 }
 
 .pco-event-item {
-    padding: 16px;
-    border-bottom: 1px solid #eee;
-}
-
-.pco-event-item:hover {
-    background-color: #f9f9f9;
+    padding: 0 0 20px 0;
+    margin-bottom: 0;
 }
 
 .pco-event-title-btn {
@@ -425,8 +445,8 @@ button.pco-badge-signup:active {
     margin: 0;
     text-align: left;
     cursor: pointer;
-    width: 100%;
-    margin-bottom: 4px;
+    width: auto;
+    margin-bottom: 2px;
     font-family: inherit;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -437,47 +457,44 @@ button.pco-badge-signup:active {
     outline: none;
 }
 
-.pco-event-title {
+.pco-event-name {
     font-weight: 600;
-    font-size: 18px;
+    font-size: 1.1rem;
     color: #333;
     transition: color 0.2s ease;
     display: block;
 }
 
-.pco-event-title-btn:hover .pco-event-title {
+.pco-event-title-btn:hover .pco-event-name {
     color: #000;
 }
 
 .pco-event-time {
     display: block;
-    font-size: 14px;
+    font-size: 0.9rem;
     color: #333;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .pco-event-location {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 13px;
+    font-size: 0.75rem;
     color: #999;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    text-decoration: none;
-    cursor: pointer;
-    transition: color 0.2s ease;
-    width: fit-content;
+    margin-bottom: 8px;
 }
 
-.pco-event-location:hover {
-    color: #007bff;
-    text-decoration: underline;
+.pco-event-badges {
+    margin-top: 8px;
 }
 
-.pco-event-location:hover .pco-location-icon {
-    color: #007bff;
-    opacity: 1;
+.pco-no-events {
+    color: #999;
+    font-size: 0.9rem;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 4px;
+    text-align: center;
 }
 
 .pco-location-icon {
