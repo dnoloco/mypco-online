@@ -27,6 +27,9 @@ class MyPCO_Calendar_Admin {
 
         // Handle cache clearing
         $this->loader->add_action('admin_init', $this, 'handle_cache_clear');
+
+        // Handle settings save
+        $this->loader->add_action('admin_init', $this, 'handle_settings_save');
     }
 
     /**
@@ -73,12 +76,18 @@ class MyPCO_Calendar_Admin {
      * NO HTML HERE - just prepare data and load template.
      */
     public function render_settings_page() {
+        // Get current settings
+        $settings = get_option('mypco_calendar_settings', []);
+
         // Prepare data for template
         $data = [
             'shortcode' => '[mypco_calendar]',
             'old_shortcode' => '[pco_calendar]',
             'cache_cleared' => isset($_GET['cache_cleared']),
+            'settings_saved' => isset($_GET['settings_saved']),
             'module_status' => 'active',
+            'featured_count' => isset($settings['featured_count']) ? (int) $settings['featured_count'] : 2,
+            'featured_mode' => isset($settings['featured_mode']) ? $settings['featured_mode'] : 'upcoming',
             'features' => [
                 'List view with featured events',
                 'Month view with mini calendar',
@@ -113,6 +122,39 @@ class MyPCO_Calendar_Admin {
 
         // Redirect with success message
         wp_redirect(admin_url('admin.php?page=mypco-calendar&cache_cleared=1'));
+        exit;
+    }
+
+    /**
+     * Handle settings save.
+     */
+    public function handle_settings_save() {
+        if (!isset($_POST['mypco_save_calendar_settings'])) {
+            return;
+        }
+
+        check_admin_referer('mypco_calendar_settings');
+
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
+        // Sanitize and save settings
+        $settings = [
+            'featured_count' => isset($_POST['featured_count']) ? absint($_POST['featured_count']) : 2,
+            'featured_mode' => isset($_POST['featured_mode']) && in_array($_POST['featured_mode'], ['upcoming', 'random'])
+                ? sanitize_text_field($_POST['featured_mode'])
+                : 'upcoming',
+        ];
+
+        update_option('mypco_calendar_settings', $settings);
+
+        // Clear cache so new settings take effect
+        global $wpdb;
+        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '%_transient_mypco_calendar%'");
+
+        // Redirect with success message
+        wp_redirect(admin_url('admin.php?page=mypco-calendar&settings_saved=1'));
         exit;
     }
 

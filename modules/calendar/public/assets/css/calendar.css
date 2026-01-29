@@ -226,6 +226,15 @@ body.pco-view-detail-active .pco-layout-grid {
 
 .pco-featured-section {
     margin-bottom: 40px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 30px;
+}
+
+.pco-section-title.pco-featured-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 20px 0;
+    color: #333;
 }
 
 .pco-featured-card {
@@ -233,37 +242,67 @@ body.pco-view-detail-active .pco-layout-grid {
     gap: 20px;
     background: #fff;
     align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.pco-featured-card:last-child {
+    margin-bottom: 0;
+}
+
+.pco-featured-image {
+    flex-shrink: 0;
+    width: 160px;
+    height: 100px;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .pco-featured-img {
-    width: 200px;
-    height: 112px;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    border-radius: 6px;
-    flex-shrink: 0;
+    display: block;
 }
 
-.pco-featured-content h3 {
-    margin: 0 0 5px 0;
-    font-size: 1.2rem;
+.pco-featured-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.pco-featured-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    display: block;
+    margin-bottom: 4px;
+    transition: color 0.2s ease;
+}
+
+.pco-featured-title-btn:hover .pco-featured-name {
+    color: #000;
 }
 
 .pco-featured-meta {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-bottom: 10px;
+    gap: 6px;
+    margin-bottom: 12px;
     color: #666;
     font-size: 0.9rem;
 }
 
-.pco-location-separator {
-    margin: 0 4px;
+.pco-featured-date {
+    color: #666;
 }
 
-.pco-featured-meta .pco-location {
-    color: #666;
+.pco-featured-recurring {
+    color: #999;
+}
+
+.pco-featured-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 .pco-badges {
@@ -273,10 +312,10 @@ body.pco-view-detail-active .pco-layout-grid {
 
 .pco-badge {
     font-size: 0.75rem;
-    padding: 3px 8px;
+    padding: 4px 10px;
     border-radius: 4px;
-    background: #eee;
-    color: #444;
+    background: #f5f5f5;
+    color: #666;
     border: none;
 }
 
@@ -286,6 +325,11 @@ body.pco-view-detail-active .pco-layout-grid {
     border: none;
 }
 
+.pco-badge-signup {
+    background: #f5f5f5;
+    color: #666;
+}
+
 .pco-featured-title-btn {
     background: none;
     border: none;
@@ -293,7 +337,7 @@ body.pco-view-detail-active .pco-layout-grid {
     margin: 0;
     text-align: left;
     cursor: pointer;
-    width: 100%;
+    width: auto;
     font-family: inherit;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -304,15 +348,12 @@ body.pco-view-detail-active .pco-layout-grid {
     outline: none;
 }
 
-.pco-featured-title-btn h3 {
-    margin: 0 0 5px 0;
-    font-size: 1.2rem;
-    color: #333;
-    transition: color 0.2s ease;
+.pco-location-separator {
+    margin: 0 4px;
 }
 
-.pco-featured-title-btn:hover h3 {
-    color: #000;
+.pco-featured-meta .pco-location {
+    color: #666;
 }
 
 .pco-badge-signup {
