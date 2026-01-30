@@ -110,8 +110,13 @@ class MyPCO_Calendar_Public {
             return ['error' => 'API not configured. Please set up your Planning Center credentials.'];
         }
 
+        // Fetch events starting from the first day of the current month
+        // so the month view shows the entire current month, not just future events
+        $month_start = date('Y-m-01\T00:00:00\Z');
+
         $params = [
-            'filter' => 'future',
+            'where[starts_at][gte]' => $month_start,
+            'order' => 'starts_at',
             'per_page' => min((int) $atts['count'], 100),
             'include' => 'event'
         ];
