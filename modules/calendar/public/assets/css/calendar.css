@@ -704,11 +704,11 @@ button.pco-badge-signup:active {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .pco-month-view-title {
-    font-size: 32px;
+    font-size: 1.5rem;
     font-weight: 700;
     margin: 0;
     color: #333;
@@ -716,47 +716,35 @@ button.pco-badge-signup:active {
 
 .pco-month-view-nav {
     display: flex;
-    gap: 0;
+    gap: 8px;
     align-items: center;
 }
 
 .pco-month-nav-btn {
-    padding: 8px 16px;
-    border: 1px solid #ddd;
-    background: white;
-    border-radius: 0;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
     cursor: pointer;
-    font-size: 16px;
-    transition: all 0.2s;
+    font-size: 20px;
     color: #333;
-    min-width: 100px;
+    line-height: 1;
 }
 
-.pco-month-nav-btn:first-child {
-    border-top-left-radius: 20px;
-    border-bottom-left-radius: 20px;
-    border-right: none;
-}
-
-.pco-month-nav-btn:last-child {
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 20px;
-    border-left: none;
+.pco-month-nav-btn:hover {
+    color: #666;
 }
 
 .pco-month-nav-today {
-    padding: 8px 20px;
+    padding: 6px 16px;
     border: 1px solid #ddd;
     background: white;
     border-radius: 20px;
     cursor: pointer;
-    font-size: 16px;
-    transition: all 0.2s;
+    font-size: 14px;
     color: #333;
     font-weight: 500;
 }
 
-.pco-month-nav-btn:hover,
 .pco-month-nav-today:hover {
     background: #f5f5f5;
 }
@@ -765,68 +753,66 @@ button.pco-badge-signup:active {
 .pco-month-calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    overflow: hidden;
+    border-top: 1px solid #e0e0e0;
 }
 
 .pco-month-day-header {
-    background: #f8f9fa;
-    padding: 10px;
+    padding: 12px 8px;
     text-align: center;
     font-weight: 600;
-    font-size: 12px;
+    font-size: 13px;
     color: #666;
     border-bottom: 1px solid #e0e0e0;
 }
 
-.pco-month-day-header:last-child {
-    border-right: none;
-}
-
 .pco-month-day-cell {
-    height: 120px;  /* Fixed height for consistency */
+    min-height: 110px;
     padding: 8px;
     border-right: 1px solid #e0e0e0;
     border-bottom: 1px solid #e0e0e0;
     background: white;
-    vertical-align: top;
-    overflow: hidden;  /* Prevent content from expanding cell */
     display: flex;
     flex-direction: column;
 }
 
-.pco-month-day-cell:nth-child(7n) {
+.pco-month-day-cell:nth-child(7n+7) {
     border-right: none;
 }
 
-.pco-month-day-empty {
-    background: #fafafa;
+/* Days from other months */
+.pco-month-day-other {
+    background: #f9f9f9;
 }
 
-.pco-month-day-today {
-    background: #e3f2fd;
+.pco-month-day-other .pco-month-day-number {
+    color: #bbb;
 }
 
 .pco-month-day-number {
-    font-weight: 600;
     font-size: 14px;
-    margin-bottom: 5px;
-    color: #333;
-    flex-shrink: 0;  /* Don't let date number shrink */
+    margin-bottom: 6px;
+    color: #666;
+    text-align: center;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
 }
 
-.pco-month-day-today .pco-month-day-number {
-    color: #1976d2;
+/* Today's date - dark circle highlight */
+.pco-month-day-number.is-today {
+    background: #333;
+    color: white;
+    border-radius: 50%;
+    font-weight: 600;
 }
 
 .pco-month-day-events {
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    overflow-y: auto;  /* Scroll if too many events */
-    flex: 1;  /* Take remaining space */
-    min-height: 0;  /* Allow flexbox to shrink */
+    gap: 3px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
 }
 
 /* Thin scrollbar for event list */
@@ -843,82 +829,38 @@ button.pco-badge-signup:active {
     border-radius: 2px;
 }
 
-.pco-month-day-events::-webkit-scrollbar-thumb:hover {
-    background: #999;
-}
-
 .pco-month-event {
-    font-size: 11px;
-    padding: 2px 4px;
-    margin-bottom: 2px;
-    background: #e8f0fe;
-    border-radius: 3px;
+    font-size: 12px;
+    padding: 2px 0;
     cursor: pointer;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: #1a73e8;
-    transition: background 0.2s ease;
+    color: #333;
 }
 
 .pco-month-event:hover {
-    background: #d2e3fc;
+    color: #1a73e8;
+}
+
+.pco-month-event-time {
+    color: #666;
+}
+
+.pco-month-event-name {
+    font-weight: 600;
+}
+
+/* Featured events with star */
+.pco-month-event .pco-star {
+    color: #f5a623;
+    margin-right: 2px;
 }
 
 .pco-month-event-more {
-    font-size: 10px;
+    font-size: 11px;
     color: #666;
-    padding: 2px 4px;
-    font-style: italic;
-}
-
-/* Month View Header */
-.pco-month-view-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.pco-month-view-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin: 0;
-}
-
-.pco-month-view-nav {
-    display: flex;
-    gap: 8px;
-}
-
-.pco-month-nav-btn,
-.pco-month-nav-today {
-    padding: 8px 16px;
-    border: 1px solid #ddd;
-    background: white;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s ease;
-}
-
-.pco-month-nav-btn:hover,
-.pco-month-nav-today:hover {
-    background: #f0f0f0;
-    border-color: #ccc;
-}
-
-.pco-month-nav-today {
-    background: #1a73e8;
-    color: white;
-    border-color: #1a73e8;
-}
-
-.pco-month-nav-today:hover {
-    background: #1557b0;
-    border-color: #1557b0;
+    padding: 2px 0;
 }
 
 /* =====================================================
@@ -1247,26 +1189,27 @@ button.pco-badge-signup:active {
     }
 
     .pco-month-day-cell {
-        height: 100px;  /* Smaller on mobile */
-        padding: 6px;
+        min-height: 80px;
+        padding: 4px;
     }
 
     .pco-month-day-number {
-        font-size: 14px;
+        font-size: 12px;
+        width: 24px;
+        height: 24px;
+        line-height: 24px;
     }
 
     .pco-month-event {
-        font-size: 11px;
-        padding: 2px 3px;
+        font-size: 10px;
     }
 
     .pco-month-view-title {
-        font-size: 24px;
+        font-size: 1.2rem;
     }
 
-    .pco-month-nav-btn,
-    .pco-month-nav-today {
-        font-size: 14px;
-        padding: 6px 12px;
+    .pco-month-view-header {
+        flex-wrap: wrap;
+        gap: 10px;
     }
 }
