@@ -444,12 +444,14 @@
         $('#pco-breadcrumb-event-name').text(eventData.name || '');
 
         // Format date/time display (e.g., "Sunday, February 1, 10–11:15am")
+        // Use time_full (full range) if available, otherwise fall back to time
+        var timeDisplay = eventData.time_full || eventData.time;
         var dateTimeDisplay = '';
         if (eventData.date) {
             dateTimeDisplay = eventData.date;
-            if (eventData.time && eventData.time !== 'All Day') {
-                dateTimeDisplay += ', ' + eventData.time;
-            } else if (eventData.time === 'All Day') {
+            if (timeDisplay && timeDisplay !== 'All Day') {
+                dateTimeDisplay += ', ' + timeDisplay;
+            } else if (timeDisplay === 'All Day') {
                 dateTimeDisplay += ' (All Day)';
             }
         }
