@@ -190,8 +190,10 @@
                 classes.push('is-today');
             }
 
-            // Check if has events
-            if (state.expandedEvents[dateKey] && state.expandedEvents[dateKey].length > 0) {
+            // Check if has events (only show dots for today and future dates)
+            var cellDate = new Date(state.currentYear, state.currentMonth, day);
+            var todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            if (state.expandedEvents[dateKey] && state.expandedEvents[dateKey].length > 0 && cellDate >= todayStart) {
                 classes.push('has-events');
             }
 

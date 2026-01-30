@@ -172,13 +172,20 @@ if (!function_exists('mypco_get_location_name')) {
         <?php else: ?>
 
             <?php
-            // Group events by month and day
+            // Group events by month and day, filtering out past events
+            $tz = new DateTimeZone('America/Chicago');
+            $today = new DateTime('today', $tz);
             $events_by_month = [];
+
             foreach ($regular_events as $event) {
                 try {
-                    $tz = new DateTimeZone('America/Chicago');
                     $start = new DateTime($event['starts_at'], new DateTimeZone('UTC'));
                     $start->setTimezone($tz);
+
+                    // Skip past events
+                    if ($start < $today) {
+                        continue;
+                    }
 
                     $month_key = $start->format('Y-m');
                     $month_display = $start->format('F Y');
@@ -205,6 +212,19 @@ if (!function_exists('mypco_get_location_name')) {
                 }
             }
             ?>
+
+            <?php if (empty($events_by_month)): ?>
+                <?php
+                // Show current month header with "No events scheduled" message
+                $current_month_display = (new DateTime('now', $tz))->format('F Y');
+                ?>
+                <div class="pco-month-group">
+                    <h3 class="pco-month-header"><?php echo esc_html($current_month_display); ?></h3>
+                    <div class="pco-no-events-box">
+                        <?php _e('No events scheduled', 'mypco-online'); ?>
+                    </div>
+                </div>
+            <?php else: ?>
 
             <?php foreach ($events_by_month as $month_key => $month_data): ?>
                 <div class="pco-month-group">
@@ -285,6 +305,8 @@ if (!function_exists('mypco_get_location_name')) {
                     <?php endforeach; ?>
                 </div>
             <?php endforeach; ?>
+
+            <?php endif; ?>
 
         <?php endif; ?>
     </div>
