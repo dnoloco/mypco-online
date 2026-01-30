@@ -622,8 +622,20 @@ button.pco-badge-signup:active {
 
 .pco-gallery-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+@media (max-width: 900px) {
+    .pco-gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .pco-gallery-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .pco-gallery-item {
@@ -641,8 +653,9 @@ button.pco-badge-signup:active {
 
 .pco-gallery-image-wrapper {
     width: 100%;
-    height: 200px;
+    height: 160px;
     overflow: hidden;
+    position: relative;
 }
 
 .pco-gallery-img {
@@ -652,7 +665,7 @@ button.pco-badge-signup:active {
 }
 
 .pco-gallery-content {
-    padding: 20px;
+    padding: 15px;
 }
 
 .pco-gallery-title-btn {
@@ -696,10 +709,6 @@ button.pco-badge-signup:active {
 /* Hide section title in gallery view */
 .pco-gallery-title {
     display: none;
-}
-
-.pco-gallery-image-wrapper {
-    position: relative;
 }
 
 .pco-gallery-featured-badge {
