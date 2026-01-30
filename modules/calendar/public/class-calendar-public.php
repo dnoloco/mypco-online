@@ -284,7 +284,7 @@ class MyPCO_Calendar_Public {
         try {
             $start_dt = MyPCO_Date_Helper::parse_event_date($starts_at, $is_all_day, $this->timezone, false);
             $date_display = MyPCO_Date_Helper::get_date_display($starts_at, $ends_at, $is_all_day, $this->timezone);
-            $time_display = MyPCO_Date_Helper::get_time_display($starts_at, $is_all_day, $this->timezone);
+            $time_display = MyPCO_Date_Helper::get_time_display($starts_at, $is_all_day, $this->timezone, $ends_at);
             $date_key = $start_dt->format('Y-m-d');
             $month_header = $start_dt->format('F Y');
             $day_header = $start_dt->format('l, M j');

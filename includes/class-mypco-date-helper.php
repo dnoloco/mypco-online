@@ -159,12 +159,13 @@ class MyPCO_Date_Helper {
     /**
      * Get time display string.
      *
-     * @param string $iso_string ISO date string
+     * @param string $iso_string ISO date string for start time
      * @param bool $is_all_day Whether the event is all-day
      * @param DateTimeZone|null $target_tz Target timezone
-     * @return string Time string (e.g., "2:30pm" or "All Day")
+     * @param string|null $end_iso_string ISO date string for end time (optional)
+     * @return string Time string (e.g., "10–11:15am" or "All Day")
      */
-    public static function get_time_display($iso_string, $is_all_day = false, $target_tz = null) {
+    public static function get_time_display($iso_string, $is_all_day = false, $target_tz = null, $end_iso_string = null) {
         if ($is_all_day) {
             return 'All Day';
         }
@@ -174,14 +175,26 @@ class MyPCO_Date_Helper {
         }
 
         try {
-            $dt = self::parse_event_date($iso_string, false, $target_tz, false);
-            $minutes = $dt->format('i');
-            // If minutes are 00, just show hour + am/pm (e.g., "6pm")
-            // Otherwise show hour:minutes + am/pm (e.g., "6:30pm")
-            if ($minutes === '00') {
-                return $dt->format('ga'); // "6pm"
+            $start_dt = self::parse_event_date($iso_string, false, $target_tz, false);
+
+            // If we have an end time, format as a range
+            if (!empty($end_iso_string)) {
+                $end_dt = self::parse_event_date($end_iso_string, false, $target_tz, false);
+
+                // Format: "10–11:15am" or "10am–12pm" if different am/pm
+                $start_hour = $start_dt->format('g');
+                $end_minutes = $end_dt->format('i');
+                $end_format = ($end_minutes === '00') ? 'ga' : 'g:ia';
+
+                return $start_hour . '–' . $end_dt->format($end_format);
             }
-            return $dt->format('g:ia'); // "6:30pm"
+
+            // Just start time
+            $minutes = $start_dt->format('i');
+            if ($minutes === '00') {
+                return $start_dt->format('ga'); // "6pm"
+            }
+            return $start_dt->format('g:ia'); // "6:30pm"
         } catch (Exception $e) {
             return 'Time Error';
         }
