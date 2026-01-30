@@ -355,6 +355,7 @@ class MyPCO_Calendar_Public {
                 'location' => $event['location'],
                 'location_name' => $event['location_name'],
                 'registration_url' => $event['registration_url'],
+                'is_featured' => $event['is_featured'] ?? false,
             ];
 
             foreach ($event_dates as $date_key) {

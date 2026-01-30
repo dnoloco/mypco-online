@@ -752,7 +752,7 @@ button.pco-badge-signup:active {
 /* Month View Grid */
 .pco-month-calendar-grid {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(7, minmax(0, 1fr));
     border-top: 1px solid #e0e0e0;
 }
 
@@ -763,6 +763,7 @@ button.pco-badge-signup:active {
     font-size: 13px;
     color: #666;
     border-bottom: 1px solid #e0e0e0;
+    overflow: hidden;
 }
 
 .pco-month-day-cell {
@@ -773,6 +774,8 @@ button.pco-badge-signup:active {
     background: white;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
 }
 
 .pco-month-day-cell:nth-child(7n+7) {
@@ -810,9 +813,10 @@ button.pco-badge-signup:active {
     display: flex;
     flex-direction: column;
     gap: 3px;
-    overflow-y: auto;
+    overflow: hidden;
     flex: 1;
     min-height: 0;
+    min-width: 0;
 }
 
 /* Thin scrollbar for event list */
