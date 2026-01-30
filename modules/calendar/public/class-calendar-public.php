@@ -100,6 +100,9 @@ class MyPCO_Calendar_Public {
             return $this->render_error($events_data['error']);
         }
 
+        // Fetch tags/categories
+        $tags = $this->fetch_tags();
+
         // Process the data
         $processed_data = $this->process_calendar_data($events_data);
 
@@ -108,11 +111,13 @@ class MyPCO_Calendar_Public {
             'expandedEvents' => $processed_data['expanded_events'],
             'currentMonth' => date('n'),
             'currentYear' => date('Y'),
+            'tags' => $tags,
         ]);
 
         // Pass to template and return output
         return $this->load_template('calendar-main', array_merge($processed_data, [
             'default_view' => $atts['view'],
+            'tags' => $tags,
         ]));
     }
 
@@ -143,6 +148,68 @@ class MyPCO_Calendar_Public {
             $params,
             $transient_key
         );
+    }
+
+    /**
+     * Fetch tags (categories) from PCO API.
+     */
+    private function fetch_tags() {
+        if (!$this->api_model) {
+            return [];
+        }
+
+        $params = [
+            'per_page' => 100,
+            'include' => 'tag_group'
+        ];
+
+        $transient_key = 'mypco_calendar_tags_' . md5(serialize($params));
+
+        $response = $this->api_model->get_data_with_caching(
+            'calendar',
+            '/v2/tags',
+            $params,
+            $transient_key
+        );
+
+        if (isset($response['error']) || empty($response['data'])) {
+            return [];
+        }
+
+        // Build tag group map
+        $tag_groups = [];
+        if (!empty($response['included'])) {
+            foreach ($response['included'] as $item) {
+                if ($item['type'] === 'TagGroup') {
+                    $tag_groups[$item['id']] = $item['attributes']['name'] ?? '';
+                }
+            }
+        }
+
+        // Format tags for dropdown
+        $tags = [];
+        foreach ($response['data'] as $tag) {
+            $tag_id = $tag['id'];
+            $tag_name = $tag['attributes']['name'] ?? '';
+            $tag_group_id = $tag['relationships']['tag_group']['data']['id'] ?? null;
+            $tag_group_name = $tag_group_id ? ($tag_groups[$tag_group_id] ?? '') : '';
+
+            $tags[] = [
+                'id' => $tag_id,
+                'name' => $tag_name,
+                'group_id' => $tag_group_id,
+                'group_name' => $tag_group_name,
+            ];
+        }
+
+        // Sort tags by group name, then by tag name
+        usort($tags, function($a, $b) {
+            $group_cmp = strcmp($a['group_name'], $b['group_name']);
+            if ($group_cmp !== 0) return $group_cmp;
+            return strcmp($a['name'], $b['name']);
+        });
+
+        return $tags;
     }
 
     /**
