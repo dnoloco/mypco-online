@@ -381,13 +381,6 @@
 
         html += '</div>';
 
-        // Show "No events scheduled" message if no upcoming events in current month
-        if (!hasUpcomingEvents) {
-            html += '<div class="pco-no-events-box pco-month-no-events">';
-            html += 'No events scheduled';
-            html += '</div>';
-        }
-
         $('#pco-view-month').html(html);
 
         // Add click handlers for month events
