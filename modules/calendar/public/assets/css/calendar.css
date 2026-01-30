@@ -365,6 +365,20 @@ body.pco-view-detail-active .pco-header {
     color: #666;
 }
 
+.pco-badge-featured {
+    background: #fffbe6;
+    color: #b77a00;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pco-badge-featured .dashicons {
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
+}
+
 .pco-featured-title-btn {
     background: none;
     border: none;
@@ -676,6 +690,85 @@ button.pco-badge-signup:active {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+/* Hide section title in gallery view */
+.pco-gallery-title {
+    display: none;
+}
+
+.pco-gallery-image-wrapper {
+    position: relative;
+}
+
+.pco-gallery-featured-badge {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: #d4a012;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pco-gallery-featured-badge .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
+.pco-gallery-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pco-gallery-date .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: #999;
+}
+
+.pco-gallery-recurring {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #666;
+    margin-left: 8px;
+}
+
+.pco-gallery-recurring .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
+.pco-gallery-summary {
+    font-size: 14px;
+    color: #666;
+    margin: 10px 0;
+    line-height: 1.4;
+}
+
+.pco-gallery-location {
+    font-size: 13px;
+    color: #888;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pco-gallery-location .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
 }
 
 /* ============================================

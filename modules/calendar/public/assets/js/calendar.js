@@ -84,18 +84,15 @@
         }
         state.currentView = viewName;
 
-        // Toggle body class for views that hide sidebar (detail and month)
-        if (viewName === 'detail' || viewName === 'month') {
-            $('body').addClass('pco-detail-active');
-        } else {
-            $('body').removeClass('pco-detail-active');
-        }
+        // Toggle body classes for view-specific styling
+        $('body').removeClass('pco-detail-active pco-view-detail-active pco-view-month-active pco-view-gallery-active');
 
-        // Toggle body class specifically for detail view (hides header)
         if (viewName === 'detail') {
-            $('body').addClass('pco-view-detail-active');
-        } else {
-            $('body').removeClass('pco-view-detail-active');
+            $('body').addClass('pco-detail-active pco-view-detail-active');
+        } else if (viewName === 'month') {
+            $('body').addClass('pco-detail-active pco-view-month-active');
+        } else if (viewName === 'gallery') {
+            $('body').addClass('pco-view-gallery-active');
         }
 
         // Render month calendar if switching to month view
