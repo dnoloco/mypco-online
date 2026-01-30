@@ -44,6 +44,9 @@
         if (defaultView !== 'list') {
             switchView(defaultView);
         }
+
+        // Remove the initial view data attribute (used to prevent flicker on load)
+        document.documentElement.removeAttribute('data-pco-initial-view');
     }
 
     /**
