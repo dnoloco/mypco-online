@@ -33,6 +33,7 @@
         initEventDetail();
         initEventNavigation();
         initCategoryFilter();
+        initClearFiltersHandler();
 
         // Get initial view from PHP-rendered data attribute (server reads cookie)
         var initialView = $('.pco-wrapper').data('initial-view') || 'list';
@@ -75,10 +76,25 @@
     }
 
     /**
+     * Check if event has the selected tag (handles string/number comparison)
+     */
+    function eventHasTag(tagIds, selectedTagId) {
+        if (!selectedTagId) return true;
+        if (!tagIds || !Array.isArray(tagIds)) return false;
+        // Compare as strings since API returns string IDs
+        return tagIds.some(function(id) {
+            return String(id) === String(selectedTagId);
+        });
+    }
+
+    /**
      * Filter list view by selected category
      */
     function filterListView() {
         var tagId = state.selectedTagId;
+
+        // Remove existing "no events" message
+        $('#pco-view-list .pco-filter-no-events').remove();
 
         // Show/hide featured events
         $('.pco-featured-card').each(function() {
@@ -89,7 +105,7 @@
             }
             var tagIds = eventData?.tag_ids || [];
 
-            if (!tagId || tagIds.indexOf(tagId) !== -1) {
+            if (eventHasTag(tagIds, tagId)) {
                 $card.show();
             } else {
                 $card.hide();
@@ -113,7 +129,7 @@
             }
             var tagIds = eventData?.tag_ids || [];
 
-            if (!tagId || tagIds.indexOf(tagId) !== -1) {
+            if (eventHasTag(tagIds, tagId)) {
                 $item.show();
             } else {
                 $item.hide();
@@ -142,6 +158,21 @@
                 $group.show();
             }
         });
+
+        // Show "No events found" message if filtering and no visible events
+        var visibleEvents = $('.pco-event-item:visible').length;
+        var visibleMonthGroups = $('.pco-month-group:visible').length;
+        if (tagId && visibleFeatured === 0 && visibleEvents === 0) {
+            // Hide all month groups when showing no events message
+            $('.pco-month-group').hide();
+            $('.pco-events-section').append(
+                '<div class="pco-filter-no-events">' +
+                '<div class="pco-filter-no-events-icon">📅</div>' +
+                '<p>No events found.</p>' +
+                '<button class="pco-clear-filters-btn" type="button">Clear filters</button>' +
+                '</div>'
+            );
+        }
     }
 
     /**
@@ -150,20 +181,37 @@
     function filterGalleryView() {
         var tagId = state.selectedTagId;
 
-        $('.pco-gallery-card').each(function() {
-            var $card = $(this);
-            var eventData = $card.find('.pco-event-title-btn').data('event');
+        // Remove existing "no events" message
+        $('#pco-view-gallery .pco-filter-no-events').remove();
+
+        var visibleCount = 0;
+
+        $('.pco-gallery-item').each(function() {
+            var $item = $(this);
+            var eventData = $item.find('.pco-event-title-btn').data('event');
             if (typeof eventData === 'string') {
                 try { eventData = JSON.parse(eventData); } catch(e) { return; }
             }
             var tagIds = eventData?.tag_ids || [];
 
-            if (!tagId || tagIds.indexOf(tagId) !== -1) {
-                $card.show();
+            if (eventHasTag(tagIds, tagId)) {
+                $item.show();
+                visibleCount++;
             } else {
-                $card.hide();
+                $item.hide();
             }
         });
+
+        // Show "No events found" message if filtering and no visible events
+        if (tagId && visibleCount === 0) {
+            $('.pco-gallery-grid').after(
+                '<div class="pco-filter-no-events">' +
+                '<div class="pco-filter-no-events-icon">📅</div>' +
+                '<p>No events found.</p>' +
+                '<button class="pco-clear-filters-btn" type="button">Clear filters</button>' +
+                '</div>'
+            );
+        }
     }
 
     /**
@@ -172,7 +220,19 @@
     function eventMatchesFilter(event) {
         if (!state.selectedTagId) return true;
         var tagIds = event.tag_ids || [];
-        return tagIds.indexOf(state.selectedTagId) !== -1;
+        return eventHasTag(tagIds, state.selectedTagId);
+    }
+
+    /**
+     * Clear filters button handler
+     */
+    function initClearFiltersHandler() {
+        $(document).on('click', '.pco-clear-filters-btn', function() {
+            // Reset dropdown to "All Categories"
+            $('#pco-category-filter').val('');
+            state.selectedTagId = '';
+            applyFilters();
+        });
     }
 
     /**

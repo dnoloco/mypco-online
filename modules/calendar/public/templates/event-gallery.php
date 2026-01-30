@@ -174,7 +174,8 @@ uasort($events_by_name, function($a, $b) {
                     'dateKey' => $date_key,
                     'location' => $location,
                     'location_name' => $location_name,
-                    'registration_url' => $event['registration_url']
+                    'registration_url' => $event['registration_url'],
+                    'tag_ids' => $event['tag_ids'] ?? []
                 ]);
                 ?>
                 
