@@ -392,10 +392,12 @@
             }
         });
 
-        // Click on day cell to go to that date in list view
+        // Click on day cell to go to that date in list view (only for today and future dates)
         $('.pco-month-day-cell').on('click', function(e) {
             if ($(e.target).closest('.pco-month-event').length) return;
             var dateKey = $(this).data('date');
+            // Don't navigate for past dates
+            if (isDatePast(dateKey)) return;
             if (dateKey && state.expandedEvents[dateKey] && state.expandedEvents[dateKey].length > 0) {
                 scrollToDate(dateKey);
             }
