@@ -73,18 +73,34 @@ if (!function_exists('mypco_get_location_name')) {
                 $is_recurring = $event['is_recurring'] ?? false;
                 $is_multi_day = $event['is_multi_day'] ?? false;
 
-                // Determine date display for featured event
-                if (!empty($event['featured_date_display'])) {
-                    $featured_date = $event['featured_date_display'];
-                } else {
-                    // Simple date format: "Feb 3, 2026"
-                    try {
-                        $start = new DateTime($event['starts_at'], new DateTimeZone('UTC'));
-                        $start->setTimezone(new DateTimeZone('America/Chicago'));
-                        $featured_date = $start->format('M j, Y');
-                    } catch (Exception $e) {
-                        $featured_date = $event['date_display'];
+                // Determine date and time display for featured event
+                $tz = new DateTimeZone('America/Chicago');
+                try {
+                    $start_dt = new DateTime($event['starts_at'], new DateTimeZone('UTC'));
+                    $start_dt->setTimezone($tz);
+
+                    if (!empty($event['featured_date_display'])) {
+                        $featured_date = $event['featured_date_display'];
+                    } else {
+                        $featured_date = $start_dt->format('M j, Y');
                     }
+
+                    // Format time display with proper timezone
+                    if ($is_all_day) {
+                        $featured_time = __('All Day', 'mypco-online');
+                    } else {
+                        $featured_time = $start_dt->format('g:ia');
+
+                        // Add end time if available
+                        if (!empty($event['ends_at'])) {
+                            $end_dt = new DateTime($event['ends_at'], new DateTimeZone('UTC'));
+                            $end_dt->setTimezone($tz);
+                            $featured_time = $start_dt->format('g') . '–' . $end_dt->format('g:ia');
+                        }
+                    }
+                } catch (Exception $e) {
+                    $featured_date = $event['date_display'] ?? '';
+                    $featured_time = '';
                 }
 
                 $location_name = mypco_get_location_name($event['location']);
@@ -94,7 +110,7 @@ if (!function_exists('mypco_get_location_name')) {
                     'summary' => $event['summary'],
                     'image_url' => $event['image_url'],
                     'date' => $featured_date,
-                    'time' => $is_all_day ? 'All Day' : date('g:i a', strtotime($event['starts_at'])),
+                    'time' => $featured_time,
                     'location' => $event['location'],
                     'location_name' => $location_name,
                     'registration_url' => $event['registration_url']
