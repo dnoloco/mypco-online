@@ -162,7 +162,7 @@ class MyPCO_Date_Helper {
      * @param string $iso_string ISO date string
      * @param bool $is_all_day Whether the event is all-day
      * @param DateTimeZone|null $target_tz Target timezone
-     * @return string Time string (e.g., "2:30 pm" or "All Day")
+     * @return string Time string (e.g., "2:30pm" or "All Day")
      */
     public static function get_time_display($iso_string, $is_all_day = false, $target_tz = null) {
         if ($is_all_day) {
@@ -175,7 +175,13 @@ class MyPCO_Date_Helper {
 
         try {
             $dt = self::parse_event_date($iso_string, false, $target_tz, false);
-            return $dt->format('g:i a');
+            $minutes = $dt->format('i');
+            // If minutes are 00, just show hour + am/pm (e.g., "6pm")
+            // Otherwise show hour:minutes + am/pm (e.g., "6:30pm")
+            if ($minutes === '00') {
+                return $dt->format('ga'); // "6pm"
+            }
+            return $dt->format('g:ia'); // "6:30pm"
         } catch (Exception $e) {
             return 'Time Error';
         }

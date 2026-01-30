@@ -68,11 +68,25 @@
         // Show target view
         $('#pco-view-' + viewName).addClass('active');
 
-        // Track view state
-        if (viewName !== 'detail') {
+        // Track view state - save where we came from when going to detail view
+        if (viewName === 'detail' && state.currentView !== 'detail') {
             state.previousView = state.currentView;
         }
         state.currentView = viewName;
+
+        // Toggle body class for views that hide sidebar (detail and month)
+        if (viewName === 'detail' || viewName === 'month') {
+            $('body').addClass('pco-detail-active');
+        } else {
+            $('body').removeClass('pco-detail-active');
+        }
+
+        // Toggle body class specifically for detail view (hides header)
+        if (viewName === 'detail') {
+            $('body').addClass('pco-view-detail-active');
+        } else {
+            $('body').removeClass('pco-view-detail-active');
+        }
 
         // Render month calendar if switching to month view
         if (viewName === 'month') {
@@ -158,8 +172,8 @@
 
         $('.pco-mini-cal-grid').html(html);
 
-        // Add click handler for days with events
-        $('.pco-mini-cal-day.has-events').on('click', function() {
+        // Add click handler for all days to scroll to that date in list view
+        $('.pco-mini-cal-day').on('click', function() {
             var dateKey = $(this).data('date');
             scrollToDate(dateKey);
         });
@@ -174,17 +188,17 @@
             switchView('list');
         }
 
-        // Find and scroll to the date header
-        var $dateHeader = $('.pco-day-header[data-date="' + dateKey + '"]');
-        if ($dateHeader.length) {
+        // Find and scroll to the day group (which has the data-date attribute)
+        var $dayGroup = $('.pco-day-group[data-date="' + dateKey + '"]');
+        if ($dayGroup.length) {
             $('html, body').animate({
-                scrollTop: $dateHeader.offset().top - 100
+                scrollTop: $dayGroup.offset().top - 100
             }, 300);
 
             // Highlight briefly
-            $dateHeader.addClass('highlight');
+            $dayGroup.addClass('highlight');
             setTimeout(function() {
-                $dateHeader.removeClass('highlight');
+                $dayGroup.removeClass('highlight');
             }, 2000);
         }
     }
@@ -193,8 +207,8 @@
      * Month Calendar - full month view
      */
     function initMonthCalendar() {
-        // Navigation for month view
-        $(document).on('click', '.pco-month-nav', function() {
+        // Navigation for month view - prev/next arrows
+        $(document).on('click', '.pco-month-nav-btn', function() {
             var nav = $(this).data('nav');
 
             if (nav === 'prev') {
@@ -203,7 +217,7 @@
                     state.currentMonth = 11;
                     state.currentYear--;
                 }
-            } else {
+            } else if (nav === 'next') {
                 state.currentMonth++;
                 if (state.currentMonth > 11) {
                     state.currentMonth = 0;
@@ -211,6 +225,15 @@
                 }
             }
 
+            renderMiniCalendar();
+            renderMonthCalendar();
+        });
+
+        // Today button
+        $(document).on('click', '.pco-month-nav-today', function() {
+            var today = new Date();
+            state.currentMonth = today.getMonth();
+            state.currentYear = today.getFullYear();
             renderMiniCalendar();
             renderMonthCalendar();
         });
@@ -226,77 +249,93 @@
 
         var firstDay = new Date(state.currentYear, state.currentMonth, 1).getDay();
         var daysInMonth = new Date(state.currentYear, state.currentMonth + 1, 0).getDate();
+        var daysInPrevMonth = new Date(state.currentYear, state.currentMonth, 0).getDate();
         var today = new Date();
 
-        var html = '<div class="pco-month-calendar">';
+        var html = '';
 
-        // Header with navigation
-        html += '<div class="pco-month-header-nav">';
-        html += '<button class="pco-month-nav" data-nav="prev">&lt; Prev</button>';
-        html += '<h3>' + months[state.currentMonth] + ' ' + state.currentYear + '</h3>';
-        html += '<button class="pco-month-nav" data-nav="next">Next &gt;</button>';
+        // Header with title and navigation
+        html += '<div class="pco-month-view-header">';
+        html += '<h2 class="pco-month-view-title">' + months[state.currentMonth] + ' ' + state.currentYear + '</h2>';
+        html += '<div class="pco-month-view-nav">';
+        html += '<button class="pco-month-nav-btn" data-nav="prev" aria-label="Previous month">&#8249;</button>';
+        html += '<button class="pco-month-nav-today">Today</button>';
+        html += '<button class="pco-month-nav-btn" data-nav="next" aria-label="Next month">&#8250;</button>';
         html += '</div>';
+        html += '</div>';
+
+        // Calendar grid container
+        html += '<div class="pco-month-calendar-grid">';
 
         // Day headers
-        html += '<div class="pco-month-days-header">';
         for (var i = 0; i < 7; i++) {
-            html += '<div class="pco-month-day-name">' + days[i] + '</div>';
-        }
-        html += '</div>';
-
-        // Calendar grid
-        html += '<div class="pco-month-grid">';
-
-        // Empty cells before first day
-        for (var i = 0; i < firstDay; i++) {
-            html += '<div class="pco-month-cell pco-month-cell-empty"></div>';
+            html += '<div class="pco-month-day-header">' + days[i] + '</div>';
         }
 
-        // Day cells
+        // Previous month's trailing days
+        var prevMonth = state.currentMonth - 1;
+        var prevYear = state.currentYear;
+        if (prevMonth < 0) {
+            prevMonth = 11;
+            prevYear--;
+        }
+        for (var i = firstDay - 1; i >= 0; i--) {
+            var prevDay = daysInPrevMonth - i;
+            var prevDateKey = prevYear + '-' +
+                              String(prevMonth + 1).padStart(2, '0') + '-' +
+                              String(prevDay).padStart(2, '0');
+            html += '<div class="pco-month-day-cell pco-month-day-other">';
+            html += '<div class="pco-month-day-number">' + prevDay + '</div>';
+            html += renderDayEvents(prevDateKey);
+            html += '</div>';
+        }
+
+        // Current month days
         for (var day = 1; day <= daysInMonth; day++) {
             var dateKey = state.currentYear + '-' +
                           String(state.currentMonth + 1).padStart(2, '0') + '-' +
                           String(day).padStart(2, '0');
 
-            var classes = ['pco-month-cell'];
-            var events = state.expandedEvents[dateKey] || [];
+            var cellClasses = ['pco-month-day-cell'];
+            var dayNumClasses = ['pco-month-day-number'];
 
             // Check if today
-            if (today.getDate() === day &&
-                today.getMonth() === state.currentMonth &&
-                today.getFullYear() === state.currentYear) {
-                classes.push('is-today');
+            var isToday = (today.getDate() === day &&
+                          today.getMonth() === state.currentMonth &&
+                          today.getFullYear() === state.currentYear);
+            if (isToday) {
+                cellClasses.push('pco-month-day-today');
+                dayNumClasses.push('is-today');
             }
 
-            html += '<div class="' + classes.join(' ') + '" data-date="' + dateKey + '">';
-            html += '<div class="pco-month-cell-day">' + day + '</div>';
-
-            // Show events (limit to 3)
-            if (events.length > 0) {
-                html += '<div class="pco-month-cell-events">';
-                var displayCount = Math.min(events.length, 3);
-
-                for (var e = 0; e < displayCount; e++) {
-                    var evt = events[e];
-                    html += '<div class="pco-month-event" data-event=\'' + JSON.stringify(evt).replace(/'/g, '&#39;') + '\'>';
-                    html += '<span class="pco-month-event-time">' + escapeHtml(evt.time) + '</span> ';
-                    html += '<span class="pco-month-event-name">' + escapeHtml(evt.name) + '</span>';
-                    html += '</div>';
-                }
-
-                if (events.length > 3) {
-                    html += '<div class="pco-month-more">+' + (events.length - 3) + ' more</div>';
-                }
-
-                html += '</div>';
-            }
-
+            html += '<div class="' + cellClasses.join(' ') + '" data-date="' + dateKey + '">';
+            html += '<div class="' + dayNumClasses.join(' ') + '">' + day + '</div>';
+            html += renderDayEvents(dateKey);
             html += '</div>';
         }
 
-        html += '</div></div>';
+        // Next month's leading days to fill grid
+        var totalCells = firstDay + daysInMonth;
+        var remainingCells = (7 - (totalCells % 7)) % 7;
+        var nextMonth = state.currentMonth + 1;
+        var nextYear = state.currentYear;
+        if (nextMonth > 11) {
+            nextMonth = 0;
+            nextYear++;
+        }
+        for (var i = 1; i <= remainingCells; i++) {
+            var nextDateKey = nextYear + '-' +
+                              String(nextMonth + 1).padStart(2, '0') + '-' +
+                              String(i).padStart(2, '0');
+            html += '<div class="pco-month-day-cell pco-month-day-other">';
+            html += '<div class="pco-month-day-number">' + String(i).padStart(2, '0') + '</div>';
+            html += renderDayEvents(nextDateKey);
+            html += '</div>';
+        }
 
-        $('.pco-month-calendar-container').html(html);
+        html += '</div>';
+
+        $('#pco-view-month').html(html);
 
         // Add click handlers for month events
         $('.pco-month-event').on('click', function(e) {
@@ -307,13 +346,43 @@
             }
         });
 
-        // Click on day cell to see all events
-        $('.pco-month-cell').on('click', function() {
+        // Click on day cell to go to that date in list view
+        $('.pco-month-day-cell').on('click', function(e) {
+            if ($(e.target).closest('.pco-month-event').length) return;
             var dateKey = $(this).data('date');
-            if (state.expandedEvents[dateKey] && state.expandedEvents[dateKey].length > 0) {
+            if (dateKey && state.expandedEvents[dateKey] && state.expandedEvents[dateKey].length > 0) {
                 scrollToDate(dateKey);
             }
         });
+    }
+
+    /**
+     * Render events for a specific day in month view
+     */
+    function renderDayEvents(dateKey) {
+        var events = state.expandedEvents[dateKey] || [];
+        if (events.length === 0) return '';
+
+        var html = '<div class="pco-month-day-events">';
+        var displayCount = Math.min(events.length, 3);
+
+        for (var e = 0; e < displayCount; e++) {
+            var evt = events[e];
+            var isFeatured = evt.is_featured || false;
+            var starIcon = isFeatured ? '<span class="pco-star">★</span> ' : '';
+
+            html += '<div class="pco-month-event' + (isFeatured ? ' is-featured' : '') + '" data-event=\'' + JSON.stringify(evt).replace(/'/g, '&#39;') + '\'>';
+            html += starIcon + '<span class="pco-month-event-time">' + escapeHtml(evt.time) + '</span> ';
+            html += '<span class="pco-month-event-name">' + escapeHtml(evt.name) + '</span>';
+            html += '</div>';
+        }
+
+        if (events.length > 3) {
+            html += '<div class="pco-month-event-more">+' + (events.length - 3) + ' more</div>';
+        }
+
+        html += '</div>';
+        return html;
     }
 
     /**
@@ -366,8 +435,18 @@
         // Populate detail view
         $('#pco-detail-title').text(eventData.name || '');
         $('#pco-breadcrumb-event-name').text(eventData.name || '');
-        $('#pco-detail-date').text(eventData.date || '');
-        $('#pco-detail-time').text(eventData.time ? ' at ' + eventData.time : '');
+
+        // Format date/time display (e.g., "Sunday, February 1, 10–11:15am")
+        var dateTimeDisplay = '';
+        if (eventData.date) {
+            dateTimeDisplay = eventData.date;
+            if (eventData.time && eventData.time !== 'All Day') {
+                dateTimeDisplay += ', ' + eventData.time;
+            } else if (eventData.time === 'All Day') {
+                dateTimeDisplay += ' (All Day)';
+            }
+        }
+        $('#pco-detail-datetime').text(dateTimeDisplay);
 
         // Description - use description or summary
         var description = eventData.description || eventData.summary || 'No description available.';
@@ -381,20 +460,38 @@
             $('#pco-detail-image-container').hide();
         }
 
+        // Categories (if available)
+        if (eventData.categories && eventData.categories.length > 0) {
+            var categoriesHtml = '';
+            eventData.categories.forEach(function(cat) {
+                categoriesHtml += '<span class="pco-detail-category-badge">' + escapeHtml(cat) + '</span>';
+            });
+            $('#pco-detail-categories').html(categoriesHtml);
+            $('#pco-detail-categories-container').show();
+        } else {
+            $('#pco-detail-categories-container').hide();
+        }
+
         // Location
         if (eventData.location) {
-            $('#pco-detail-location-text').text(eventData.location_name || eventData.location);
-
-            // Parse address if available
+            var locationName = eventData.location_name || eventData.location;
             var address = '';
+
+            // Parse address if available (format: "Location Name - Address")
             if (eventData.location.indexOf(' - ') !== -1) {
                 address = eventData.location.substring(eventData.location.indexOf(' - ') + 3);
             }
-            $('#pco-detail-address').text(address);
 
-            // Google Maps link
-            var mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(eventData.location);
-            $('#pco-detail-location-link').attr('href', mapsUrl).data('maps-url', mapsUrl);
+            $('#pco-detail-location-name').text(locationName);
+            $('#pco-detail-location-address').html(address.replace(/, /g, '<br>'));
+
+            // Google Maps links
+            var mapsQuery = encodeURIComponent(eventData.location);
+            var mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + mapsQuery;
+            var directionsUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + mapsQuery;
+
+            $('#pco-detail-show-map').show();
+            $('#pco-detail-directions').attr('href', directionsUrl).show();
 
             $('#pco-detail-location-container').show();
         } else {
@@ -403,7 +500,7 @@
 
         // Registration button
         if (eventData.registration_url) {
-            $('#pco-detail-signup-btn').data('signup-url', eventData.registration_url);
+            $('#pco-detail-signup-btn').attr('href', eventData.registration_url);
             $('#pco-detail-signup-container').show();
         } else {
             $('#pco-detail-signup-container').hide();
@@ -411,6 +508,9 @@
 
         // Switch to detail view
         switchView('detail');
+
+        // Scroll to top
+        window.scrollTo(0, 0);
     }
 
     /**

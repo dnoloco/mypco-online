@@ -99,7 +99,7 @@ foreach ($all_events as $event) {
                         }
                     }
                     
-                    $time_display = $first_instance['all_day'] ? __('All Day', 'mypco-online') : $start->format('g:i a');
+                    $time_display = ($first_instance['is_all_day'] ?? false) ? __('All Day', 'mypco-online') : $start->format('g:i a');
                     $date_key = $start->format('Y-m-d');
                     
                 } catch (Exception $e) {
@@ -139,7 +139,7 @@ foreach ($all_events as $event) {
                              class="pco-gallery-img" 
                              alt="<?php echo esc_attr($event['name']); ?>">
                         
-                        <?php if ($event['featured']): ?>
+                        <?php if ($event['is_featured'] ?? false): ?>
                             <div class="pco-gallery-featured-badge">
                                 <span class="dashicons dashicons-star-filled"></span>
                                 <?php _e('Featured', 'mypco-online'); ?>

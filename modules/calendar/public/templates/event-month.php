@@ -69,7 +69,8 @@ defined('ABSPATH') || exit;
             <!-- Events will be populated by JavaScript based on selected date -->
             <?php if (!empty($all_events)): ?>
                 <div class="pco-month-events-items">
-                    <?php foreach ($all_events as $event): 
+                    <?php foreach ($all_events as $event):
+                        $is_all_day = $event['is_all_day'] ?? false;
                         $event_data_json = json_encode([
                             'name' => $event['name'],
                             'description' => $event['description'],
@@ -77,17 +78,17 @@ defined('ABSPATH') || exit;
                             'image_url' => $event['image_url'],
                             'starts_at' => $event['starts_at'],
                             'ends_at' => $event['ends_at'],
-                            'all_day' => $event['all_day'],
+                            'all_day' => $is_all_day,
                             'location' => $event['location'],
                             'registration_url' => $event['registration_url']
                         ]);
-                        
+
                         try {
                             $tz = new DateTimeZone('America/Chicago');
                             $start = new DateTime($event['starts_at'], new DateTimeZone('UTC'));
                             $start->setTimezone($tz);
                             $date_key = $start->format('Y-m-d');
-                            $time_display = $event['all_day'] ? __('All Day', 'mypco-online') : $start->format('g:i a');
+                            $time_display = $is_all_day ? __('All Day', 'mypco-online') : $start->format('g:i a');
                         } catch (Exception $e) {
                             $date_key = '';
                             $time_display = '';
@@ -120,7 +121,7 @@ defined('ABSPATH') || exit;
                                     </p>
                                 <?php endif; ?>
                                 
-                                <?php if ($event['featured']): ?>
+                                <?php if ($event['is_featured'] ?? false): ?>
                                     <span class="pco-badge is-featured">
                                         ★ <?php _e('Featured', 'mypco-online'); ?>
                                     </span>
