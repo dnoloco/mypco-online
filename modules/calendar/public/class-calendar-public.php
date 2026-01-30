@@ -58,6 +58,16 @@ class MyPCO_Calendar_Public {
             MYPCO_VERSION
         );
 
+        // Add critical inline CSS to prevent flicker on page load
+        // This renders in <head> before the external stylesheet
+        $critical_css = '
+            .pco-view-section { display: none; }
+            .pco-view-section.active { display: block; }
+            .pco-sidebar-hidden { display: none; }
+            .pco-grid-full-width { grid-template-columns: 1fr; }
+        ';
+        wp_add_inline_style('mypco-calendar-public', $critical_css);
+
         wp_enqueue_script(
             'mypco-calendar-public',
             MYPCO_PLUGIN_URL . 'modules/calendar/public/assets/js/calendar.js',
