@@ -67,8 +67,20 @@ foreach ($all_events as $event) {
     }
 }
 
-// Sort events by closest upcoming date
+// Sort events: featured first, then by closest upcoming date
 uasort($events_by_name, function($a, $b) {
+    $a_featured = $a['event']['is_featured'] ?? false;
+    $b_featured = $b['event']['is_featured'] ?? false;
+
+    // Featured events come first
+    if ($a_featured && !$b_featured) {
+        return -1;
+    }
+    if (!$a_featured && $b_featured) {
+        return 1;
+    }
+
+    // Then sort by closest upcoming date
     return $a['closest_date'] <=> $b['closest_date'];
 });
 ?>
