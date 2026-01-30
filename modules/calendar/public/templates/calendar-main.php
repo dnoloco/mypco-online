@@ -13,50 +13,21 @@
  */
 
 defined('ABSPATH') || exit;
+
+// Read saved view from cookie (WordPress-compliant: server-side rendering)
+$saved_view = isset($_COOKIE['pco_calendar_view']) ? sanitize_key($_COOKIE['pco_calendar_view']) : 'list';
+$valid_views = ['list', 'month', 'gallery'];
+if (!in_array($saved_view, $valid_views, true)) {
+    $saved_view = 'list';
+}
+
+// Determine active states
+$list_active = ($saved_view === 'list') ? ' active' : '';
+$month_active = ($saved_view === 'month') ? ' active' : '';
+$gallery_active = ($saved_view === 'gallery') ? ' active' : '';
 ?>
 
-<script>
-// Immediately set saved view before content renders to prevent flicker
-(function() {
-    var savedView = localStorage.getItem('pco-calendar-view');
-    if (savedView && savedView !== 'list' && savedView !== 'detail') {
-        document.documentElement.setAttribute('data-pco-initial-view', savedView);
-    }
-})();
-</script>
-<style>
-/* Hide non-active views immediately based on saved preference */
-html[data-pco-initial-view="month"] .pco-view-section:not(#pco-view-month),
-html[data-pco-initial-view="gallery"] .pco-view-section:not(#pco-view-gallery) {
-    display: none !important;
-}
-html[data-pco-initial-view="month"] #pco-view-month,
-html[data-pco-initial-view="gallery"] #pco-view-gallery {
-    display: block !important;
-}
-/* Update button active states */
-html[data-pco-initial-view="month"] .pco-view-btn[data-target="pco-view-list"],
-html[data-pco-initial-view="gallery"] .pco-view-btn[data-target="pco-view-list"] {
-    background-color: transparent !important;
-    color: #666 !important;
-}
-html[data-pco-initial-view="month"] .pco-view-btn[data-target="pco-view-month"],
-html[data-pco-initial-view="gallery"] .pco-view-btn[data-target="pco-view-gallery"] {
-    background-color: #000 !important;
-    color: #fff !important;
-}
-/* Hide sidebar for month/gallery views */
-html[data-pco-initial-view="month"] .pco-sidebar,
-html[data-pco-initial-view="gallery"] .pco-sidebar {
-    display: none !important;
-}
-html[data-pco-initial-view="month"] .pco-layout-grid,
-html[data-pco-initial-view="gallery"] .pco-layout-grid {
-    grid-template-columns: 1fr !important;
-}
-</style>
-
-<div class="pco-wrapper">
+<div class="pco-wrapper" data-initial-view="<?php echo esc_attr($saved_view); ?>">
     <!-- Header with view switcher -->
     <div class="pco-header">
         <div class="pco-category-dropdown">
@@ -65,13 +36,13 @@ html[data-pco-initial-view="gallery"] .pco-layout-grid {
             </select>
         </div>
         <div class="pco-view-switcher">
-            <button class="pco-view-btn active" data-target="pco-view-list">
+            <button class="pco-view-btn<?php echo esc_attr($list_active); ?>" data-target="pco-view-list">
                 <?php _e('List', 'mypco-online'); ?>
             </button>
-            <button class="pco-view-btn" data-target="pco-view-month">
+            <button class="pco-view-btn<?php echo esc_attr($month_active); ?>" data-target="pco-view-month">
                 <?php _e('Month', 'mypco-online'); ?>
             </button>
-            <button class="pco-view-btn" data-target="pco-view-gallery">
+            <button class="pco-view-btn<?php echo esc_attr($gallery_active); ?>" data-target="pco-view-gallery">
                 <?php _e('Gallery', 'mypco-online'); ?>
             </button>
         </div>

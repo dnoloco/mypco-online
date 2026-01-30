@@ -32,21 +32,17 @@
         initEventDetail();
         initEventNavigation();
 
-        // Set initial view: check localStorage first, then data attribute, then default to list
-        var savedView = localStorage.getItem('pco-calendar-view');
-        var defaultView = savedView || $('.pco-wrapper').data('default-view') || 'list';
+        // Get initial view from PHP-rendered data attribute (server reads cookie)
+        var initialView = $('.pco-wrapper').data('initial-view') || 'list';
 
-        // Don't restore to detail view (it needs event data)
-        if (defaultView === 'detail') {
-            defaultView = 'list';
+        // Set state to match server-rendered view
+        state.currentView = initialView;
+        state.previousView = initialView;
+
+        // Render month calendar if starting on month view
+        if (initialView === 'month') {
+            renderMonthCalendar();
         }
-
-        if (defaultView !== 'list') {
-            switchView(defaultView);
-        }
-
-        // Remove the initial view data attribute (used to prevent flicker on load)
-        document.documentElement.removeAttribute('data-pco-initial-view');
     }
 
     /**
@@ -94,9 +90,10 @@
         }
         state.currentView = viewName;
 
-        // Save view to localStorage (except detail view which needs event data)
+        // Save view to cookie (except detail view which needs event data)
+        // Cookie allows PHP to read it server-side for flicker-free page loads
         if (viewName !== 'detail') {
-            localStorage.setItem('pco-calendar-view', viewName);
+            document.cookie = 'pco_calendar_view=' + viewName + ';path=/;max-age=31536000;SameSite=Lax';
         }
 
         // Toggle body classes for view-specific styling
