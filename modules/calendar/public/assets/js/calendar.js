@@ -107,6 +107,15 @@
             $('body').addClass('pco-view-gallery-active');
         }
 
+        // Toggle sidebar/grid classes (sync with PHP-driven initial state)
+        if (viewName === 'month' || viewName === 'gallery' || viewName === 'detail') {
+            $('.pco-sidebar').addClass('pco-sidebar-hidden');
+            $('.pco-layout-grid').addClass('pco-grid-full-width');
+        } else {
+            $('.pco-sidebar').removeClass('pco-sidebar-hidden');
+            $('.pco-layout-grid').removeClass('pco-grid-full-width');
+        }
+
         // Render month calendar if switching to month view
         if (viewName === 'month') {
             renderMonthCalendar();

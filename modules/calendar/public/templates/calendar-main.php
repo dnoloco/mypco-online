@@ -25,6 +25,11 @@ if (!in_array($saved_view, $valid_views, true)) {
 $list_active = ($saved_view === 'list') ? ' active' : '';
 $month_active = ($saved_view === 'month') ? ' active' : '';
 $gallery_active = ($saved_view === 'gallery') ? ' active' : '';
+
+// Determine if sidebar should be hidden (month and gallery views)
+$hide_sidebar = in_array($saved_view, ['month', 'gallery'], true);
+$sidebar_class = $hide_sidebar ? ' pco-sidebar-hidden' : '';
+$grid_class = $hide_sidebar ? ' pco-grid-full-width' : '';
 ?>
 
 <div class="pco-wrapper" data-initial-view="<?php echo esc_attr($saved_view); ?>">
@@ -48,9 +53,9 @@ $gallery_active = ($saved_view === 'gallery') ? ' active' : '';
         </div>
     </div>
 
-    <div class="pco-layout-grid">
+    <div class="pco-layout-grid<?php echo esc_attr($grid_class); ?>">
         <!-- Sidebar with mini calendar -->
-        <div class="pco-sidebar">
+        <div class="pco-sidebar<?php echo esc_attr($sidebar_class); ?>">
             <div class="pco-mini-cal">
                 <div class="pco-mini-cal-header">
                     <span class="pco-mini-cal-nav" data-nav="prev" title="<?php esc_attr_e('Previous month', 'mypco-online'); ?>">&lt;</span>

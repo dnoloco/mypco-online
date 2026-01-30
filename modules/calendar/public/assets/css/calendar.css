@@ -42,6 +42,16 @@ body.pco-view-detail-active .pco-header {
    VIEW-SPECIFIC SIDEBAR HIDING
    ============================================ */
 
+/* PHP-driven classes for initial page load (no flicker) */
+.pco-sidebar-hidden {
+    display: none !important;
+}
+
+.pco-grid-full-width {
+    grid-template-columns: 1fr !important;
+}
+
+/* JS-driven body classes for dynamic switching */
 body.pco-view-month-active .pco-sidebar,
 body.pco-view-gallery-active .pco-sidebar,
 body.pco-detail-active .pco-sidebar {
