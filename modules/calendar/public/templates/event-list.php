@@ -113,7 +113,8 @@ if (!function_exists('mypco_get_location_name')) {
                     'time' => $featured_time,
                     'location' => $event['location'],
                     'location_name' => $location_name,
-                    'registration_url' => $event['registration_url']
+                    'registration_url' => $event['registration_url'],
+                    'tag_ids' => $event['tag_ids'] ?? []
                 ]);
                 ?>
 
@@ -268,7 +269,8 @@ if (!function_exists('mypco_get_location_name')) {
                                     'time' => $time_display,
                                     'location' => $event['location'],
                                     'location_name' => $location_name,
-                                    'registration_url' => $event['registration_url']
+                                    'registration_url' => $event['registration_url'],
+                                    'tag_ids' => $event['tag_ids'] ?? []
                                 ]);
                                 ?>
 
