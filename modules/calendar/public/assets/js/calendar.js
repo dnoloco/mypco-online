@@ -32,8 +32,15 @@
         initEventDetail();
         initEventNavigation();
 
-        // Set initial view from data attribute if available
-        var defaultView = $('.pco-wrapper').data('default-view') || 'list';
+        // Set initial view: check localStorage first, then data attribute, then default to list
+        var savedView = localStorage.getItem('pco-calendar-view');
+        var defaultView = savedView || $('.pco-wrapper').data('default-view') || 'list';
+
+        // Don't restore to detail view (it needs event data)
+        if (defaultView === 'detail') {
+            defaultView = 'list';
+        }
+
         if (defaultView !== 'list') {
             switchView(defaultView);
         }
@@ -83,6 +90,11 @@
             state.previousView = state.currentView;
         }
         state.currentView = viewName;
+
+        // Save view to localStorage (except detail view which needs event data)
+        if (viewName !== 'detail') {
+            localStorage.setItem('pco-calendar-view', viewName);
+        }
 
         // Toggle body classes for view-specific styling
         $('body').removeClass('pco-detail-active pco-view-detail-active pco-view-month-active pco-view-gallery-active');
