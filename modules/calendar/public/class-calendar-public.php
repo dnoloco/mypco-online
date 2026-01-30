@@ -285,12 +285,14 @@ class MyPCO_Calendar_Public {
             $start_dt = MyPCO_Date_Helper::parse_event_date($starts_at, $is_all_day, $this->timezone, false);
             $date_display = MyPCO_Date_Helper::get_date_display($starts_at, $ends_at, $is_all_day, $this->timezone);
             $time_display = MyPCO_Date_Helper::get_time_display($starts_at, $is_all_day, $this->timezone, $ends_at);
+            $time_short = MyPCO_Date_Helper::get_time_display($starts_at, $is_all_day, $this->timezone); // Start time only
             $date_key = $start_dt->format('Y-m-d');
             $month_header = $start_dt->format('F Y');
             $day_header = $start_dt->format('l, M j');
         } catch (Exception $e) {
             $date_display = 'Date Error';
             $time_display = '';
+            $time_short = '';
             $date_key = '';
             $month_header = 'Date Error';
             $day_header = 'Date Error';
@@ -309,6 +311,7 @@ class MyPCO_Calendar_Public {
             'is_featured' => !empty($parent['featured']),
             'date_display' => $date_display,
             'time_display' => $time_display,
+            'time_short' => $time_short,
             'date_key' => $date_key,
             'month_header' => $month_header,
             'day_header' => $day_header,
@@ -355,7 +358,8 @@ class MyPCO_Calendar_Public {
                 'description' => $event['description'],
                 'summary' => $event['summary'],
                 'image_url' => $event['image_url'],
-                'time' => $event['time_display'],
+                'time' => $event['time_short'] ?? $event['time_display'], // Short time for month grid display
+                'time_full' => $event['time_display'], // Full time range for detail view
                 'date' => $event['date_display'],
                 'location' => $event['location'],
                 'location_name' => $event['location_name'],
