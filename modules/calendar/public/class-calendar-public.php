@@ -186,9 +186,15 @@ class MyPCO_Calendar_Public {
             }
         }
 
-        // Format tags for dropdown
+        // Format tags for dropdown (only public/church center categories)
         $tags = [];
         foreach ($response['data'] as $tag) {
+            // Only include tags that are public (church_center_category = true)
+            $is_public = $tag['attributes']['church_center_category'] ?? false;
+            if (!$is_public) {
+                continue;
+            }
+
             $tag_id = $tag['id'];
             $tag_name = $tag['attributes']['name'] ?? '';
             $tag_group_id = $tag['relationships']['tag_group']['data']['id'] ?? null;
