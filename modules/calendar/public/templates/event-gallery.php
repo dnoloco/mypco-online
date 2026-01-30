@@ -138,7 +138,21 @@ uasort($events_by_name, function($a, $b) {
                     }
                 }
 
-                $time_display = ($closest_instance['is_all_day'] ?? false) ? __('All Day', 'mypco-online') : $closest_date->format('g:ia');
+                // Format time display with end time if available
+                if ($closest_instance['is_all_day'] ?? false) {
+                    $time_display = __('All Day', 'mypco-online');
+                } else {
+                    $time_display = $closest_date->format('g:ia');
+                    if (!empty($closest_instance['ends_at'])) {
+                        try {
+                            $end_time = new DateTime($closest_instance['ends_at'], new DateTimeZone('UTC'));
+                            $end_time->setTimezone($tz);
+                            $time_display = $closest_date->format('g') . '–' . $end_time->format('g:ia');
+                        } catch (Exception $e) {
+                            // Keep just start time
+                        }
+                    }
+                }
                 $date_key = $closest_date->format('Y-m-d');
 
                 // Extract location name
