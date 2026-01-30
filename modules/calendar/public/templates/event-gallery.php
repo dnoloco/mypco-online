@@ -24,18 +24,53 @@
 
 defined('ABSPATH') || exit;
 
-// Helper to group events by parent event
-$events_by_parent = [];
+// Group events by name (to consolidate recurring events) and filter past events
+$tz = new DateTimeZone('America/Chicago');
+$today = new DateTime('today', $tz);
+
+$events_by_name = [];
 foreach ($all_events as $event) {
-    $event_id = $event['id'];
-    if (!isset($events_by_parent[$event_id])) {
-        $events_by_parent[$event_id] = [
+    // Skip events without images for gallery view
+    if (empty($event['image_url'])) {
+        continue;
+    }
+
+    // Parse event date and skip past events
+    try {
+        $event_start = new DateTime($event['starts_at'], new DateTimeZone('UTC'));
+        $event_start->setTimezone($tz);
+
+        // Skip events that have already passed
+        if ($event_start < $today) {
+            continue;
+        }
+    } catch (Exception $e) {
+        continue;
+    }
+
+    $event_name = $event['name'];
+    if (!isset($events_by_name[$event_name])) {
+        $events_by_name[$event_name] = [
             'event' => $event,
-            'instances' => []
+            'instances' => [],
+            'closest_instance' => $event,
+            'closest_date' => $event_start
         ];
     }
-    $events_by_parent[$event_id]['instances'][] = $event;
+
+    $events_by_name[$event_name]['instances'][] = $event;
+
+    // Track the closest upcoming instance
+    if ($event_start < $events_by_name[$event_name]['closest_date']) {
+        $events_by_name[$event_name]['closest_instance'] = $event;
+        $events_by_name[$event_name]['closest_date'] = $event_start;
+    }
 }
+
+// Sort events by closest upcoming date
+uasort($events_by_name, function($a, $b) {
+    return $a['closest_date'] <=> $b['closest_date'];
+});
 ?>
 
 <div id="pco-view-gallery" class="pco-view-section">
@@ -44,72 +79,58 @@ foreach ($all_events as $event) {
         <?php _e('Event Gallery', 'mypco-online'); ?>
     </h2>
     
-    <?php if (empty($all_events)): ?>
-        
+    <?php if (empty($events_by_name)): ?>
+
         <p class="pco-no-events">
-            <?php _e('No events found to display.', 'mypco-online'); ?>
+            <?php _e('No upcoming events found to display.', 'mypco-online'); ?>
         </p>
-        
+
     <?php else: ?>
-        
+
         <div class="pco-gallery-grid">
-            
-            <?php foreach ($events_by_parent as $event_id => $event_group): 
+
+            <?php foreach ($events_by_name as $event_name => $event_group):
                 $event = $event_group['event'];
                 $instances = $event_group['instances'];
-                
-                // Skip events without images for gallery view
-                if (empty($event['image_url'])) {
-                    continue;
-                }
-                
-                // Determine if recurring (multiple instances)
+                $closest_instance = $event_group['closest_instance'];
+                $closest_date = $event_group['closest_date'];
+
+                // Determine if recurring (multiple upcoming instances)
                 $is_recurring = count($instances) > 1;
-                
-                // Get first instance for display
-                $first_instance = $instances[0];
-                
-                // Format date display
-                try {
-                    $tz = new DateTimeZone('America/Chicago');
-                    $start = new DateTime($first_instance['starts_at'], new DateTimeZone('UTC'));
-                    $start->setTimezone($tz);
-                    
-                    if ($is_recurring) {
-                        $gallery_date = $start->format('M j, Y');
-                    } else {
-                        // Check for multi-day event
-                        if ($first_instance['ends_at']) {
-                            $end = new DateTime($first_instance['ends_at'], new DateTimeZone('UTC'));
+
+                // Format date display using closest upcoming instance
+                if ($is_recurring) {
+                    $gallery_date = $closest_date->format('M j, Y');
+                } else {
+                    // Check for multi-day event
+                    if ($closest_instance['ends_at']) {
+                        try {
+                            $end = new DateTime($closest_instance['ends_at'], new DateTimeZone('UTC'));
                             $end->setTimezone($tz);
-                            
-                            if ($start->format('Y-m-d') !== $end->format('Y-m-d')) {
+
+                            if ($closest_date->format('Y-m-d') !== $end->format('Y-m-d')) {
                                 // Multi-day event
-                                if ($start->format('m') === $end->format('m')) {
-                                    $gallery_date = $start->format('F j') . '-' . $end->format('j, Y');
+                                if ($closest_date->format('m') === $end->format('m')) {
+                                    $gallery_date = $closest_date->format('M j') . ' - ' . $end->format('M j, Y');
                                 } else {
-                                    $gallery_date = $start->format('F j') . '-' . $end->format('F j, Y');
+                                    $gallery_date = $closest_date->format('M j') . ' - ' . $end->format('M j, Y');
                                 }
                             } else {
-                                // Single day
-                                $gallery_date = $start->format('M j, Y');
+                                $gallery_date = $closest_date->format('M j, Y');
                             }
-                        } else {
-                            $gallery_date = $start->format('M j, Y');
+                        } catch (Exception $e) {
+                            $gallery_date = $closest_date->format('M j, Y');
                         }
+                    } else {
+                        $gallery_date = $closest_date->format('M j, Y');
                     }
-                    
-                    $time_display = ($first_instance['is_all_day'] ?? false) ? __('All Day', 'mypco-online') : $start->format('g:i a');
-                    $date_key = $start->format('Y-m-d');
-                    
-                } catch (Exception $e) {
-                    $gallery_date = __('Date unavailable', 'mypco-online');
-                    $time_display = '';
-                    $date_key = '';
                 }
-                
+
+                $time_display = ($closest_instance['is_all_day'] ?? false) ? __('All Day', 'mypco-online') : $closest_date->format('g:ia');
+                $date_key = $closest_date->format('Y-m-d');
+
                 // Extract location name
-                $location = $first_instance['location'];
+                $location = $closest_instance['location'];
                 if (!empty($location) && strpos($location, ' - ') !== false) {
                     $location_name = trim(substr($location, 0, strpos($location, ' - ')));
                 } else {
