@@ -54,8 +54,8 @@ body.pco-detail-active .pco-layout-grid {
     grid-template-columns: 1fr !important;
 }
 
-/* Also hide header controls in detail view */
-body.pco-detail-active .pco-header {
+/* Hide header only in event detail view, not month view */
+body.pco-view-detail-active .pco-header {
     display: none !important;
 }
 

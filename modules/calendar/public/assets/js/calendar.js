@@ -81,6 +81,13 @@
             $('body').removeClass('pco-detail-active');
         }
 
+        // Toggle body class specifically for detail view (hides header)
+        if (viewName === 'detail') {
+            $('body').addClass('pco-view-detail-active');
+        } else {
+            $('body').removeClass('pco-view-detail-active');
+        }
+
         // Render month calendar if switching to month view
         if (viewName === 'month') {
             renderMonthCalendar();
