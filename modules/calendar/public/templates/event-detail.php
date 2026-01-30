@@ -92,10 +92,6 @@ defined('ABSPATH') || exit;
 
                 <!-- Location Buttons -->
                 <div class="pco-detail-location-buttons">
-                    <button id="pco-detail-show-map" class="pco-detail-btn-outline" style="display: none;">
-                        <?php _e('Show map', 'mypco-online'); ?>
-                    </button>
-
                     <a id="pco-detail-directions"
                        href="#"
                        class="pco-detail-btn-outline"
