@@ -137,7 +137,7 @@ class MyPCO_Calendar_Public {
             'where[starts_at][gte]' => $month_start,
             'order' => 'starts_at',
             'per_page' => min((int) $atts['count'], 100),
-            'include' => 'event'
+            'include' => 'event,event.tags'
         ];
 
         $transient_key = 'mypco_calendar_v2_' . md5(serialize($params));
@@ -223,13 +223,23 @@ class MyPCO_Calendar_Public {
      */
     private function process_calendar_data($response_data) {
         $event_instances = $response_data['data'] ?? [];
-        $included_events = $response_data['included'] ?? [];
+        $included_items = $response_data['included'] ?? [];
 
-        // Build event map
+        // Build event map and event-to-tags map
         $event_map = [];
-        foreach ($included_events as $item) {
+        $event_tags_map = []; // Maps event ID to array of tag IDs
+
+        foreach ($included_items as $item) {
             if ($item['type'] === 'Event') {
                 $event_map[$item['id']] = $item['attributes'];
+                // Get tag IDs from relationships
+                $tag_ids = [];
+                if (!empty($item['relationships']['tags']['data'])) {
+                    foreach ($item['relationships']['tags']['data'] as $tag_ref) {
+                        $tag_ids[] = $tag_ref['id'];
+                    }
+                }
+                $event_tags_map[$item['id']] = $tag_ids;
             }
         }
 
@@ -245,8 +255,9 @@ class MyPCO_Calendar_Public {
         foreach ($event_instances as $instance) {
             $parent_id = $instance['relationships']['event']['data']['id'] ?? null;
             $parent = $event_map[$parent_id] ?? null;
+            $tag_ids = $event_tags_map[$parent_id] ?? [];
 
-            $formatted = $this->format_event_instance($instance, $parent);
+            $formatted = $this->format_event_instance($instance, $parent, $tag_ids);
 
             // Add to all events list (for Upcoming section)
             $all_events_list[] = $formatted;
@@ -350,7 +361,7 @@ class MyPCO_Calendar_Public {
     /**
      * Format a single event instance for display.
      */
-    private function format_event_instance($instance, $parent) {
+    private function format_event_instance($instance, $parent, $tag_ids = []) {
         $attr = $instance['attributes'];
         $starts_at = $attr['starts_at'];
         $ends_at = $attr['ends_at'] ?? null;
@@ -405,6 +416,7 @@ class MyPCO_Calendar_Public {
             'location' => $location_full,
             'location_name' => $location_name,
             'registration_url' => $registration_url,
+            'tag_ids' => $tag_ids,
             // For JavaScript event data
             'event_data' => json_encode([
                 'name' => $parent['name'] ?? '',
@@ -417,6 +429,7 @@ class MyPCO_Calendar_Public {
                 'location' => $location_full,
                 'location_name' => $location_name,
                 'registration_url' => $registration_url,
+                'tag_ids' => $tag_ids,
             ]),
         ];
     }
@@ -452,6 +465,7 @@ class MyPCO_Calendar_Public {
                 'location_name' => $event['location_name'],
                 'registration_url' => $event['registration_url'],
                 'is_featured' => $event['is_featured'] ?? false,
+                'tag_ids' => $event['tag_ids'] ?? [],
             ];
 
             foreach ($event_dates as $date_key) {

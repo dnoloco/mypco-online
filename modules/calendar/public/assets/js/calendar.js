@@ -15,7 +15,8 @@
         currentMonth: new Date().getMonth(),
         currentYear: new Date().getFullYear(),
         expandedEvents: window.pcoExpandedEvents || window.mypcoCalendarData?.expandedEvents || {},
-        allEventButtons: []
+        allEventButtons: [],
+        selectedTagId: '' // Current category filter
     };
 
     /**
@@ -31,6 +32,7 @@
         initMonthCalendar();
         initEventDetail();
         initEventNavigation();
+        initCategoryFilter();
 
         // Get initial view from PHP-rendered data attribute (server reads cookie)
         var initialView = $('.pco-wrapper').data('initial-view') || 'list';
@@ -43,6 +45,134 @@
         if (initialView === 'month') {
             renderMonthCalendar();
         }
+    }
+
+    /**
+     * Initialize category filter dropdown
+     */
+    function initCategoryFilter() {
+        $('#pco-category-filter').on('change', function() {
+            state.selectedTagId = $(this).val();
+            applyFilters();
+        });
+    }
+
+    /**
+     * Apply category filters across all views
+     */
+    function applyFilters() {
+        // Filter list view
+        filterListView();
+
+        // Filter gallery view
+        filterGalleryView();
+
+        // Re-render month view (it uses expandedEvents which we'll filter)
+        renderMiniCalendar();
+        if (state.currentView === 'month') {
+            renderMonthCalendar();
+        }
+    }
+
+    /**
+     * Filter list view by selected category
+     */
+    function filterListView() {
+        var tagId = state.selectedTagId;
+
+        // Show/hide featured events
+        $('.pco-featured-card').each(function() {
+            var $card = $(this);
+            var eventData = $card.find('.pco-event-title-btn').data('event');
+            if (typeof eventData === 'string') {
+                try { eventData = JSON.parse(eventData); } catch(e) { return; }
+            }
+            var tagIds = eventData?.tag_ids || [];
+
+            if (!tagId || tagIds.indexOf(tagId) !== -1) {
+                $card.show();
+            } else {
+                $card.hide();
+            }
+        });
+
+        // Show/hide featured section if all cards hidden
+        var visibleFeatured = $('.pco-featured-card:visible').length;
+        if (visibleFeatured === 0) {
+            $('.pco-featured-events').hide();
+        } else {
+            $('.pco-featured-events').show();
+        }
+
+        // Show/hide regular events
+        $('.pco-event-item').each(function() {
+            var $item = $(this);
+            var eventData = $item.find('.pco-event-title-btn').data('event');
+            if (typeof eventData === 'string') {
+                try { eventData = JSON.parse(eventData); } catch(e) { return; }
+            }
+            var tagIds = eventData?.tag_ids || [];
+
+            if (!tagId || tagIds.indexOf(tagId) !== -1) {
+                $item.show();
+            } else {
+                $item.hide();
+            }
+        });
+
+        // Hide day groups with no visible events
+        $('.pco-day-group').each(function() {
+            var $group = $(this);
+            var visibleEvents = $group.find('.pco-event-item:visible').length;
+            if (visibleEvents === 0) {
+                $group.hide();
+            } else {
+                $group.show();
+            }
+        });
+
+        // Hide month groups with no visible day groups
+        $('.pco-month-group').each(function() {
+            var $group = $(this);
+            var visibleDays = $group.find('.pco-day-group:visible').length;
+            var hasNoEventsBox = $group.find('.pco-no-events-box').length > 0;
+            if (visibleDays === 0 && !hasNoEventsBox) {
+                $group.hide();
+            } else {
+                $group.show();
+            }
+        });
+    }
+
+    /**
+     * Filter gallery view by selected category
+     */
+    function filterGalleryView() {
+        var tagId = state.selectedTagId;
+
+        $('.pco-gallery-card').each(function() {
+            var $card = $(this);
+            var eventData = $card.find('.pco-event-title-btn').data('event');
+            if (typeof eventData === 'string') {
+                try { eventData = JSON.parse(eventData); } catch(e) { return; }
+            }
+            var tagIds = eventData?.tag_ids || [];
+
+            if (!tagId || tagIds.indexOf(tagId) !== -1) {
+                $card.show();
+            } else {
+                $card.hide();
+            }
+        });
+    }
+
+    /**
+     * Check if an event matches the current filter
+     */
+    function eventMatchesFilter(event) {
+        if (!state.selectedTagId) return true;
+        var tagIds = event.tag_ids || [];
+        return tagIds.indexOf(state.selectedTagId) !== -1;
     }
 
     /**
@@ -190,10 +320,14 @@
                 classes.push('is-today');
             }
 
-            // Check if has events (only show dots for today and future dates)
+            // Check if has events (only show dots for today and future dates, filtered by category)
             var cellDate = new Date(state.currentYear, state.currentMonth, day);
             var todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-            if (state.expandedEvents[dateKey] && state.expandedEvents[dateKey].length > 0 && cellDate >= todayStart) {
+            var dayEvents = state.expandedEvents[dateKey] || [];
+            var filteredEvents = dayEvents.filter(function(evt) {
+                return eventMatchesFilter(evt);
+            });
+            if (filteredEvents.length > 0 && cellDate >= todayStart) {
                 classes.push('has-events');
             }
 
@@ -349,9 +483,14 @@
                 cellClasses.push('pco-month-day-past');
             }
 
-            // Check if this date has events (for tracking upcoming events)
-            if (dateKey >= todayKey && state.expandedEvents[dateKey] && state.expandedEvents[dateKey].length > 0) {
-                hasUpcomingEvents = true;
+            // Check if this date has events (for tracking upcoming events, filtered by category)
+            if (dateKey >= todayKey && state.expandedEvents[dateKey]) {
+                var dayFilteredEvents = state.expandedEvents[dateKey].filter(function(evt) {
+                    return eventMatchesFilter(evt);
+                });
+                if (dayFilteredEvents.length > 0) {
+                    hasUpcomingEvents = true;
+                }
             }
 
             html += '<div class="' + cellClasses.join(' ') + '" data-date="' + dateKey + '">';
@@ -424,7 +563,13 @@
             return '';
         }
 
-        var events = state.expandedEvents[dateKey] || [];
+        var allEvents = state.expandedEvents[dateKey] || [];
+
+        // Filter events by selected category
+        var events = allEvents.filter(function(evt) {
+            return eventMatchesFilter(evt);
+        });
+
         if (events.length === 0) return '';
 
         var html = '<div class="pco-month-day-events">';
