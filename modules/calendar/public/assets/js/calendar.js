@@ -68,6 +68,16 @@
         // Show target view
         $('#pco-view-' + viewName).addClass('active');
 
+        // Reset to current month when switching between list and month views
+        // (but not when navigating to/from detail view)
+        if ((state.currentView === 'list' && viewName === 'month') ||
+            (state.currentView === 'month' && viewName === 'list')) {
+            var today = new Date();
+            state.currentMonth = today.getMonth();
+            state.currentYear = today.getFullYear();
+            renderMiniCalendar();
+        }
+
         // Track view state - save where we came from when going to detail view
         if (viewName === 'detail' && state.currentView !== 'detail') {
             state.previousView = state.currentView;
