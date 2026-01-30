@@ -15,7 +15,7 @@
 defined('ABSPATH') || exit;
 ?>
 
-<div class="pco-wrapper">
+<div class="pco-wrapper" data-default-view="<?php echo esc_attr($default_view); ?>">
     <!-- Header with view switcher -->
     <div class="pco-header">
         <div class="pco-category-dropdown">

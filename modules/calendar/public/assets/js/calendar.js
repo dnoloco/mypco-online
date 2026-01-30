@@ -8,14 +8,16 @@
 (function($) {
     'use strict';
 
-    // Calendar state
+    // Calendar state - always initialize to current month
+    var now = new Date();
     var state = {
         currentView: 'list',
         previousView: 'list',
-        currentMonth: new Date().getMonth(),
-        currentYear: new Date().getFullYear(),
+        currentMonth: now.getMonth(),
+        currentYear: now.getFullYear(),
         expandedEvents: window.pcoExpandedEvents || window.mypcoCalendarData?.expandedEvents || {},
-        allEventButtons: []
+        allEventButtons: [],
+        monthViewInitialized: false
     };
 
     /**
@@ -90,6 +92,13 @@
 
         // Render month calendar if switching to month view
         if (viewName === 'month') {
+            // On first render, ensure we show the current month
+            if (!state.monthViewInitialized) {
+                var today = new Date();
+                state.currentMonth = today.getMonth();
+                state.currentYear = today.getFullYear();
+                state.monthViewInitialized = true;
+            }
             renderMonthCalendar();
         }
     }
