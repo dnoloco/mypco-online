@@ -165,8 +165,8 @@
 
         $('.pco-mini-cal-grid').html(html);
 
-        // Add click handler for days with events
-        $('.pco-mini-cal-day.has-events').on('click', function() {
+        // Add click handler for all days to scroll to that date in list view
+        $('.pco-mini-cal-day').on('click', function() {
             var dateKey = $(this).data('date');
             scrollToDate(dateKey);
         });
@@ -181,17 +181,17 @@
             switchView('list');
         }
 
-        // Find and scroll to the date header
-        var $dateHeader = $('.pco-day-header[data-date="' + dateKey + '"]');
-        if ($dateHeader.length) {
+        // Find and scroll to the day group (which has the data-date attribute)
+        var $dayGroup = $('.pco-day-group[data-date="' + dateKey + '"]');
+        if ($dayGroup.length) {
             $('html, body').animate({
-                scrollTop: $dateHeader.offset().top - 100
+                scrollTop: $dayGroup.offset().top - 100
             }, 300);
 
             // Highlight briefly
-            $dateHeader.addClass('highlight');
+            $dayGroup.addClass('highlight');
             setTimeout(function() {
-                $dateHeader.removeClass('highlight');
+                $dayGroup.removeClass('highlight');
             }, 2000);
         }
     }
