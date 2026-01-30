@@ -549,12 +549,10 @@
             $('#pco-detail-location-name').text(locationName);
             $('#pco-detail-location-address').html(address.replace(/, /g, '<br>'));
 
-            // Google Maps links
+            // Google Maps directions link
             var mapsQuery = encodeURIComponent(eventData.location);
-            var mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + mapsQuery;
             var directionsUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + mapsQuery;
 
-            $('#pco-detail-show-map').show();
             $('#pco-detail-directions').attr('href', directionsUrl).show();
 
             $('#pco-detail-location-container').show();
