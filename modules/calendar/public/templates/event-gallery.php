@@ -132,73 +132,47 @@ foreach ($all_events as $event) {
                 ?>
                 
                 <div class="pco-gallery-item">
-                    
+
                     <!-- Event Image -->
                     <div class="pco-gallery-image-wrapper">
-                        <img src="<?php echo esc_url($event['image_url']); ?>" 
-                             class="pco-gallery-img" 
+                        <img src="<?php echo esc_url($event['image_url']); ?>"
+                             class="pco-gallery-img"
                              alt="<?php echo esc_attr($event['name']); ?>">
-                        
-                        <?php if ($event['is_featured'] ?? false): ?>
-                            <div class="pco-gallery-featured-badge">
-                                <span class="dashicons dashicons-star-filled"></span>
-                                <?php _e('Featured', 'mypco-online'); ?>
-                            </div>
-                        <?php endif; ?>
                     </div>
-                    
+
                     <!-- Event Content -->
                     <div class="pco-gallery-content">
-                        
+
                         <!-- Event Title (Clickable) -->
-                        <button class="pco-event-title-btn pco-gallery-title-btn" 
+                        <button class="pco-event-title-btn pco-gallery-title-btn"
                                 data-event='<?php echo esc_attr($event_data_json); ?>'>
                             <strong class="pco-gallery-event-name">
                                 <?php echo esc_html($event['name']); ?>
                             </strong>
                         </button>
-                        
-                        <!-- Event Meta -->
+
+                        <!-- Event Meta: Date and Recurring indicator -->
                         <div class="pco-gallery-meta">
-                            <span class="pco-gallery-date">
-                                <span class="dashicons dashicons-calendar-alt"></span>
-                                <?php echo esc_html($gallery_date); ?>
-                            </span>
-                            
-                            <?php if ($is_recurring): ?>
-                                <span class="pco-gallery-recurring">
-                                    <span class="dashicons dashicons-update"></span>
-                                    <?php _e('Recurring', 'mypco-online'); ?>
-                                </span>
-                            <?php endif; ?>
+                            <?php echo esc_html($gallery_date); ?><?php if ($is_recurring): ?> | <?php _e('Recurring', 'mypco-online'); ?><?php endif; ?>
                         </div>
-                        
-                        <!-- Event Summary -->
-                        <?php if ($event['summary']): ?>
-                            <p class="pco-gallery-summary">
-                                <?php echo esc_html(wp_trim_words($event['summary'], 15)); ?>
-                            </p>
-                        <?php endif; ?>
-                        
-                        <!-- Location -->
-                        <?php if ($location_name): ?>
-                            <div class="pco-gallery-location">
-                                <span class="dashicons dashicons-location"></span>
-                                <?php echo esc_html($location_name); ?>
-                            </div>
-                        <?php endif; ?>
-                        
+
                         <!-- Badges -->
                         <div class="pco-gallery-badges">
+                            <?php if ($event['is_featured'] ?? false): ?>
+                                <span class="pco-badge pco-badge-featured">
+                                    <span class="dashicons dashicons-star-filled"></span>
+                                    <?php _e('Featured', 'mypco-online'); ?>
+                                </span>
+                            <?php endif; ?>
                             <?php if ($event['registration_url']): ?>
                                 <span class="pco-badge pco-badge-signup">
                                     <?php _e('Signups available', 'mypco-online'); ?>
                                 </span>
                             <?php endif; ?>
                         </div>
-                        
+
                     </div>
-                    
+
                 </div>
                 
             <?php endforeach; ?>
