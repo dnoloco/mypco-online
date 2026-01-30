@@ -172,6 +172,42 @@ body.pco-detail-active .pco-header {
     font-size: 11px;
 }
 
+/* Mini calendar day cells */
+.pco-mini-cal-day {
+    cursor: pointer;
+    color: #666;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 0;
+}
+
+.pco-mini-cal-day:hover {
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+/* Today's date - bold with rounded gray background */
+.pco-mini-cal-day.is-today {
+    font-weight: bold;
+    color: #333;
+    background: #e8e8e8;
+    border-radius: 6px;
+}
+
+/* Dates with events - show green dot */
+.pco-mini-cal-day.has-events::after {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 5px;
+    background-color: #6cbf6c;
+    border-radius: 50%;
+    margin-top: 2px;
+}
+
 /* Day header cells (S M T W T F S) */
 .pco-day-header-cell {
     font-weight: bold;
@@ -427,6 +463,16 @@ button.pco-badge-signup:active {
 
 .pco-day-group {
     margin-bottom: 20px;
+}
+
+/* Highlight effect when scrolling to a day group */
+.pco-day-group.highlight {
+    animation: dayGroupHighlight 2s ease-out;
+}
+
+@keyframes dayGroupHighlight {
+    0% { background-color: #fff3cd; }
+    100% { background-color: transparent; }
 }
 
 .pco-day-header {
