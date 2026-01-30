@@ -991,6 +991,20 @@ button.pco-badge-signup:active {
     font-weight: 600;
 }
 
+/* Past dates - grayed out */
+.pco-month-day-past {
+    background: #f9f9f9;
+}
+
+.pco-month-day-past .pco-month-day-number {
+    color: #bbb;
+}
+
+/* No events message in month view */
+.pco-month-no-events {
+    margin-top: 20px;
+}
+
 .pco-month-day-events {
     display: flex;
     flex-direction: column;

@@ -165,18 +165,13 @@ if (!function_exists('mypco_get_location_name')) {
             <?php _e('Upcoming', 'mypco-online'); ?>
         </h2>
 
-        <?php if (empty($regular_events)): ?>
-            <p class="pco-no-events">
-                <?php _e('No upcoming events found.', 'mypco-online'); ?>
-            </p>
-        <?php else: ?>
+        <?php
+        // Group events by month and day, filtering out past events
+        $tz = new DateTimeZone('America/Chicago');
+        $today = new DateTime('today', $tz);
+        $events_by_month = [];
 
-            <?php
-            // Group events by month and day, filtering out past events
-            $tz = new DateTimeZone('America/Chicago');
-            $today = new DateTime('today', $tz);
-            $events_by_month = [];
-
+        if (!empty($regular_events)) {
             foreach ($regular_events as $event) {
                 try {
                     $start = new DateTime($event['starts_at'], new DateTimeZone('UTC'));
@@ -211,20 +206,21 @@ if (!function_exists('mypco_get_location_name')) {
                     // Skip events with invalid dates
                 }
             }
-            ?>
+        }
+        ?>
 
-            <?php if (empty($events_by_month)): ?>
-                <?php
-                // Show current month header with "No events scheduled" message
-                $current_month_display = (new DateTime('now', $tz))->format('F Y');
-                ?>
-                <div class="pco-month-group">
-                    <h3 class="pco-month-header"><?php echo esc_html($current_month_display); ?></h3>
-                    <div class="pco-no-events-box">
-                        <?php _e('No events scheduled', 'mypco-online'); ?>
-                    </div>
+        <?php if (empty($events_by_month)): ?>
+            <?php
+            // Show current month header with "No events scheduled" message
+            $current_month_display = (new DateTime('now', $tz))->format('F Y');
+            ?>
+            <div class="pco-month-group">
+                <h3 class="pco-month-header"><?php echo esc_html($current_month_display); ?></h3>
+                <div class="pco-no-events-box">
+                    <?php _e('No events scheduled', 'mypco-online'); ?>
                 </div>
-            <?php else: ?>
+            </div>
+        <?php else: ?>
 
             <?php foreach ($events_by_month as $month_key => $month_data): ?>
                 <div class="pco-month-group">
@@ -305,8 +301,6 @@ if (!function_exists('mypco_get_location_name')) {
                     <?php endforeach; ?>
                 </div>
             <?php endforeach; ?>
-
-            <?php endif; ?>
 
         <?php endif; ?>
     </div>

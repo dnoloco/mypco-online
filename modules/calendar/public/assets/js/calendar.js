@@ -320,6 +320,12 @@
             html += '</div>';
         }
 
+        // Track if there are any events remaining in the month (today or future)
+        var hasUpcomingEvents = false;
+        var todayKey = today.getFullYear() + '-' +
+                       String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                       String(today.getDate()).padStart(2, '0');
+
         // Current month days
         for (var day = 1; day <= daysInMonth; day++) {
             var dateKey = state.currentYear + '-' +
@@ -336,6 +342,16 @@
             if (isToday) {
                 cellClasses.push('pco-month-day-today');
                 dayNumClasses.push('is-today');
+            }
+
+            // Check if past date (before today)
+            if (dateKey < todayKey) {
+                cellClasses.push('pco-month-day-past');
+            }
+
+            // Check if this date has events (for tracking upcoming events)
+            if (dateKey >= todayKey && state.expandedEvents[dateKey] && state.expandedEvents[dateKey].length > 0) {
+                hasUpcomingEvents = true;
             }
 
             html += '<div class="' + cellClasses.join(' ') + '" data-date="' + dateKey + '">';
@@ -365,6 +381,13 @@
 
         html += '</div>';
 
+        // Show "No events scheduled" message if no upcoming events in current month
+        if (!hasUpcomingEvents) {
+            html += '<div class="pco-no-events-box pco-month-no-events">';
+            html += 'No events scheduled';
+            html += '</div>';
+        }
+
         $('#pco-view-month').html(html);
 
         // Add click handlers for month events
@@ -387,9 +410,25 @@
     }
 
     /**
+     * Check if a date is in the past (before today)
+     */
+    function isDatePast(dateKey) {
+        var today = new Date();
+        var todayKey = today.getFullYear() + '-' +
+                       String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                       String(today.getDate()).padStart(2, '0');
+        return dateKey < todayKey;
+    }
+
+    /**
      * Render events for a specific day in month view
      */
     function renderDayEvents(dateKey) {
+        // Don't show events for past dates
+        if (isDatePast(dateKey)) {
+            return '';
+        }
+
         var events = state.expandedEvents[dateKey] || [];
         if (events.length === 0) return '';
 
