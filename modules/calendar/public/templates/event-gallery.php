@@ -85,7 +85,7 @@ uasort($events_by_name, function($a, $b) {
 });
 ?>
 
-<div id="pco-view-gallery" class="pco-view-section">
+<div id="pco-view-gallery" class="pco-view-section<?php echo esc_attr($gallery_active); ?>">
     
     <h2 class="pco-section-title pco-gallery-title">
         <?php _e('Event Gallery', 'mypco-online'); ?>

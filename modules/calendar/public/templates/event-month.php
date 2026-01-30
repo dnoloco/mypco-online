@@ -16,7 +16,7 @@
 defined('ABSPATH') || exit;
 ?>
 
-<div id="pco-view-month" class="pco-view-section">
+<div id="pco-view-month" class="pco-view-section<?php echo esc_attr($month_active); ?>">
     
     <!-- Month Navigation Header -->
     <div class="pco-month-header">

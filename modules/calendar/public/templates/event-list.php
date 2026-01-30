@@ -59,7 +59,7 @@ if (!function_exists('mypco_get_location_name')) {
 }
 ?>
 
-<div id="pco-view-list" class="pco-view-section active">
+<div id="pco-view-list" class="pco-view-section<?php echo esc_attr($list_active); ?>">
     
     <!-- Featured Events Section -->
     <?php if (!empty($featured_events)): ?>
