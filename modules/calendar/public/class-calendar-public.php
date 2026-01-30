@@ -65,6 +65,10 @@ class MyPCO_Calendar_Public {
             .pco-view-section.active { display: block; }
             .pco-sidebar-hidden { display: none; }
             .pco-grid-full-width { grid-template-columns: 1fr; }
+            #pco-view-month .pco-month-header { display: flex; justify-content: space-between; align-items: center; }
+            .pco-month-days-header { display: grid; grid-template-columns: repeat(7, 1fr); }
+            .pco-month-days-header .pco-day-header { text-align: center; }
+            .pco-month-loading { display: flex; justify-content: center; align-items: center; min-height: 200px; color: #999; }
         ';
         wp_add_inline_style('mypco-calendar-public', $critical_css);
 
