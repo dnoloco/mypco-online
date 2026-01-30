@@ -176,17 +176,10 @@ body.pco-view-detail-active .pco-header {
 .pco-mini-cal-day {
     cursor: pointer;
     color: #666;
-    font-size: 14px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 4px 0;
 }
 
 .pco-mini-cal-day:hover {
     background: #f0f0f0;
-    border-radius: 4px;
 }
 
 /* Today's date - bold with rounded gray background */
@@ -194,18 +187,19 @@ body.pco-view-detail-active .pco-header {
     font-weight: bold;
     color: #333;
     background: #e8e8e8;
-    border-radius: 6px;
 }
 
-/* Dates with events - show green dot */
+/* Dates with events - show green dot below the number */
 .pco-mini-cal-day.has-events::after {
     content: '';
-    display: block;
-    width: 5px;
-    height: 5px;
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
     background-color: #6cbf6c;
     border-radius: 50%;
-    margin-top: 2px;
 }
 
 /* Day header cells (S M T W T F S) */
