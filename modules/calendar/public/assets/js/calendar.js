@@ -185,7 +185,8 @@
         // Show "No events found" message if no visible events (featured or regular)
         var visibleEvents = $('.pco-event-item:visible').length;
         if (visibleFeatured === 0 && visibleEvents === 0) {
-            // Hide titles when showing no events message
+            // Hide all content when showing no events message
+            $('.pco-month-group').hide();
             $('.pco-upcoming-title').hide();
             $('.pco-events-section').append(
                 '<div class="pco-filter-no-events">' +
