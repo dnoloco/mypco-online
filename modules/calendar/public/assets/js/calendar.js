@@ -96,6 +96,15 @@
         // Remove existing "no events" message
         $('#pco-view-list .pco-filter-no-events').remove();
 
+        // IMPORTANT: Show all containers first so :visible checks work correctly
+        // jQuery's :visible selector returns false for elements inside hidden parents,
+        // even if the elements themselves are not hidden
+        $('.pco-featured-section').show();
+        $('.pco-month-group').show();
+        $('.pco-day-group').show();
+        $('.pco-events-section').show();
+        $('.pco-upcoming-title').show();
+
         // If no filter, reset to default state
         if (!tagId) {
             // Show featured cards that are not initially hidden, hide those that are
@@ -107,18 +116,12 @@
                     $card.show();
                 }
             });
-            // Show featured section if there are visible cards
+            // Hide featured section if no visible cards
             var visibleFeaturedDefault = $('.pco-featured-card:visible').length;
-            if (visibleFeaturedDefault > 0) {
-                $('.pco-featured-section').show();
-            } else {
+            if (visibleFeaturedDefault === 0) {
                 $('.pco-featured-section').hide();
             }
             $('.pco-event-item').show();
-            $('.pco-day-group').show();
-            $('.pco-month-group').show();
-            $('.pco-events-section').show();
-            $('.pco-upcoming-title').show();
             return;
         }
 
@@ -138,12 +141,10 @@
             }
         });
 
-        // Show/hide featured section based on visible cards
+        // Hide featured section if no visible cards
         var visibleFeatured = $('.pco-featured-card:visible').length;
         if (visibleFeatured === 0) {
             $('.pco-featured-section').hide();
-        } else {
-            $('.pco-featured-section').show();
         }
 
         // Show/hide regular events based on tag match
@@ -168,8 +169,6 @@
             var visibleEvents = $group.find('.pco-event-item:visible').length;
             if (visibleEvents === 0) {
                 $group.hide();
-            } else {
-                $group.show();
             }
         });
 
@@ -180,17 +179,13 @@
             var hasNoEventsBox = $group.find('.pco-no-events-box').length > 0;
             if (visibleDays === 0 && !hasNoEventsBox) {
                 $group.hide();
-            } else {
-                $group.show();
             }
         });
 
         // Show "No events found" message if no visible events (featured or regular)
         var visibleEvents = $('.pco-event-item:visible').length;
         if (visibleFeatured === 0 && visibleEvents === 0) {
-            // Hide all sections when showing no events message
-            $('.pco-month-group').hide();
-            $('.pco-featured-section').hide();
+            // Hide titles when showing no events message
             $('.pco-upcoming-title').hide();
             $('.pco-events-section').append(
                 '<div class="pco-filter-no-events">' +
@@ -199,9 +194,6 @@
                 '<button class="pco-clear-filters-btn" type="button">Clear filters</button>' +
                 '</div>'
             );
-        } else {
-            // Show Upcoming title if there are visible events
-            $('.pco-upcoming-title').show();
         }
     }
 
