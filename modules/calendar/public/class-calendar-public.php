@@ -292,6 +292,7 @@ class MyPCO_Calendar_Public {
     /**
      * Deduplicate featured events for recurring events.
      * Shows only one entry per parent event with date range info.
+     * Returns ALL featured events but marks which should be initially visible.
      */
     private function deduplicate_featured_events($featured_events) {
         // Get settings
@@ -354,8 +355,16 @@ class MyPCO_Calendar_Public {
         }
         // 'upcoming' is already sorted by date
 
-        // Limit to max featured count
-        return array_slice($deduplicated, 0, $max_featured);
+        // Mark which events should be initially visible vs hidden (for category filtering)
+        $index = 0;
+        foreach ($deduplicated as &$event) {
+            $event['initially_hidden'] = ($index >= $max_featured);
+            $index++;
+        }
+        unset($event); // break reference
+
+        // Return ALL featured events (not limited) - template/JS will handle visibility
+        return $deduplicated;
     }
 
     /**

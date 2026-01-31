@@ -72,6 +72,7 @@ if (!function_exists('mypco_get_location_name')) {
                 $is_all_day = $event['is_all_day'] ?? false;
                 $is_recurring = $event['is_recurring'] ?? false;
                 $is_multi_day = $event['is_multi_day'] ?? false;
+                $initially_hidden = $event['initially_hidden'] ?? false;
 
                 // Determine date and time display for featured event
                 $tz = new DateTimeZone('America/Chicago');
@@ -116,9 +117,15 @@ if (!function_exists('mypco_get_location_name')) {
                     'registration_url' => $event['registration_url'],
                     'tag_ids' => $event['tag_ids'] ?? []
                 ]);
+
+                // Add hidden class for featured events beyond the initial limit
+                $card_class = 'pco-featured-card';
+                if ($initially_hidden) {
+                    $card_class .= ' pco-featured-initially-hidden';
+                }
                 ?>
 
-                <div class="pco-featured-card">
+                <div class="<?php echo esc_attr($card_class); ?>">
                     <?php if ($event['image_url']): ?>
                         <div class="pco-featured-image">
                             <img src="<?php echo esc_url($event['image_url']); ?>"
