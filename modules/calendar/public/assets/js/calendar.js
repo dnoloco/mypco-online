@@ -96,7 +96,17 @@
         // Remove existing "no events" message
         $('#pco-view-list .pco-filter-no-events').remove();
 
-        // Show/hide featured events
+        // If no filter, show everything and return
+        if (!tagId) {
+            $('.pco-featured-card').show();
+            $('.pco-featured-events').show();
+            $('.pco-event-item').show();
+            $('.pco-day-group').show();
+            $('.pco-month-group').show();
+            return;
+        }
+
+        // Show/hide featured events based on tag match
         $('.pco-featured-card').each(function() {
             var $card = $(this);
             var eventData = $card.find('.pco-event-title-btn').data('event');
@@ -112,7 +122,7 @@
             }
         });
 
-        // Show/hide featured section if all cards hidden
+        // Show/hide featured section based on visible cards
         var visibleFeatured = $('.pco-featured-card:visible').length;
         if (visibleFeatured === 0) {
             $('.pco-featured-events').hide();
@@ -120,7 +130,7 @@
             $('.pco-featured-events').show();
         }
 
-        // Show/hide regular events
+        // Show/hide regular events based on tag match
         $('.pco-event-item').each(function() {
             var $item = $(this);
             var eventData = $item.find('.pco-event-title-btn').data('event');
@@ -159,12 +169,12 @@
             }
         });
 
-        // Show "No events found" message if filtering and no visible events
+        // Show "No events found" message if no visible events (featured or regular)
         var visibleEvents = $('.pco-event-item:visible').length;
-        var visibleMonthGroups = $('.pco-month-group:visible').length;
-        if (tagId && visibleFeatured === 0 && visibleEvents === 0) {
-            // Hide all month groups when showing no events message
+        if (visibleFeatured === 0 && visibleEvents === 0) {
+            // Hide all sections when showing no events message
             $('.pco-month-group').hide();
+            $('.pco-featured-events').hide();
             $('.pco-events-section').append(
                 '<div class="pco-filter-no-events">' +
                 '<div class="pco-filter-no-events-icon">📅</div>' +
@@ -183,6 +193,12 @@
 
         // Remove existing "no events" message
         $('#pco-view-gallery .pco-filter-no-events').remove();
+
+        // If no filter, show everything and return
+        if (!tagId) {
+            $('.pco-gallery-item').show();
+            return;
+        }
 
         var visibleCount = 0;
 
