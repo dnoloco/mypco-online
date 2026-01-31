@@ -96,10 +96,24 @@
         // Remove existing "no events" message
         $('#pco-view-list .pco-filter-no-events').remove();
 
-        // If no filter, show everything and return
+        // If no filter, reset to default state
         if (!tagId) {
-            $('.pco-featured-card').show();
-            $('.pco-featured-section').show();
+            // Show featured cards that are not initially hidden, hide those that are
+            $('.pco-featured-card').each(function() {
+                var $card = $(this);
+                if ($card.hasClass('pco-featured-initially-hidden')) {
+                    $card.hide();
+                } else {
+                    $card.show();
+                }
+            });
+            // Show featured section if there are visible cards
+            var visibleFeaturedDefault = $('.pco-featured-card:visible').length;
+            if (visibleFeaturedDefault > 0) {
+                $('.pco-featured-section').show();
+            } else {
+                $('.pco-featured-section').hide();
+            }
             $('.pco-event-item').show();
             $('.pco-day-group').show();
             $('.pco-month-group').show();
@@ -108,7 +122,7 @@
             return;
         }
 
-        // Show/hide featured events based on tag match
+        // When filtering, show ALL featured cards that match the tag (including initially hidden ones)
         $('.pco-featured-card').each(function() {
             var $card = $(this);
             var eventData = $card.find('.pco-event-title-btn').data('event');

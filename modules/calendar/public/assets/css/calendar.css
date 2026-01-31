@@ -497,6 +497,11 @@ button.pco-badge-signup:active {
     color: #fff;
 }
 
+/* Initially hidden featured events (beyond max_featured limit) */
+.pco-featured-initially-hidden {
+    display: none;
+}
+
 .pco-section-title.pco-upcoming-title {
     font-size: 1.5rem;
     font-weight: 600;
