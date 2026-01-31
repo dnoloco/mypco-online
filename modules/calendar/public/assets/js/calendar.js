@@ -346,6 +346,14 @@
         if (viewName === 'month') {
             renderMonthCalendar();
         }
+
+        // Apply current filter to the view we're switching to
+        // This ensures filter state is consistent across view switches
+        if (viewName === 'list') {
+            filterListView();
+        } else if (viewName === 'gallery') {
+            filterGalleryView();
+        }
     }
 
     /**
