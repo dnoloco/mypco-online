@@ -99,10 +99,12 @@
         // If no filter, show everything and return
         if (!tagId) {
             $('.pco-featured-card').show();
-            $('.pco-featured-events').show();
+            $('.pco-featured-section').show();
             $('.pco-event-item').show();
             $('.pco-day-group').show();
             $('.pco-month-group').show();
+            $('.pco-events-section').show();
+            $('.pco-upcoming-title').show();
             return;
         }
 
@@ -125,9 +127,9 @@
         // Show/hide featured section based on visible cards
         var visibleFeatured = $('.pco-featured-card:visible').length;
         if (visibleFeatured === 0) {
-            $('.pco-featured-events').hide();
+            $('.pco-featured-section').hide();
         } else {
-            $('.pco-featured-events').show();
+            $('.pco-featured-section').show();
         }
 
         // Show/hide regular events based on tag match
@@ -174,7 +176,8 @@
         if (visibleFeatured === 0 && visibleEvents === 0) {
             // Hide all sections when showing no events message
             $('.pco-month-group').hide();
-            $('.pco-featured-events').hide();
+            $('.pco-featured-section').hide();
+            $('.pco-upcoming-title').hide();
             $('.pco-events-section').append(
                 '<div class="pco-filter-no-events">' +
                 '<div class="pco-filter-no-events-icon">📅</div>' +
@@ -182,6 +185,9 @@
                 '<button class="pco-clear-filters-btn" type="button">Clear filters</button>' +
                 '</div>'
             );
+        } else {
+            // Show Upcoming title if there are visible events
+            $('.pco-upcoming-title').show();
         }
     }
 
