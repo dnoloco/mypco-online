@@ -67,37 +67,21 @@
     margin-bottom: 20px;
 }
 
-/* WITH TITLE: Stack date/time vertically, location below */
-.mypco-location-has-title .mypco-location-info-row {
-    flex-direction: column;
-    gap: 15px;
-}
-
-.mypco-location-has-title .mypco-location-datetime {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-.mypco-location-has-title .mypco-location-details {
-    margin: 0;
-}
-
-/* WITHOUT TITLE: Date/time and location on same row */
-.mypco-location-no-title .mypco-location-info-row {
+/* DESKTOP: Date/time and location on same row for both layouts */
+.mypco-location-info-row {
     flex-direction: row;
     align-items: flex-start;
     justify-content: space-between;
 }
 
-.mypco-location-no-title .mypco-location-datetime {
+.mypco-location-datetime {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
     flex-shrink: 0;
 }
 
-.mypco-location-no-title .mypco-location-details {
+.mypco-location-details {
     margin: 0;
 }
 
