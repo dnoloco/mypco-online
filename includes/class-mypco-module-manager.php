@@ -157,6 +157,27 @@ class MyPCO_Module_Manager {
                 ],
                 'file' => 'messages/class-messages-module.php',
                 'class' => 'MyPCO_Messages_Module'
+            ],
+            'locations' => [
+                'name' => 'Locations',
+                'description' => 'Display upcoming Sunday gathering locations from Planning Center.',
+                'tier' => 'freemium',
+                'requires_license' => false,
+                'min_license_tier' => 'starter',
+                'features' => [
+                    'free' => [
+                        'next_sunday_shortcode',
+                        'sunday_list_shortcode',
+                        'google_maps_links'
+                    ],
+                    'premium' => [
+                        'custom_styling',
+                        'multiple_event_types',
+                        'location_widgets'
+                    ]
+                ],
+                'file' => 'locations/class-locations-module.php',
+                'class' => 'MyPCO_Locations_Module'
             ]
         ];
     }
