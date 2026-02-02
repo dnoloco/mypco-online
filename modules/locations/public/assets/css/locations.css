@@ -99,15 +99,6 @@
 
 .mypco-location-no-title .mypco-location-details {
     margin: 0;
-    text-align: right;
-}
-
-.mypco-location-no-title .mypco-location-info {
-    justify-content: flex-end;
-}
-
-.mypco-location-no-title .mypco-location-text {
-    align-items: flex-end;
 }
 
 /* ============================================
@@ -493,19 +484,6 @@
     .mypco-location-datetime {
         flex-direction: row;
         gap: 15px;
-    }
-
-    /* Reset alignment for no-title variant on mobile */
-    .mypco-location-no-title .mypco-location-details {
-        text-align: left;
-    }
-
-    .mypco-location-no-title .mypco-location-info {
-        justify-content: flex-start;
-    }
-
-    .mypco-location-no-title .mypco-location-text {
-        align-items: flex-start;
     }
 
     /* List */
