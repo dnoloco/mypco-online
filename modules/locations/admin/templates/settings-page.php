@@ -10,6 +10,7 @@
  * - $module_status (string)
  * - $event_name (string)
  * - $layout_style (string)
+ * - $show_title (bool)
  * - $show_map (bool)
  * - $map_height (int)
  * - $primary_color (string)
@@ -119,6 +120,21 @@ defined('ABSPATH') || exit;
                 </tr>
                 <tr>
                     <th scope="row">
+                        <label for="show_title"><?php _e('Show Event Title', 'mypco-online'); ?></label>
+                    </th>
+                    <td>
+                        <label>
+                            <input type="checkbox" id="show_title" name="show_title" value="1"
+                                <?php checked($show_title, true); ?>>
+                            <?php _e('Display the event title (e.g., "Sunday Gathering")', 'mypco-online'); ?>
+                        </label>
+                        <p class="description">
+                            <?php _e('Uncheck to hide the event title and only show date, time, and location.', 'mypco-online'); ?>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
                         <label for="show_map"><?php _e('Show Map', 'mypco-online'); ?></label>
                     </th>
                     <td>
@@ -156,6 +172,9 @@ defined('ABSPATH') || exit;
                     </th>
                     <td>
                         <select id="date_format" name="date_format">
+                            <option value="D, M j, Y" <?php selected($date_format, 'D, M j, Y'); ?>>
+                                <?php echo esc_html(date('D, M j, Y')); ?> (Sun, Feb 2, 2026)
+                            </option>
                             <option value="l, F j, Y" <?php selected($date_format, 'l, F j, Y'); ?>>
                                 <?php echo esc_html(date('l, F j, Y')); ?> (Sunday, February 2, 2026)
                             </option>
@@ -284,13 +303,18 @@ defined('ABSPATH') || exit;
                 <td><?php echo esc_html($layout_style); ?></td>
             </tr>
             <tr>
+                <td><code>show_title</code></td>
+                <td><?php _e('Show event title: yes or no', 'mypco-online'); ?></td>
+                <td><?php echo $show_title ? 'yes' : 'no'; ?></td>
+            </tr>
+            <tr>
                 <td><code>show_map</code></td>
                 <td><?php _e('Show map: yes or no', 'mypco-online'); ?></td>
                 <td><?php echo $show_map ? 'yes' : 'no'; ?></td>
             </tr>
             </tbody>
         </table>
-        <p><strong><?php _e('Example:', 'mypco-online'); ?></strong> <code>[mypco_next_sunday event="Sunday Service" layout="banner" show_map="yes"]</code></p>
+        <p><strong><?php _e('Example:', 'mypco-online'); ?></strong> <code>[mypco_next_sunday event="Sunday Service" layout="banner" show_title="no" show_map="yes"]</code></p>
 
         <h4 style="margin-top: 20px;"><?php _e('Sunday List Shortcode', 'mypco-online'); ?></h4>
         <table class="widefat">

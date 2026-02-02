@@ -93,6 +93,7 @@ class MyPCO_Locations_Public {
         $defaults = [
             'event_name' => 'Sunday Gathering',
             'layout_style' => 'card',
+            'show_title' => true,
             'show_map' => true,
             'map_height' => 200,
             'primary_color' => '#333333',
@@ -118,10 +119,12 @@ class MyPCO_Locations_Public {
         $atts = shortcode_atts([
             'event' => $settings['event_name'],
             'layout' => $settings['layout_style'],
+            'show_title' => $settings['show_title'] ? 'yes' : 'no',
             'show_map' => $settings['show_map'] ? 'yes' : 'no',
         ], $atts, 'mypco_next_sunday');
 
-        // Convert show_map to boolean
+        // Convert to booleans
+        $show_title = ($atts['show_title'] === 'yes' || $atts['show_title'] === '1' || $atts['show_title'] === true);
         $show_map = ($atts['show_map'] === 'yes' || $atts['show_map'] === '1' || $atts['show_map'] === true);
 
         // Fetch upcoming Sunday events
@@ -140,6 +143,7 @@ class MyPCO_Locations_Public {
         $data = [
             'event' => $next_sunday,
             'layout' => $atts['layout'],
+            'show_title' => $show_title,
             'show_map' => $show_map,
             'map_height' => $settings['map_height'],
             'date_format' => $settings['date_format'],
