@@ -83,6 +83,7 @@ class MyPCO_Locations_Admin {
             'module_status' => 'active',
             'event_name' => $settings['event_name'],
             'layout_style' => $settings['layout_style'],
+            'show_title' => $settings['show_title'],
             'show_map' => $settings['show_map'],
             'map_height' => $settings['map_height'],
             'primary_color' => $settings['primary_color'],
@@ -104,6 +105,7 @@ class MyPCO_Locations_Admin {
         return [
             'event_name' => 'Sunday Gathering',
             'layout_style' => 'card',
+            'show_title' => true,
             'show_map' => true,
             'map_height' => 200,
             'primary_color' => '#333333',
@@ -169,6 +171,7 @@ class MyPCO_Locations_Admin {
             'layout_style' => isset($_POST['layout_style']) && in_array($_POST['layout_style'], ['card', 'minimal', 'banner'])
                 ? sanitize_text_field($_POST['layout_style'])
                 : 'card',
+            'show_title' => isset($_POST['show_title']) ? true : false,
             'show_map' => isset($_POST['show_map']) ? true : false,
             'map_height' => isset($_POST['map_height'])
                 ? absint($_POST['map_height'])

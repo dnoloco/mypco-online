@@ -8,6 +8,7 @@
  * - $event (array) - Event data with keys: name, date_display, time_display, location_full, location_name, location_address, maps_url
  * - $layout (string) - Layout style: card, minimal, or banner
  * - $show_map (bool) - Whether to show the map
+ * - $show_title (bool) - Whether to show the event title
  * - $map_height (int) - Map height in pixels
  * - $date_format (string) - PHP date format
  * - $time_format (string) - PHP time format
@@ -23,10 +24,12 @@ $has_location = !empty($event['location_full']);
 
 <div class="mypco-location-card <?php echo $layout_class; ?>">
     <div class="mypco-location-content">
-        <!-- Event Name -->
-        <h3 class="mypco-location-title">
-            <?php echo esc_html($event['name']); ?>
-        </h3>
+        <?php if ($show_title): ?>
+            <!-- Event Name -->
+            <h3 class="mypco-location-title">
+                <?php echo esc_html($event['name']); ?>
+            </h3>
+        <?php endif; ?>
 
         <!-- Date and Time -->
         <div class="mypco-location-datetime">
@@ -65,19 +68,6 @@ $has_location = !empty($event['location_full']);
                         <?php endif; ?>
                     </div>
                 </div>
-
-                <!-- Get Directions Button -->
-                <?php if (!empty($event['maps_url'])): ?>
-                    <a href="<?php echo esc_url($event['maps_url']); ?>"
-                       class="mypco-location-directions-btn"
-                       target="_blank"
-                       rel="noopener noreferrer">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
-                        </svg>
-                        <?php _e('Get Directions', 'mypco-online'); ?>
-                    </a>
-                <?php endif; ?>
             </div>
 
             <?php if ($show_map && !empty($event['maps_url'])): ?>

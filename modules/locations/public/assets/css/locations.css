@@ -112,39 +112,6 @@
     line-height: 1.4;
 }
 
-/* Get Directions Button */
-.mypco-location-directions-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    background: var(--mypco-loc-primary);
-    color: #ffffff;
-    border: none;
-    border-radius: calc(var(--mypco-loc-radius) * 2.5);
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    cursor: pointer;
-}
-
-.mypco-location-directions-btn:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
-    color: #ffffff;
-    text-decoration: none;
-}
-
-.mypco-location-directions-btn:focus {
-    outline: 2px solid var(--mypco-loc-primary);
-    outline-offset: 2px;
-}
-
-.mypco-location-directions-btn svg {
-    flex-shrink: 0;
-}
-
 /* No Location State */
 .mypco-location-no-location {
     padding: 20px;
@@ -548,12 +515,6 @@
         font-size: 0.9rem;
     }
 
-    .mypco-location-directions-btn {
-        width: 100%;
-        justify-content: center;
-        padding: 12px 20px;
-    }
-
     /* Map */
     .mypco-location-map-overlay-text {
         font-size: 0.8rem;
@@ -608,7 +569,6 @@
    ============================================ */
 
 /* Focus visible for keyboard navigation */
-.mypco-location-directions-btn:focus-visible,
 .mypco-location-map-link:focus-visible,
 .mypco-location-list-link:focus-visible {
     outline: 2px solid var(--mypco-loc-primary);
@@ -617,16 +577,11 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-    .mypco-location-directions-btn,
     .mypco-location-map-overlay,
     .mypco-location-map-overlay-text,
     .mypco-location-list-item,
     .mypco-location-list-link {
         transition: none;
-    }
-
-    .mypco-location-directions-btn:hover {
-        transform: none;
     }
 }
 
@@ -637,7 +592,6 @@
         border-width: 2px;
     }
 
-    .mypco-location-directions-btn,
     .mypco-location-list-badge {
         border: 2px solid currentColor;
     }
@@ -652,12 +606,6 @@
     .mypco-location-card,
     .mypco-location-list-item {
         box-shadow: none;
-        border: 1px solid #000;
-    }
-
-    .mypco-location-directions-btn {
-        background: transparent;
-        color: #000;
         border: 1px solid #000;
     }
 }
