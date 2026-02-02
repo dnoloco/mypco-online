@@ -1,0 +1,107 @@
+/**
+ * Locations Admin Styles
+ *
+ * Styles for the Locations module admin settings page.
+ */
+
+.mypco-locations-admin .card {
+    max-width: 800px;
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+.mypco-locations-admin h2 {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.mypco-locations-admin h3 {
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.mypco-locations-admin h3:first-of-type {
+    margin-top: 20px;
+    padding-top: 0;
+    border-top: none;
+}
+
+.mypco-locations-admin .form-table th {
+    width: 200px;
+    padding-top: 15px;
+}
+
+.mypco-locations-admin .form-table td {
+    padding-top: 15px;
+}
+
+/* Color picker styling */
+.mypco-locations-admin input[type="color"] {
+    width: 50px;
+    height: 34px;
+    padding: 2px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.mypco-locations-admin .mypco-color-preview {
+    margin-left: 10px;
+    font-family: monospace;
+    font-size: 13px;
+    color: #666;
+    vertical-align: middle;
+}
+
+/* Shortcode tables */
+.mypco-locations-admin .widefat {
+    margin-bottom: 15px;
+}
+
+.mypco-locations-admin .widefat code {
+    background: #f5f5f5;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+.mypco-locations-admin .widefat th,
+.mypco-locations-admin .widefat td {
+    padding: 10px 12px;
+}
+
+/* Description text */
+.mypco-locations-admin .description {
+    color: #666;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+/* Submit button spacing */
+.mypco-locations-admin .submit {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+/* Select inputs */
+.mypco-locations-admin select {
+    min-width: 250px;
+}
+
+/* Number inputs */
+.mypco-locations-admin .small-text {
+    width: 60px;
+}
+
+/* Checkbox labels */
+.mypco-locations-admin label input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+/* Notice styling */
+.mypco-locations-admin .notice {
+    margin: 15px 0;
+}
