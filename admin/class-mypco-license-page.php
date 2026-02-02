@@ -35,11 +35,11 @@ class MyPCO_License_Page {
     }
 
     /**
-     * Add license submenu
+     * Add license page (hidden from menu, accessible via direct URL)
      */
     public function add_license_menu() {
         add_submenu_page(
-            'mypco-dashboard',
+            null, // Hidden from menu
             __('License', 'mypco-online'),
             __('License', 'mypco-online'),
             'manage_options',

@@ -51,8 +51,9 @@ class MyPCO_Services_Admin
             [$this, 'render_services_page']
         );
 
+        // Team Reports - hidden from menu (will be added as premium module later)
         add_submenu_page(
-            'mypco-dashboard',
+            null, // Hidden from menu
             __('Team Reports', 'mypco-online'),
             __('Team Reports', 'mypco-online'),
             'edit_posts',
