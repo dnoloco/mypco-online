@@ -39,6 +39,113 @@ class MyPCO_Modules {
     }
 
     /**
+     * Render the Active Modules Page (shows only enabled modules with their settings links)
+     */
+    public function render_active_modules_page() {
+        if (!$this->module_manager) {
+            echo '<div class="notice notice-error"><p>Module Manager not found.</p></div>';
+            return;
+        }
+
+        $modules = $this->module_manager->get_modules();
+        $license_status = $this->license_manager ? $this->license_manager->get_status_summary() : null;
+        $is_licensed = $license_status && $license_status['status'] === 'active';
+
+        // Get only enabled modules
+        $active_modules = [];
+        foreach ($modules as $key => $module) {
+            if ($this->module_manager->is_module_enabled($key)) {
+                $active_modules[$key] = $module;
+            }
+        }
+
+        ?>
+        <div class="wrap">
+            <h1><?php _e('Active Modules', 'mypco-online'); ?></h1>
+            <p class="description"><?php _e('Your currently enabled modules. Click on a module to access its settings.', 'mypco-online'); ?></p>
+
+            <?php if (empty($active_modules)): ?>
+                <div class="notice notice-info" style="margin: 20px 0;">
+                    <p>
+                        <?php _e('No modules are currently active.', 'mypco-online'); ?>
+                        <a href="<?php echo admin_url('admin.php?page=mypco-modules'); ?>"><?php _e('Enable modules', 'mypco-online'); ?></a>
+                    </p>
+                </div>
+            <?php else: ?>
+                <div class="mypco-modules-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; margin-top: 20px;">
+                    <?php
+                    foreach ($active_modules as $key => $module) {
+                        $this->render_active_module_card($key, $module, $is_licensed);
+                    }
+                    ?>
+                </div>
+            <?php endif; ?>
+
+            <p style="margin-top: 30px;">
+                <a href="<?php echo admin_url('admin.php?page=mypco-modules'); ?>" class="button">
+                    <?php _e('Manage All Modules', 'mypco-online'); ?>
+                </a>
+            </p>
+        </div>
+        <?php
+    }
+
+    /**
+     * Render a single active module card (simplified view with settings link)
+     */
+    private function render_active_module_card($key, $module, $is_licensed) {
+        // Define settings pages for each module
+        $settings_pages = [
+            'calendar' => 'mypco-calendar',
+            'groups' => 'mypco-groups',
+            'services' => 'mypco-services',
+            'messages' => 'mypco-messages',
+            'locations' => 'mypco-locations',
+        ];
+
+        $settings_page = isset($settings_pages[$key]) ? $settings_pages[$key] : null;
+
+        // Determine badge
+        $badge = '';
+        $badge_style = '';
+        if ($module['tier'] === 'freemium') {
+            $badge = 'FREEMIUM';
+            $badge_style = 'background: #2271b1; color: #fff;';
+        } elseif ($module['tier'] === 'premium') {
+            $badge = 'PREMIUM';
+            $badge_style = 'background: #dba617; color: #fff;';
+        }
+        ?>
+        <div class="postbox mypco-module-card is-active" style="margin-bottom: 0; display: flex; flex-direction: column; border-left: 4px solid #46b450;">
+            <div class="postbox-header" style="padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="margin:0; font-size: 1.1em;"><?php echo esc_html($module['name']); ?></h2>
+                <?php if ($badge): ?>
+                    <span class="mypco-badge" style="font-size: 9px; padding: 2px 8px; border-radius: 3px; font-weight: bold; <?php echo $badge_style; ?>">
+                        <?php echo esc_html($badge); ?>
+                    </span>
+                <?php endif; ?>
+            </div>
+
+            <div class="inside" style="padding: 15px; flex-grow: 1;">
+                <p style="color: #666; min-height: 40px;"><?php echo esc_html($module['description']); ?></p>
+
+                <div class="module-footer" style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: #46b450; font-weight: bold;">
+                        <span class="dashicons dashicons-yes" style="font-size: 16px; width: 16px; height: 16px; vertical-align: middle;"></span> <?php _e('Active', 'mypco-online'); ?>
+                    </span>
+
+                    <?php if ($settings_page): ?>
+                        <a href="<?php echo admin_url('admin.php?page=' . $settings_page); ?>" class="button button-primary">
+                            <?php _e('Settings', 'mypco-online'); ?>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+
+    /**
      * Render the Modules Management Page
      */
     public function render_modules_page() {

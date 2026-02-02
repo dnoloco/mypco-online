@@ -47,10 +47,10 @@ class MyPCO_Admin {
                 'dashicons-cloud', 30
         );
 
-        // Existing submenus
+        // Submenus in order: Dashboard, Active Modules, Modules, Settings (Settings added by settings page class)
         add_submenu_page('mypco-dashboard', 'Dashboard', 'Dashboard', 'manage_options', 'mypco-dashboard', [$this, 'render_dashboard']);
+        add_submenu_page('mypco-dashboard', 'Active Modules', 'Active Modules', 'manage_options', 'mypco-active-modules', [$this, 'render_active_modules_page']);
         add_submenu_page('mypco-dashboard', 'Modules', 'Modules', 'manage_options', 'mypco-modules', [$this, 'render_modules_page']);
-        // add_submenu_page('mypco-dashboard', 'License', 'License', 'manage_options', 'mypco-license', [$this, 'render_license_page']);
 
         add_action("load-$page_hook", [$this, 'on_load_dashboard_page']);
     }
@@ -217,6 +217,11 @@ class MyPCO_Admin {
         // Assume $this->modules_ui was passed or instantiated
         $modules_ui = new MyPCO_Modules($this->loader, $this->api_model);
         $modules_ui->render_modules_page();
+    }
+
+    public function render_active_modules_page() {
+        $modules_ui = new MyPCO_Modules($this->loader, $this->api_model);
+        $modules_ui->render_active_modules_page();
     }
 
     public function render_license_page() { ?>
