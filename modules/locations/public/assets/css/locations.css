@@ -39,7 +39,7 @@
 
 .mypco-location-card {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    max-width: 600px;
+    max-width: 800px;
     margin: 0 auto;
 }
 
@@ -51,18 +51,68 @@
 .mypco-location-title {
     font-size: 1.5rem;
     font-weight: 600;
-    margin: 0 0 20px 0;
+    margin: 0 0 15px 0;
     color: var(--mypco-loc-text);
     line-height: 1.3;
 }
 
-/* Date and Time Section */
-.mypco-location-datetime {
+/* ============================================
+   INFO ROW - DATE/TIME + LOCATION CONTAINER
+   ============================================ */
+
+.mypco-location-info-row {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
+
+/* WITH TITLE: Stack date/time vertically, location below */
+.mypco-location-has-title .mypco-location-info-row {
+    flex-direction: column;
+    gap: 15px;
+}
+
+.mypco-location-has-title .mypco-location-datetime {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.mypco-location-has-title .mypco-location-details {
+    margin: 0;
+}
+
+/* WITHOUT TITLE: Date/time and location on same row */
+.mypco-location-no-title .mypco-location-info-row {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.mypco-location-no-title .mypco-location-datetime {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    flex-shrink: 0;
+}
+
+.mypco-location-no-title .mypco-location-details {
+    margin: 0;
+    text-align: right;
+}
+
+.mypco-location-no-title .mypco-location-info {
+    justify-content: flex-end;
+}
+
+.mypco-location-no-title .mypco-location-text {
+    align-items: flex-end;
+}
+
+/* ============================================
+   DATE AND TIME
+   ============================================ */
 
 .mypco-location-date,
 .mypco-location-time {
@@ -78,16 +128,18 @@
     color: var(--mypco-loc-muted);
 }
 
-/* Location Details */
+/* ============================================
+   LOCATION DETAILS
+   ============================================ */
+
 .mypco-location-details {
-    margin-bottom: 20px;
+    margin-bottom: 0;
 }
 
 .mypco-location-info {
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    margin-bottom: 15px;
 }
 
 .mypco-location-pin {
@@ -229,37 +281,9 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 30px 20px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 30px;
-}
-
-.mypco-location-banner .mypco-location-title {
-    flex: 0 0 auto;
-    margin: 0;
-    font-size: 1.3rem;
-}
-
-.mypco-location-banner .mypco-location-datetime {
-    flex: 1;
-    margin: 0;
-}
-
-.mypco-location-banner .mypco-location-details {
-    flex: 0 0 auto;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.mypco-location-banner .mypco-location-info {
-    margin: 0;
 }
 
 .mypco-location-banner .mypco-location-map-container {
-    flex: 0 0 100%;
     margin-top: 20px;
 }
 
@@ -460,22 +484,28 @@
         font-size: 1.3rem;
     }
 
-    .mypco-location-datetime {
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    /* Banner - stack vertically */
-    .mypco-location-banner .mypco-location-content {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 20px;
-    }
-
-    .mypco-location-banner .mypco-location-details {
-        flex-direction: column;
-        align-items: flex-start;
+    /* Stack everything on tablet for both layouts */
+    .mypco-location-info-row {
+        flex-direction: column !important;
         gap: 15px;
+    }
+
+    .mypco-location-datetime {
+        flex-direction: row;
+        gap: 15px;
+    }
+
+    /* Reset alignment for no-title variant on mobile */
+    .mypco-location-no-title .mypco-location-details {
+        text-align: left;
+    }
+
+    .mypco-location-no-title .mypco-location-info {
+        justify-content: flex-start;
+    }
+
+    .mypco-location-no-title .mypco-location-text {
+        align-items: flex-start;
     }
 
     /* List */
@@ -507,7 +537,13 @@
 
     .mypco-location-title {
         font-size: 1.2rem;
-        margin-bottom: 15px;
+        margin-bottom: 12px;
+    }
+
+    /* Stack date and time vertically on small screens */
+    .mypco-location-datetime {
+        flex-direction: column !important;
+        gap: 8px;
     }
 
     .mypco-location-date,
