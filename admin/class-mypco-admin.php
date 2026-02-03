@@ -47,12 +47,20 @@ class MyPCO_Admin {
                 'dashicons-cloud', 30
         );
 
-        // Submenus in order: Dashboard, Active Modules, Modules, Settings (Settings added by settings page class)
+        // Dashboard submenu (first item)
         add_submenu_page('mypco-dashboard', 'Dashboard', 'Dashboard', 'manage_options', 'mypco-dashboard', [$this, 'render_dashboard']);
-        add_submenu_page('mypco-dashboard', 'Active Modules', 'Active Modules', 'manage_options', 'mypco-active-modules', [$this, 'render_active_modules_page']);
-        add_submenu_page('mypco-dashboard', 'Modules', 'Modules', 'manage_options', 'mypco-modules', [$this, 'render_modules_page']);
+
+        // Active modules will add their own menu items here (via their own admin_menu hooks)
+        // Modules and Settings are added at a later priority to appear after active modules
 
         add_action("load-$page_hook", [$this, 'on_load_dashboard_page']);
+    }
+
+    /**
+     * Add Modules menu item (called at later priority so it appears after active module menus)
+     */
+    public function add_modules_menu() {
+        add_submenu_page('mypco-dashboard', 'Modules', 'Modules', 'manage_options', 'mypco-modules', [$this, 'render_modules_page']);
     }
 
     public function on_load_dashboard_page() {
@@ -217,11 +225,6 @@ class MyPCO_Admin {
         // Assume $this->modules_ui was passed or instantiated
         $modules_ui = new MyPCO_Modules($this->loader, $this->api_model);
         $modules_ui->render_modules_page();
-    }
-
-    public function render_active_modules_page() {
-        $modules_ui = new MyPCO_Modules($this->loader, $this->api_model);
-        $modules_ui->render_active_modules_page();
     }
 
     public function render_license_page() { ?>
