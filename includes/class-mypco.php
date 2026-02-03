@@ -107,20 +107,25 @@ class MyPCO {
 
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
+
+        // Add Dashboard menu first (priority 10)
         $this->loader->add_action('admin_menu', $plugin_admin, 'add_admin_menu');
 
-        // 2. Initialize the API Settings Page
+        // 2. Load the Module system - active modules add their menus at default priority
+        // This means active module menus appear after Dashboard
+        $this->load_modules();
+
+        // 3. Add Modules menu at later priority (after active module menus)
+        $this->loader->add_action('admin_menu', $plugin_admin, 'add_modules_menu', 99);
+
+        // 4. Initialize the API Settings Page at later priority (after Modules)
         $plugin_settings = new MyPCO_Settings_Page($this->plugin_name, $this->version, $this->api_model);
-        $this->loader->add_action('admin_menu', $plugin_settings, 'add_settings_menu');
+        $this->loader->add_action('admin_menu', $plugin_settings, 'add_settings_menu', 99);
         $this->loader->add_action('admin_init', $plugin_settings, 'handle_settings_save');
 
-        // 3. Initialize the License Page
+        // 5. Initialize the License Page (hidden from menu)
         $license_page = new MyPCO_License_Page($this->plugin_name, $this->version);
         $license_page->init($this->loader);
-
-        // 4. Load the Module system
-        // This starts the Modules UI and any active feature modules (Services, etc.)
-        $this->load_modules();
     }
 
     private function define_public_hooks() {
