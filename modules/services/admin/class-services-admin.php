@@ -52,8 +52,9 @@ class MyPCO_Services_Admin
         );
 
         // Team Reports - hidden from menu (will be added as premium module later)
+        // Use 'options.php' as parent to create a hidden page (avoids null deprecation in PHP 8)
         add_submenu_page(
-            null, // Hidden from menu
+            'options.php',
             __('Team Reports', 'mypco-online'),
             __('Team Reports', 'mypco-online'),
             'edit_posts',

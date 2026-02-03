@@ -38,8 +38,9 @@ class MyPCO_License_Page {
      * Add license page (hidden from menu, accessible via direct URL)
      */
     public function add_license_menu() {
+        // Use 'options.php' as parent to create a hidden page (avoids null deprecation in PHP 8)
         add_submenu_page(
-            null, // Hidden from menu
+            'options.php',
             __('License', 'mypco-online'),
             __('License', 'mypco-online'),
             'manage_options',
