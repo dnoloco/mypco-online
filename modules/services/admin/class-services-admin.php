@@ -584,7 +584,7 @@ class MyPCO_Services_Admin
             $submenu_file = 'mypco-message-log';
         }
 
-        return $parent_file;
+        return $parent_file ?? '';
     }
 
     /**

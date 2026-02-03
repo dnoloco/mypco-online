@@ -28,25 +28,59 @@ class MyPCO_License_Page {
      * Initialize hooks
      */
     public function init($loader) {
-        $loader->add_action('admin_menu', $this, 'add_license_menu');
+        add_action('admin_menu', [$this, 'add_license_menu']);
+        add_action('admin_menu', [$this, 'hide_license_menu'], 999);
+        add_filter('parent_file', [$this, 'set_license_menu_highlight']);
+        add_action('current_screen', [$this, 'set_license_page_title']);
+
         $loader->add_action('wp_ajax_mypco_activate_license', $this, 'ajax_activate_license');
         $loader->add_action('wp_ajax_mypco_deactivate_license', $this, 'ajax_deactivate_license');
         $loader->add_action('wp_ajax_mypco_refresh_license', $this, 'ajax_refresh_license');
     }
 
     /**
-     * Add license page (hidden from menu, accessible via direct URL)
+     * Set Modules as active submenu when on License page
+     */
+    public function set_license_menu_highlight($parent_file) {
+        global $submenu_file;
+
+        if (isset($_GET['page']) && $_GET['page'] === 'mypco-license') {
+            $submenu_file = 'mypco-modules';
+        }
+
+        return $parent_file ?? '';
+    }
+
+    /**
+     * Set page title to avoid null deprecation warning after remove_submenu_page
+     */
+    public function set_license_page_title() {
+        global $title;
+
+        if (isset($_GET['page']) && $_GET['page'] === 'mypco-license') {
+            $title = __('License', 'mypco-online');
+        }
+    }
+
+    /**
+     * Add license page under mypco-dashboard
      */
     public function add_license_menu() {
-        // Use 'options.php' as parent to create a hidden page (avoids null deprecation in PHP 8)
         add_submenu_page(
-            'options.php',
+            'mypco-dashboard',
             __('License', 'mypco-online'),
             __('License', 'mypco-online'),
             'manage_options',
             'mypco-license',
             [$this, 'render_license_page']
         );
+    }
+
+    /**
+     * Hide license menu item from visible menu
+     */
+    public function hide_license_menu() {
+        remove_submenu_page('mypco-dashboard', 'mypco-license');
     }
 
     /**
