@@ -300,7 +300,8 @@ class MyPCO_Calendar_Public {
         $max_featured = isset($settings['featured_count']) ? (int) $settings['featured_count'] : 2;
         $display_mode = isset($settings['featured_mode']) ? $settings['featured_mode'] : 'upcoming';
 
-        // Group by parent event
+        // Group by parent event, selecting the next upcoming instance
+        $now = new DateTime('now', $this->timezone);
         $grouped = [];
         foreach ($featured_events as $event) {
             $parent_id = $event['parent_id'];
@@ -311,9 +312,23 @@ class MyPCO_Calendar_Public {
                 ];
             }
             $grouped[$parent_id]['instances'][] = $event;
+
+            // Select the closest upcoming instance as the representative event
+            try {
+                $event_start = new DateTime($event['starts_at'], new DateTimeZone('UTC'));
+                $event_start->setTimezone($this->timezone);
+                $current_start = new DateTime($grouped[$parent_id]['event']['starts_at'], new DateTimeZone('UTC'));
+                $current_start->setTimezone($this->timezone);
+
+                if ($event_start >= $now && ($current_start < $now || $event_start < $current_start)) {
+                    $grouped[$parent_id]['event'] = $event;
+                }
+            } catch (Exception $e) {
+                // Keep existing selection on parse error
+            }
         }
 
-        // Process each group - take first instance but mark as recurring if multiple
+        // Process each group - use closest upcoming instance, mark as recurring if multiple
         $deduplicated = [];
         foreach ($grouped as $parent_id => $data) {
             $event = $data['event'];
@@ -322,7 +337,7 @@ class MyPCO_Calendar_Public {
 
             // Calculate date display for featured event
             if ($is_recurring) {
-                // Show first instance date with recurring indicator
+                // Show next upcoming instance date with recurring indicator
                 $event['is_recurring'] = true;
                 $event['instance_count'] = count($instances);
             } else {
