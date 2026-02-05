@@ -5,10 +5,15 @@
  * Displays a list of upcoming Sundays with date, time, and clickable location names.
  *
  * Available variables:
- * - $events (array) - Array of event data
+ * - $events (array) - Array of event data (each with date_obj DateTime)
  * - $date_format (string) - PHP date format
  * - $time_format (string) - PHP time format
- * - $settings (array) - All module settings
+ * - $show_time (bool) - Whether to show the time
+ * - $show_address (bool) - Whether to show the address
+ * - $settings (array) - All shortcode settings
+ * - $scope_class (string) - Unique CSS class for scoped styles
+ * - $custom_class (string) - User-defined CSS class
+ * - $scoped_css (string) - Inline <style> block
  */
 
 defined('ABSPATH') || exit;
@@ -18,12 +23,16 @@ if (empty($events)) {
 }
 ?>
 
-<div class="mypco-location-list">
+<?php echo $scoped_css; ?>
+
+<div class="mypco-location-list <?php echo esc_attr($scope_class); ?><?php echo $custom_class; ?>">
     <ul class="mypco-location-list-items">
         <?php foreach ($events as $index => $event): ?>
             <?php
             $has_location = !empty($event['location_full']);
             $is_first = ($index === 0);
+            $date_display = $event['date_obj']->format($date_format);
+            $time_display = $event['date_obj']->format($time_format);
             ?>
             <li class="mypco-location-list-item <?php echo $is_first ? 'mypco-location-list-item-next' : ''; ?>">
                 <!-- Date Badge -->
@@ -37,17 +46,19 @@ if (empty($events)) {
                 <div class="mypco-location-list-details">
                     <!-- Date Display -->
                     <div class="mypco-location-list-date-full">
-                        <?php echo esc_html($event['date_display']); ?>
+                        <?php echo esc_html($date_display); ?>
                     </div>
 
                     <!-- Time -->
-                    <div class="mypco-location-list-time">
-                        <svg class="mypco-location-list-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                        <?php echo esc_html($event['time_display']); ?>
-                    </div>
+                    <?php if ($show_time): ?>
+                        <div class="mypco-location-list-time">
+                            <svg class="mypco-location-list-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            <?php echo esc_html($time_display); ?>
+                        </div>
+                    <?php endif; ?>
 
                     <!-- Location (Clickable) -->
                     <?php if ($has_location): ?>
@@ -63,6 +74,9 @@ if (empty($events)) {
                                    rel="noopener noreferrer"
                                    title="<?php esc_attr_e('Get directions in Google Maps', 'mypco-online'); ?>">
                                     <?php echo esc_html($event['location_name'] ?: $event['location_full']); ?>
+                                    <?php if ($show_address && !empty($event['location_address'])): ?>
+                                        <span class="mypco-location-list-address"> &mdash; <?php echo esc_html($event['location_address']); ?></span>
+                                    <?php endif; ?>
                                     <svg class="mypco-location-list-external" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                                         <polyline points="15 3 21 3 21 9"></polyline>
