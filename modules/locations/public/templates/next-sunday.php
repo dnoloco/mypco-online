@@ -5,14 +5,19 @@
  * Displays the upcoming Sunday gathering with date, time, location, and map.
  *
  * Available variables:
- * - $event (array) - Event data with keys: name, date_display, time_display, location_full, location_name, location_address, maps_url
+ * - $event (array) - Event data with keys: name, date_obj, location_full, location_name, location_address, maps_url
  * - $layout (string) - Layout style: card, minimal, or banner
  * - $show_map (bool) - Whether to show the map
  * - $show_title (bool) - Whether to show the event title
+ * - $show_time (bool) - Whether to show the time
+ * - $show_address (bool) - Whether to show the address
  * - $map_height (int) - Map height in pixels
  * - $date_format (string) - PHP date format
  * - $time_format (string) - PHP time format
- * - $settings (array) - All module settings
+ * - $settings (array) - All shortcode settings
+ * - $scope_class (string) - Unique CSS class for scoped styles
+ * - $custom_class (string) - User-defined CSS class
+ * - $scoped_css (string) - Inline <style> block
  * - $create_maps_embed_url (callable) - Function to create map embed URL
  */
 
@@ -21,9 +26,15 @@ defined('ABSPATH') || exit;
 $layout_class = 'mypco-location-' . esc_attr($layout);
 $title_class = $show_title ? 'mypco-location-has-title' : 'mypco-location-no-title';
 $has_location = !empty($event['location_full']);
+
+// Format date/time using per-shortcode settings
+$date_display = $event['date_obj']->format($date_format);
+$time_display = $event['date_obj']->format($time_format);
 ?>
 
-<div class="mypco-location-card <?php echo $layout_class; ?> <?php echo $title_class; ?>">
+<?php echo $scoped_css; ?>
+
+<div class="mypco-location-card <?php echo $layout_class; ?> <?php echo $title_class; ?> <?php echo esc_attr($scope_class); ?><?php echo $custom_class; ?>">
     <div class="mypco-location-content">
         <?php if ($show_title): ?>
             <!-- Event Name -->
@@ -43,15 +54,17 @@ $has_location = !empty($event['location_full']);
                         <line x1="8" y1="2" x2="8" y2="6"></line>
                         <line x1="3" y1="10" x2="21" y2="10"></line>
                     </svg>
-                    <span><?php echo esc_html($event['date_display']); ?></span>
+                    <span><?php echo esc_html($date_display); ?></span>
                 </div>
-                <div class="mypco-location-time">
-                    <svg class="mypco-location-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg>
-                    <span><?php echo esc_html($event['time_display']); ?></span>
-                </div>
+                <?php if ($show_time): ?>
+                    <div class="mypco-location-time">
+                        <svg class="mypco-location-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span><?php echo esc_html($time_display); ?></span>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <?php if ($has_location): ?>
@@ -66,7 +79,7 @@ $has_location = !empty($event['location_full']);
                             <?php if (!empty($event['location_name'])): ?>
                                 <span class="mypco-location-name"><?php echo esc_html($event['location_name']); ?></span>
                             <?php endif; ?>
-                            <?php if (!empty($event['location_address'])): ?>
+                            <?php if ($show_address && !empty($event['location_address'])): ?>
                                 <span class="mypco-location-address"><?php echo esc_html($event['location_address']); ?></span>
                             <?php endif; ?>
                         </div>

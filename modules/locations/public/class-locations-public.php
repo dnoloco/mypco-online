@@ -4,6 +4,7 @@
  *
  * Handles all frontend/public functionality for the Locations module.
  * Provides shortcodes for displaying upcoming Sunday gathering locations.
+ * Supports per-shortcode settings via the `id` attribute.
  */
 
 if (!defined('ABSPATH')) {
@@ -57,54 +58,40 @@ class MyPCO_Locations_Public {
             [],
             MYPCO_VERSION
         );
-
-        // Add dynamic styles from settings
-        $this->add_dynamic_styles();
     }
 
     /**
-     * Add dynamic CSS from settings.
+     * Get settings for a specific shortcode ID, with fallback.
+     *
+     * @param int    $id   Shortcode configuration ID.
+     * @param string $type Shortcode type for fallback.
+     * @return array Settings array.
      */
-    private function add_dynamic_styles() {
-        $settings = $this->get_settings();
-
-        $custom_css = "
-            .mypco-location-card {
-                --mypco-loc-primary: {$settings['primary_color']};
-                --mypco-loc-text: {$settings['text_color']};
-                --mypco-loc-bg: {$settings['background_color']};
-                --mypco-loc-radius: {$settings['border_radius']}px;
-            }
-            .mypco-location-list {
-                --mypco-loc-primary: {$settings['primary_color']};
-                --mypco-loc-text: {$settings['text_color']};
-                --mypco-loc-bg: {$settings['background_color']};
-                --mypco-loc-radius: {$settings['border_radius']}px;
-            }
-        ";
-
-        wp_add_inline_style('mypco-locations-public', $custom_css);
+    private function get_shortcode_settings($id, $type = 'next_sunday') {
+        // Load admin class for the static helper
+        require_once MYPCO_PLUGIN_DIR . 'modules/locations/admin/class-locations-admin.php';
+        return MyPCO_Locations_Admin::get_shortcode_settings($id, $type);
     }
 
     /**
-     * Get module settings.
+     * Build scoped inline CSS for a shortcode instance.
+     *
+     * @param string $scope_class Unique CSS class for this instance.
+     * @param array  $settings    Shortcode settings.
+     * @return string CSS block.
      */
-    private function get_settings() {
-        $defaults = [
-            'event_name' => 'Sunday Gathering',
-            'layout_style' => 'card',
-            'show_title' => true,
-            'show_map' => true,
-            'map_height' => 200,
-            'primary_color' => '#333333',
-            'text_color' => '#333333',
-            'background_color' => '#ffffff',
-            'border_radius' => 8,
-            'date_format' => 'l, F j, Y',
-            'time_format' => 'g:i a',
-        ];
-        $saved = get_option('mypco_locations_settings', []);
-        return wp_parse_args($saved, $defaults);
+    private function build_scoped_styles($scope_class, $settings) {
+        $primary = $settings['primary_color'] ?? '#333333';
+        $text = $settings['text_color'] ?? '#333333';
+        $bg = $settings['background_color'] ?? '#ffffff';
+        $radius = $settings['border_radius'] ?? 8;
+
+        return "<style>.{$scope_class} {
+    --mypco-loc-primary: {$primary};
+    --mypco-loc-text: {$text};
+    --mypco-loc-bg: {$bg};
+    --mypco-loc-radius: {$radius}px;
+}</style>";
     }
 
     /**
@@ -114,41 +101,69 @@ class MyPCO_Locations_Public {
      * @return string HTML output
      */
     public function render_next_sunday_shortcode($atts) {
-        $settings = $this->get_settings();
-
         $atts = shortcode_atts([
-            'event' => $settings['event_name'],
-            'layout' => $settings['layout_style'],
-            'show_title' => $settings['show_title'] ? 'yes' : 'no',
-            'show_map' => $settings['show_map'] ? 'yes' : 'no',
+            'id'         => 0,
+            'event'      => '',
+            'layout'     => '',
+            'show_title' => '',
+            'show_map'   => '',
         ], $atts, 'mypco_next_sunday');
 
-        // Convert to booleans
-        $show_title = ($atts['show_title'] === 'yes' || $atts['show_title'] === '1' || $atts['show_title'] === true);
-        $show_map = ($atts['show_map'] === 'yes' || $atts['show_map'] === '1' || $atts['show_map'] === true);
+        $id = absint($atts['id']);
+        $settings = $this->get_shortcode_settings($id, 'next_sunday');
+
+        // Allow shortcode attributes to override stored settings
+        $event_name = !empty($atts['event']) ? $atts['event'] : ($settings['event_name'] ?? 'Sunday Gathering');
+        $layout = !empty($atts['layout']) ? $atts['layout'] : ($settings['layout_style'] ?? 'card');
+
+        if ($atts['show_title'] !== '') {
+            $show_title = ($atts['show_title'] === 'yes' || $atts['show_title'] === '1' || $atts['show_title'] === true);
+        } else {
+            $show_title = $settings['show_title'] ?? true;
+        }
+
+        if ($atts['show_map'] !== '') {
+            $show_map = ($atts['show_map'] === 'yes' || $atts['show_map'] === '1' || $atts['show_map'] === true);
+        } else {
+            $show_map = $settings['show_map'] ?? true;
+        }
+
+        $show_time = $settings['show_time'] ?? true;
+        $show_address = $settings['show_address'] ?? true;
 
         // Fetch upcoming Sunday events
-        $sunday_events = $this->fetch_sunday_events($atts['event']);
+        $sunday_events = $this->fetch_sunday_events($event_name);
 
         if (empty($sunday_events)) {
-            return '<div class="mypco-location-empty">' .
-                   esc_html__('No upcoming Sunday gatherings found.', 'mypco-online') .
-                   '</div>';
+            $empty_msg = !empty($settings['empty_message'])
+                ? $settings['empty_message']
+                : __('No upcoming Sunday gatherings found.', 'mypco-online');
+            return '<div class="mypco-location-empty">' . esc_html($empty_msg) . '</div>';
         }
 
         // Get the next Sunday
         $next_sunday = $sunday_events[0];
 
+        // Build scoped styles
+        $scope_class = 'mypco-sc-' . ($id > 0 ? $id : 'default-ns');
+        $custom_class = !empty($settings['custom_class']) ? ' ' . esc_attr($settings['custom_class']) : '';
+        $scoped_css = $this->build_scoped_styles($scope_class, $settings);
+
         // Prepare data for template
         $data = [
-            'event' => $next_sunday,
-            'layout' => $atts['layout'],
-            'show_title' => $show_title,
-            'show_map' => $show_map,
-            'map_height' => $settings['map_height'],
-            'date_format' => $settings['date_format'],
-            'time_format' => $settings['time_format'],
-            'settings' => $settings,
+            'event'        => $next_sunday,
+            'layout'       => $layout,
+            'show_title'   => $show_title,
+            'show_map'     => $show_map,
+            'show_time'    => $show_time,
+            'show_address' => $show_address,
+            'map_height'   => $settings['map_height'] ?? 200,
+            'date_format'  => $settings['date_format'] ?? 'l, F j, Y',
+            'time_format'  => $settings['time_format'] ?? 'g:i a',
+            'settings'     => $settings,
+            'scope_class'  => $scope_class,
+            'custom_class' => $custom_class,
+            'scoped_css'   => $scoped_css,
         ];
 
         return $this->load_template('next-sunday', $data);
@@ -161,34 +176,54 @@ class MyPCO_Locations_Public {
      * @return string HTML output
      */
     public function render_sunday_list_shortcode($atts) {
-        $settings = $this->get_settings();
-
         $atts = shortcode_atts([
-            'event' => $settings['event_name'],
-            'count' => 'auto', // auto = 4 weeks, or 5 if beginning of month with 5 Sundays
+            'id'    => 0,
+            'event' => '',
+            'count' => '',
         ], $atts, 'mypco_sunday_list');
 
+        $id = absint($atts['id']);
+        $settings = $this->get_shortcode_settings($id, 'sunday_list');
+
+        // Allow shortcode attributes to override stored settings
+        $event_name = !empty($atts['event']) ? $atts['event'] : ($settings['event_name'] ?? 'Sunday Gathering');
+        $count = !empty($atts['count']) ? $atts['count'] : ($settings['count'] ?? 'auto');
+
+        $show_time = $settings['show_time'] ?? true;
+        $show_address = $settings['show_address'] ?? true;
+
         // Fetch upcoming Sunday events
-        $sunday_events = $this->fetch_sunday_events($atts['event']);
+        $sunday_events = $this->fetch_sunday_events($event_name);
 
         if (empty($sunday_events)) {
-            return '<div class="mypco-location-empty">' .
-                   esc_html__('No upcoming Sunday gatherings found.', 'mypco-online') .
-                   '</div>';
+            $empty_msg = !empty($settings['empty_message'])
+                ? $settings['empty_message']
+                : __('No upcoming Sunday gatherings found.', 'mypco-online');
+            return '<div class="mypco-location-empty">' . esc_html($empty_msg) . '</div>';
         }
 
         // Determine how many Sundays to show
-        $count = $this->calculate_sunday_count($atts['count']);
+        $display_count = $this->calculate_sunday_count($count);
 
         // Get the events to display
-        $events_to_display = array_slice($sunday_events, 0, $count);
+        $events_to_display = array_slice($sunday_events, 0, $display_count);
+
+        // Build scoped styles
+        $scope_class = 'mypco-sc-' . ($id > 0 ? $id : 'default-sl');
+        $custom_class = !empty($settings['custom_class']) ? ' ' . esc_attr($settings['custom_class']) : '';
+        $scoped_css = $this->build_scoped_styles($scope_class, $settings);
 
         // Prepare data for template
         $data = [
-            'events' => $events_to_display,
-            'date_format' => $settings['date_format'],
-            'time_format' => $settings['time_format'],
-            'settings' => $settings,
+            'events'       => $events_to_display,
+            'date_format'  => $settings['date_format'] ?? 'l, F j, Y',
+            'time_format'  => $settings['time_format'] ?? 'g:i a',
+            'show_time'    => $show_time,
+            'show_address' => $show_address,
+            'settings'     => $settings,
+            'scope_class'  => $scope_class,
+            'custom_class' => $custom_class,
+            'scoped_css'   => $scoped_css,
         ];
 
         return $this->load_template('sunday-list', $data);
@@ -356,6 +391,8 @@ class MyPCO_Locations_Public {
     /**
      * Format an event instance for display.
      *
+     * Uses a neutral date format for storage; templates handle final display formatting.
+     *
      * @param array $instance Event instance from API
      * @param array $parent Parent event attributes
      * @param DateTime $event_date Parsed event date
@@ -363,15 +400,10 @@ class MyPCO_Locations_Public {
      */
     private function format_event($instance, $parent, $event_date) {
         $attr = $instance['attributes'];
-        $settings = $this->get_settings();
 
         // Parse location
         $location_full = $attr['location'] ?? '';
         $location_parts = $this->parse_location($location_full);
-
-        // Format date and time
-        $date_display = $event_date->format($settings['date_format']);
-        $time_display = $event_date->format($settings['time_format']);
 
         // Create Google Maps URL
         $maps_url = $this->create_maps_url($location_full);
@@ -379,8 +411,7 @@ class MyPCO_Locations_Public {
         return [
             'id' => $instance['id'],
             'name' => $parent['name'] ?? 'Sunday Gathering',
-            'date_display' => $date_display,
-            'time_display' => $time_display,
+            'date_obj' => $event_date,
             'date_key' => $event_date->format('Y-m-d'),
             'day_of_week' => $event_date->format('l'),
             'day_short' => $event_date->format('D'),

@@ -1,7 +1,7 @@
 /**
  * Locations Admin Styles
  *
- * Styles for the Locations module admin settings page.
+ * Styles for the Locations module admin page (list and edit views).
  */
 
 .mypco-locations-admin .card {
@@ -56,20 +56,84 @@
     vertical-align: middle;
 }
 
-/* Shortcode tables */
-.mypco-locations-admin .widefat {
+/* Shortcode table */
+.mypco-locations-admin .wp-list-table {
     margin-bottom: 15px;
 }
 
-.mypco-locations-admin .widefat code {
-    background: #f5f5f5;
+.mypco-locations-admin .wp-list-table code {
+    background: #f0f0f1;
     padding: 2px 6px;
     border-radius: 3px;
+    font-size: 12px;
 }
 
-.mypco-locations-admin .widefat th,
-.mypco-locations-admin .widefat td {
+.mypco-locations-admin .wp-list-table th,
+.mypco-locations-admin .wp-list-table td {
     padding: 10px 12px;
+    vertical-align: middle;
+}
+
+.mypco-locations-admin .mypco-shortcode-code {
+    display: inline-block;
+    margin-right: 6px;
+}
+
+/* Default badge */
+.mypco-badge-default {
+    display: inline-block;
+    background: #dfe9f0;
+    color: #2271b1;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* Delete button */
+.mypco-locations-admin .button-link-delete {
+    color: #b32d2e !important;
+    border-color: #b32d2e !important;
+}
+
+.mypco-locations-admin .button-link-delete:hover {
+    background: #b32d2e !important;
+    color: #fff !important;
+}
+
+/* Copy button */
+.mypco-locations-admin .mypco-copy-btn {
+    font-size: 11px !important;
+    min-height: 24px !important;
+    line-height: 22px !important;
+    padding: 0 8px !important;
+    vertical-align: middle;
+}
+
+/* Shortcode preview bar on edit page */
+.mypco-shortcode-preview-bar {
+    background: #f0f6fc;
+    border: 1px solid #c3c4c7;
+    border-left: 4px solid #2271b1;
+    padding: 12px 16px;
+    margin: 15px 0;
+    max-width: 800px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 2px;
+}
+
+.mypco-shortcode-preview-bar code {
+    background: #fff;
+    padding: 4px 10px;
+    border-radius: 3px;
+    font-size: 13px;
+    border: 1px solid #ddd;
 }
 
 /* Description text */
@@ -104,4 +168,5 @@
 /* Notice styling */
 .mypco-locations-admin .notice {
     margin: 15px 0;
+    max-width: 800px;
 }
