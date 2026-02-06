@@ -39,6 +39,7 @@ class MyPCO_Locations_Admin {
         $this->loader->add_action('admin_init', $this, 'handle_cache_clear');
         $this->loader->add_action('admin_init', $this, 'handle_save_shortcode');
         $this->loader->add_action('admin_init', $this, 'handle_delete_shortcode');
+        $this->loader->add_action('admin_init', $this, 'handle_bulk_action');
     }
 
     /**
@@ -293,14 +294,42 @@ class MyPCO_Locations_Admin {
      * Render the list view (main page).
      */
     private function render_list_page() {
-        $shortcodes = $this->get_shortcodes();
+        $all_shortcodes = $this->get_shortcodes();
+
+        // Count by type
+        $count_all = count($all_shortcodes);
+        $count_next_sunday = 0;
+        $count_sunday_list = 0;
+
+        foreach ($all_shortcodes as $sc) {
+            if (($sc['type'] ?? '') === 'next_sunday') {
+                $count_next_sunday++;
+            } else {
+                $count_sunday_list++;
+            }
+        }
+
+        // Apply filter
+        $filter = isset($_GET['shortcode_type']) ? sanitize_text_field($_GET['shortcode_type']) : '';
+        $shortcodes = $all_shortcodes;
+
+        if ($filter === 'next_sunday' || $filter === 'sunday_list') {
+            $shortcodes = array_filter($all_shortcodes, function ($sc) use ($filter) {
+                return ($sc['type'] ?? '') === $filter;
+            });
+        }
 
         $data = [
-            'shortcodes'     => $shortcodes,
-            'cache_cleared'  => isset($_GET['cache_cleared']),
-            'settings_saved' => isset($_GET['settings_saved']),
-            'deleted'        => isset($_GET['deleted']),
-            'page_url'       => admin_url('admin.php?page=mypco-locations'),
+            'shortcodes'        => $shortcodes,
+            'count_all'         => $count_all,
+            'count_next_sunday' => $count_next_sunday,
+            'count_sunday_list' => $count_sunday_list,
+            'current_filter'    => $filter,
+            'cache_cleared'     => isset($_GET['cache_cleared']),
+            'settings_saved'    => isset($_GET['settings_saved']),
+            'deleted'           => isset($_GET['deleted']),
+            'bulk_deleted'      => isset($_GET['bulk_deleted']) ? absint($_GET['bulk_deleted']) : 0,
+            'page_url'          => admin_url('admin.php?page=mypco-locations'),
         ];
 
         $this->load_template('settings-page', $data);
@@ -463,6 +492,39 @@ class MyPCO_Locations_Admin {
         $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '%_transient_mypco_locations%'");
 
         wp_redirect(admin_url('admin.php?page=mypco-locations&cache_cleared=1'));
+        exit;
+    }
+
+    /**
+     * Handle bulk actions (trash).
+     */
+    public function handle_bulk_action() {
+        if (!isset($_POST['mypco_bulk_action'])) {
+            return;
+        }
+
+        check_admin_referer('mypco_bulk_shortcodes');
+
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
+        $action = isset($_POST['bulk_action']) ? sanitize_text_field($_POST['bulk_action']) : '';
+        $ids = isset($_POST['shortcode_ids']) ? array_map('absint', $_POST['shortcode_ids']) : [];
+
+        if ($action !== 'trash' || empty($ids)) {
+            wp_redirect(admin_url('admin.php?page=mypco-locations'));
+            exit;
+        }
+
+        $deleted = 0;
+        foreach ($ids as $id) {
+            if ($this->delete_shortcode($id)) {
+                $deleted++;
+            }
+        }
+
+        wp_redirect(admin_url('admin.php?page=mypco-locations&bulk_deleted=' . $deleted));
         exit;
     }
 

@@ -58,25 +58,52 @@
 
 /* Shortcode table */
 .mypco-locations-admin .wp-list-table {
-    margin-bottom: 15px;
+    margin-top: 0;
 }
 
 .mypco-locations-admin .wp-list-table code {
     background: #f0f0f1;
-    padding: 2px 6px;
+    padding: 3px 8px;
     border-radius: 3px;
-    font-size: 12px;
+    font-size: 13px;
 }
 
-.mypco-locations-admin .wp-list-table th,
-.mypco-locations-admin .wp-list-table td {
-    padding: 10px 12px;
-    vertical-align: middle;
+.mypco-locations-admin .column-shortcode {
+    width: 35%;
 }
 
-.mypco-locations-admin .mypco-shortcode-code {
-    display: inline-block;
-    margin-right: 6px;
+.mypco-locations-admin .column-description {
+    width: 30%;
+}
+
+.mypco-locations-admin .column-type {
+    width: 15%;
+}
+
+.mypco-locations-admin .column-event {
+    width: 15%;
+}
+
+/* Row title link */
+.mypco-locations-admin .row-title code {
+    color: #2271b1;
+}
+
+.mypco-locations-admin .row-title:hover code {
+    color: #135e96;
+}
+
+/* Row actions */
+.mypco-locations-admin .row-actions {
+    color: #787c82;
+}
+
+.mypco-locations-admin .row-actions .trash a {
+    color: #b32d2e;
+}
+
+.mypco-locations-admin .row-actions .trash a:hover {
+    color: #a00;
 }
 
 /* Default badge */
@@ -94,25 +121,6 @@
     letter-spacing: 0.3px;
 }
 
-/* Delete button */
-.mypco-locations-admin .button-link-delete {
-    color: #b32d2e !important;
-    border-color: #b32d2e !important;
-}
-
-.mypco-locations-admin .button-link-delete:hover {
-    background: #b32d2e !important;
-    color: #fff !important;
-}
-
-/* Copy button */
-.mypco-locations-admin .mypco-copy-btn {
-    font-size: 11px !important;
-    min-height: 24px !important;
-    line-height: 22px !important;
-    padding: 0 8px !important;
-    vertical-align: middle;
-}
 
 /* Empty description placeholder */
 .mypco-locations-admin .mypco-no-description {

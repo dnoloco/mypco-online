@@ -443,78 +443,163 @@ $is_edit_view = isset($action) && in_array($action, ['edit', 'new']);
         </div>
     <?php endif; ?>
 
-    <h2><?php _e('Shortcodes', 'mypco-online'); ?></h2>
-    <p><?php _e('Each shortcode has its own settings for event filtering, layout, colors, and more. Use the shortcode with its ID on any page or post.', 'mypco-online'); ?></p>
+    <?php if (!empty($bulk_deleted)): ?>
+        <div class="notice notice-success is-dismissible">
+            <p><?php printf(_n('%d shortcode deleted.', '%d shortcodes deleted.', $bulk_deleted, 'mypco-online'), $bulk_deleted); ?></p>
+        </div>
+    <?php endif; ?>
 
-    <table class="wp-list-table widefat fixed striped">
-        <thead>
-        <tr>
-            <th scope="col" class="manage-column column-id" style="width: 40px;"><?php _e('ID', 'mypco-online'); ?></th>
-            <th scope="col" class="manage-column column-shortcode" style="width: 220px;"><?php _e('Shortcode', 'mypco-online'); ?></th>
-            <th scope="col" class="manage-column column-description"><?php _e('Description', 'mypco-online'); ?></th>
-            <th scope="col" class="manage-column column-type" style="width: 130px;"><?php _e('Type', 'mypco-online'); ?></th>
-            <th scope="col" class="manage-column column-event" style="width: 140px;"><?php _e('Event Filter', 'mypco-online'); ?></th>
-            <th scope="col" class="manage-column column-actions" style="width: 140px;"><?php _e('Actions', 'mypco-online'); ?></th>
-        </tr>
-        </thead>
-        <tbody>
-        <?php if (empty($shortcodes)): ?>
+    <!-- Filter Links -->
+    <ul class="subsubsub">
+        <li class="all">
+            <a href="<?php echo esc_url($page_url); ?>" <?php echo empty($current_filter) ? 'class="current" aria-current="page"' : ''; ?>>
+                <?php _e('All', 'mypco-online'); ?>
+                <span class="count">(<?php echo esc_html($count_all); ?>)</span>
+            </a> |
+        </li>
+        <li class="next-sunday">
+            <a href="<?php echo esc_url(add_query_arg('shortcode_type', 'next_sunday', $page_url)); ?>" <?php echo ($current_filter === 'next_sunday') ? 'class="current" aria-current="page"' : ''; ?>>
+                <?php _e('Next Sunday', 'mypco-online'); ?>
+                <span class="count">(<?php echo esc_html($count_next_sunday); ?>)</span>
+            </a> |
+        </li>
+        <li class="sunday-list">
+            <a href="<?php echo esc_url(add_query_arg('shortcode_type', 'sunday_list', $page_url)); ?>" <?php echo ($current_filter === 'sunday_list') ? 'class="current" aria-current="page"' : ''; ?>>
+                <?php _e('Sunday List', 'mypco-online'); ?>
+                <span class="count">(<?php echo esc_html($count_sunday_list); ?>)</span>
+            </a>
+        </li>
+    </ul>
+
+    <form method="post" id="mypco-shortcodes-form">
+        <?php wp_nonce_field('mypco_bulk_shortcodes'); ?>
+        <input type="hidden" name="mypco_bulk_action" value="1">
+
+        <!-- Top Tablenav -->
+        <div class="tablenav top">
+            <div class="alignleft actions bulkactions">
+                <label for="bulk-action-selector-top" class="screen-reader-text"><?php _e('Select bulk action', 'mypco-online'); ?></label>
+                <select name="bulk_action" id="bulk-action-selector-top">
+                    <option value="-1"><?php _e('Bulk actions', 'mypco-online'); ?></option>
+                    <option value="trash"><?php _e('Move to Trash', 'mypco-online'); ?></option>
+                </select>
+                <input type="submit" class="button action" value="<?php esc_attr_e('Apply', 'mypco-online'); ?>">
+            </div>
+            <div class="tablenav-pages one-page">
+                <span class="displaying-num"><?php printf(_n('%s item', '%s items', count($shortcodes), 'mypco-online'), count($shortcodes)); ?></span>
+            </div>
+            <br class="clear">
+        </div>
+
+        <table class="wp-list-table widefat fixed striped table-view-list">
+            <thead>
             <tr>
-                <td colspan="6"><?php _e('No shortcodes configured.', 'mypco-online'); ?></td>
+                <td id="cb" class="manage-column column-cb check-column">
+                    <input id="cb-select-all-1" type="checkbox">
+                </td>
+                <th scope="col" class="manage-column column-shortcode column-primary"><?php _e('Shortcode', 'mypco-online'); ?></th>
+                <th scope="col" class="manage-column column-description"><?php _e('Description', 'mypco-online'); ?></th>
+                <th scope="col" class="manage-column column-type"><?php _e('Type', 'mypco-online'); ?></th>
+                <th scope="col" class="manage-column column-event"><?php _e('Event Filter', 'mypco-online'); ?></th>
             </tr>
-        <?php else: ?>
-            <?php foreach ($shortcodes as $sc_id => $sc): ?>
-                <?php
-                $sc_type = $sc['type'] ?? 'next_sunday';
-                $sc_tag = ($sc_type === 'next_sunday') ? 'mypco_next_sunday' : 'mypco_sunday_list';
-                $sc_code = '[' . $sc_tag . ' id="' . $sc_id . '"]';
-                $sc_description = !empty($sc['description']) ? $sc['description'] : '';
-                $type_label = ($sc_type === 'next_sunday')
-                    ? __('Next Sunday', 'mypco-online')
-                    : __('Sunday List', 'mypco-online');
-                $is_sc_default = !empty($sc['is_default']);
-                ?>
-                <tr>
-                    <td><strong><?php echo esc_html($sc_id); ?></strong></td>
-                    <td>
-                        <code class="mypco-shortcode-code"><?php echo esc_html($sc_code); ?></code>
-                        <button type="button" class="button button-small mypco-copy-btn" data-copy="<?php echo esc_attr($sc_code); ?>">
-                            <?php _e('Copy', 'mypco-online'); ?>
-                        </button>
-                    </td>
-                    <td class="column-description">
-                        <?php if (!empty($sc_description)): ?>
-                            <?php echo esc_html($sc_description); ?>
-                        <?php else: ?>
-                            <span class="mypco-no-description">&mdash;</span>
-                        <?php endif; ?>
-                    </td>
-                    <td>
-                        <?php echo esc_html($type_label); ?>
-                        <?php if ($is_sc_default): ?>
-                            <span class="mypco-badge-default"><?php _e('Default', 'mypco-online'); ?></span>
-                        <?php endif; ?>
-                    </td>
-                    <td><?php echo esc_html($sc['event_name'] ?? ''); ?></td>
-                    <td>
-                        <a href="<?php echo esc_url($page_url . '&action=edit&id=' . $sc_id); ?>" class="button button-small">
-                            <?php _e('Edit', 'mypco-online'); ?>
-                        </a>
-                        <?php if (!$is_sc_default): ?>
-                            <a href="<?php echo esc_url(wp_nonce_url($page_url . '&action=delete&id=' . $sc_id, 'mypco_delete_shortcode_' . $sc_id)); ?>"
-                               class="button button-small button-link-delete"
-                               onclick="return confirm('<?php echo esc_js(__('Are you sure you want to delete this shortcode?', 'mypco-online')); ?>');">
-                                <?php _e('Delete', 'mypco-online'); ?>
-                            </a>
-                        <?php endif; ?>
-                    </td>
+            </thead>
+            <tbody id="the-list">
+            <?php if (empty($shortcodes)): ?>
+                <tr class="no-items">
+                    <td class="colspanchange" colspan="5"><?php _e('No shortcodes found.', 'mypco-online'); ?></td>
                 </tr>
-            <?php endforeach; ?>
-        <?php endif; ?>
-        </tbody>
-    </table>
+            <?php else: ?>
+                <?php foreach ($shortcodes as $sc_id => $sc): ?>
+                    <?php
+                    $sc_type = $sc['type'] ?? 'next_sunday';
+                    $sc_tag = ($sc_type === 'next_sunday') ? 'mypco_next_sunday' : 'mypco_sunday_list';
+                    $sc_code = '[' . $sc_tag . ' id="' . $sc_id . '"]';
+                    $sc_description = !empty($sc['description']) ? $sc['description'] : '';
+                    $type_label = ($sc_type === 'next_sunday')
+                        ? __('Next Sunday', 'mypco-online')
+                        : __('Sunday List', 'mypco-online');
+                    $is_sc_default = !empty($sc['is_default']);
+                    $edit_url = esc_url($page_url . '&action=edit&id=' . $sc_id);
+                    $trash_url = esc_url(wp_nonce_url($page_url . '&action=delete&id=' . $sc_id, 'mypco_delete_shortcode_' . $sc_id));
+                    ?>
+                    <tr id="shortcode-<?php echo esc_attr($sc_id); ?>">
+                        <th scope="row" class="check-column">
+                            <?php if (!$is_sc_default): ?>
+                                <input id="cb-select-<?php echo esc_attr($sc_id); ?>" type="checkbox" name="shortcode_ids[]" value="<?php echo esc_attr($sc_id); ?>">
+                            <?php endif; ?>
+                        </th>
+                        <td class="shortcode column-shortcode has-row-actions column-primary" data-colname="<?php esc_attr_e('Shortcode', 'mypco-online'); ?>">
+                            <strong>
+                                <a class="row-title" href="<?php echo $edit_url; ?>">
+                                    <code><?php echo esc_html($sc_code); ?></code>
+                                </a>
+                            </strong>
+                            <?php if ($is_sc_default): ?>
+                                <span class="mypco-badge-default"><?php _e('Default', 'mypco-online'); ?></span>
+                            <?php endif; ?>
+                            <div class="row-actions">
+                                <span class="edit">
+                                    <a href="<?php echo $edit_url; ?>"><?php _e('Edit', 'mypco-online'); ?></a>
+                                </span>
+                                <span class="copy">
+                                    | <a href="#" class="mypco-copy-link" data-copy="<?php echo esc_attr($sc_code); ?>"><?php _e('Copy', 'mypco-online'); ?></a>
+                                </span>
+                                <?php if (!$is_sc_default): ?>
+                                    <span class="trash">
+                                        | <a href="<?php echo $trash_url; ?>" class="submitdelete" onclick="return confirm('<?php echo esc_js(__('Are you sure you want to delete this shortcode?', 'mypco-online')); ?>');"><?php _e('Trash', 'mypco-online'); ?></a>
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                            <button type="button" class="toggle-row"><span class="screen-reader-text"><?php _e('Show more details', 'mypco-online'); ?></span></button>
+                        </td>
+                        <td class="description column-description" data-colname="<?php esc_attr_e('Description', 'mypco-online'); ?>">
+                            <?php if (!empty($sc_description)): ?>
+                                <?php echo esc_html($sc_description); ?>
+                            <?php else: ?>
+                                <span class="mypco-no-description">&mdash;</span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="type column-type" data-colname="<?php esc_attr_e('Type', 'mypco-online'); ?>">
+                            <?php echo esc_html($type_label); ?>
+                        </td>
+                        <td class="event column-event" data-colname="<?php esc_attr_e('Event Filter', 'mypco-online'); ?>">
+                            <?php echo esc_html($sc['event_name'] ?? ''); ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td class="manage-column column-cb check-column">
+                    <input id="cb-select-all-2" type="checkbox">
+                </td>
+                <th scope="col" class="manage-column column-shortcode column-primary"><?php _e('Shortcode', 'mypco-online'); ?></th>
+                <th scope="col" class="manage-column column-description"><?php _e('Description', 'mypco-online'); ?></th>
+                <th scope="col" class="manage-column column-type"><?php _e('Type', 'mypco-online'); ?></th>
+                <th scope="col" class="manage-column column-event"><?php _e('Event Filter', 'mypco-online'); ?></th>
+            </tr>
+            </tfoot>
+        </table>
 
-    <div class="card">
+        <!-- Bottom Tablenav -->
+        <div class="tablenav bottom">
+            <div class="alignleft actions bulkactions">
+                <label for="bulk-action-selector-bottom" class="screen-reader-text"><?php _e('Select bulk action', 'mypco-online'); ?></label>
+                <select name="bulk_action2" id="bulk-action-selector-bottom">
+                    <option value="-1"><?php _e('Bulk actions', 'mypco-online'); ?></option>
+                    <option value="trash"><?php _e('Move to Trash', 'mypco-online'); ?></option>
+                </select>
+                <input type="submit" class="button action" value="<?php esc_attr_e('Apply', 'mypco-online'); ?>">
+            </div>
+            <div class="tablenav-pages one-page">
+                <span class="displaying-num"><?php printf(_n('%s item', '%s items', count($shortcodes), 'mypco-online'), count($shortcodes)); ?></span>
+            </div>
+            <br class="clear">
+        </div>
+    </form>
+
+    <div class="card" style="margin-top: 20px;">
         <h2><?php _e('Cache Management', 'mypco-online'); ?></h2>
         <p><?php _e('Location data is cached for 1 hour. Clear the cache to fetch fresh data from Planning Center.', 'mypco-online'); ?></p>
 
@@ -531,16 +616,34 @@ $is_edit_view = isset($action) && in_array($action, ['edit', 'new']);
     (function($) {
         'use strict';
 
-        // Copy shortcode to clipboard
-        $('.mypco-copy-btn').on('click', function() {
+        // Select all checkboxes
+        $('#cb-select-all-1, #cb-select-all-2').on('change', function() {
+            var isChecked = $(this).prop('checked');
+            $('input[name="shortcode_ids[]"]').prop('checked', isChecked);
+            $('#cb-select-all-1, #cb-select-all-2').prop('checked', isChecked);
+        });
+
+        // Sync bulk action selectors
+        $('#bulk-action-selector-top').on('change', function() {
+            $('#bulk-action-selector-bottom').val($(this).val());
+        });
+        $('#bulk-action-selector-bottom').on('change', function() {
+            $('#bulk-action-selector-top').val($(this).val());
+            $('select[name="bulk_action"]').val($(this).val());
+        });
+
+        // Copy shortcode link
+        $('.mypco-copy-link').on('click', function(e) {
+            e.preventDefault();
             var text = $(this).data('copy');
-            var $btn = $(this);
+            var $link = $(this);
+            var originalText = $link.text();
 
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(text).then(function() {
-                    $btn.text('<?php echo esc_js(__('Copied!', 'mypco-online')); ?>');
+                    $link.text('<?php echo esc_js(__('Copied!', 'mypco-online')); ?>');
                     setTimeout(function() {
-                        $btn.text('<?php echo esc_js(__('Copy', 'mypco-online')); ?>');
+                        $link.text(originalText);
                     }, 2000);
                 });
             }
