@@ -182,7 +182,7 @@ class MyPCO_Locations_Admin {
 
         $next_sunday = array_merge($base, [
             'type' => 'next_sunday',
-            'name' => 'Next Sunday',
+            'description' => 'Default Next Sunday shortcode',
             'is_default' => true,
         ]);
 
@@ -197,7 +197,7 @@ class MyPCO_Locations_Admin {
 
         $sunday_list = array_merge($sunday_list_base, [
             'type' => 'sunday_list',
-            'name' => 'Sunday List',
+            'description' => 'Default Sunday List shortcode',
             'is_default' => true,
         ]);
 
@@ -328,7 +328,7 @@ class MyPCO_Locations_Admin {
             }
             $shortcode = self::get_default_shortcode_settings($type);
             $shortcode['type'] = $type;
-            $shortcode['name'] = '';
+            $shortcode['description'] = '';
             $shortcode['is_default'] = false;
             $id = 0;
         }
@@ -373,7 +373,7 @@ class MyPCO_Locations_Admin {
         // Build sanitized settings
         $settings = [
             'type'             => $type,
-            'name'             => isset($_POST['shortcode_name']) ? sanitize_text_field($_POST['shortcode_name']) : '',
+            'description'      => isset($_POST['shortcode_description']) ? sanitize_text_field($_POST['shortcode_description']) : '',
             'event_name'       => isset($_POST['event_name']) ? sanitize_text_field($_POST['event_name']) : 'Sunday Gathering',
             'show_time'        => isset($_POST['show_time']),
             'show_address'     => isset($_POST['show_address']),

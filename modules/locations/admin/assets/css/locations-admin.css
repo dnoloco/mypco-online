@@ -114,6 +114,16 @@
     vertical-align: middle;
 }
 
+/* Empty description placeholder */
+.mypco-locations-admin .mypco-no-description {
+    color: #a7aaad;
+}
+
+/* Description column */
+.mypco-locations-admin .column-description {
+    color: #50575e;
+}
+
 /* Shortcode preview bar on edit page */
 .mypco-shortcode-preview-bar {
     background: #f0f6fc;

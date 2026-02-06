@@ -70,14 +70,14 @@ $is_edit_view = isset($action) && in_array($action, ['edit', 'new']);
             <table class="form-table">
                 <tr>
                     <th scope="row">
-                        <label for="shortcode_name"><?php _e('Label', 'mypco-online'); ?></label>
+                        <label for="shortcode_description"><?php _e('Description', 'mypco-online'); ?></label>
                     </th>
                     <td>
-                        <input type="text" id="shortcode_name" name="shortcode_name"
-                               value="<?php echo esc_attr($shortcode['name'] ?? ''); ?>"
-                               class="regular-text" placeholder="<?php esc_attr_e('e.g., Homepage Banner, Sidebar Widget', 'mypco-online'); ?>">
+                        <input type="text" id="shortcode_description" name="shortcode_description"
+                               value="<?php echo esc_attr($shortcode['description'] ?? ''); ?>"
+                               class="large-text" placeholder="<?php esc_attr_e('e.g., Shows next Sunday on homepage hero section', 'mypco-online'); ?>">
                         <p class="description">
-                            <?php _e('A friendly name to identify this shortcode in the list.', 'mypco-online'); ?>
+                            <?php _e('A description to help you remember what this shortcode is used for.', 'mypco-online'); ?>
                         </p>
                     </td>
                 </tr>
@@ -443,72 +443,76 @@ $is_edit_view = isset($action) && in_array($action, ['edit', 'new']);
         </div>
     <?php endif; ?>
 
-    <div class="card">
-        <h2><?php _e('Shortcodes', 'mypco-online'); ?></h2>
-        <p><?php _e('Each shortcode has its own settings for event filtering, layout, colors, and more. Use the shortcode with its ID on any page or post.', 'mypco-online'); ?></p>
+    <h2><?php _e('Shortcodes', 'mypco-online'); ?></h2>
+    <p><?php _e('Each shortcode has its own settings for event filtering, layout, colors, and more. Use the shortcode with its ID on any page or post.', 'mypco-online'); ?></p>
 
-        <table class="wp-list-table widefat fixed striped">
-            <thead>
+    <table class="wp-list-table widefat fixed striped">
+        <thead>
+        <tr>
+            <th scope="col" class="manage-column column-id" style="width: 40px;"><?php _e('ID', 'mypco-online'); ?></th>
+            <th scope="col" class="manage-column column-shortcode" style="width: 220px;"><?php _e('Shortcode', 'mypco-online'); ?></th>
+            <th scope="col" class="manage-column column-description"><?php _e('Description', 'mypco-online'); ?></th>
+            <th scope="col" class="manage-column column-type" style="width: 130px;"><?php _e('Type', 'mypco-online'); ?></th>
+            <th scope="col" class="manage-column column-event" style="width: 140px;"><?php _e('Event Filter', 'mypco-online'); ?></th>
+            <th scope="col" class="manage-column column-actions" style="width: 140px;"><?php _e('Actions', 'mypco-online'); ?></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php if (empty($shortcodes)): ?>
             <tr>
-                <th class="column-id" style="width: 50px;"><?php _e('ID', 'mypco-online'); ?></th>
-                <th class="column-shortcode"><?php _e('Shortcode', 'mypco-online'); ?></th>
-                <th class="column-type"><?php _e('Type', 'mypco-online'); ?></th>
-                <th class="column-name"><?php _e('Label', 'mypco-online'); ?></th>
-                <th class="column-event"><?php _e('Event Filter', 'mypco-online'); ?></th>
-                <th class="column-actions" style="width: 140px;"><?php _e('Actions', 'mypco-online'); ?></th>
+                <td colspan="6"><?php _e('No shortcodes configured.', 'mypco-online'); ?></td>
             </tr>
-            </thead>
-            <tbody>
-            <?php if (empty($shortcodes)): ?>
+        <?php else: ?>
+            <?php foreach ($shortcodes as $sc_id => $sc): ?>
+                <?php
+                $sc_type = $sc['type'] ?? 'next_sunday';
+                $sc_tag = ($sc_type === 'next_sunday') ? 'mypco_next_sunday' : 'mypco_sunday_list';
+                $sc_code = '[' . $sc_tag . ' id="' . $sc_id . '"]';
+                $sc_description = !empty($sc['description']) ? $sc['description'] : '';
+                $type_label = ($sc_type === 'next_sunday')
+                    ? __('Next Sunday', 'mypco-online')
+                    : __('Sunday List', 'mypco-online');
+                $is_sc_default = !empty($sc['is_default']);
+                ?>
                 <tr>
-                    <td colspan="6"><?php _e('No shortcodes configured.', 'mypco-online'); ?></td>
-                </tr>
-            <?php else: ?>
-                <?php foreach ($shortcodes as $sc_id => $sc): ?>
-                    <?php
-                    $sc_type = $sc['type'] ?? 'next_sunday';
-                    $sc_tag = ($sc_type === 'next_sunday') ? 'mypco_next_sunday' : 'mypco_sunday_list';
-                    $sc_code = '[' . $sc_tag . ' id="' . $sc_id . '"]';
-                    $sc_name = !empty($sc['name']) ? $sc['name'] : '—';
-                    $type_label = ($sc_type === 'next_sunday')
-                        ? __('Next Sunday', 'mypco-online')
-                        : __('Sunday List', 'mypco-online');
-                    $is_sc_default = !empty($sc['is_default']);
-                    ?>
-                    <tr>
-                        <td><strong><?php echo esc_html($sc_id); ?></strong></td>
-                        <td>
-                            <code class="mypco-shortcode-code"><?php echo esc_html($sc_code); ?></code>
-                            <button type="button" class="button button-small mypco-copy-btn" data-copy="<?php echo esc_attr($sc_code); ?>">
-                                <?php _e('Copy', 'mypco-online'); ?>
-                            </button>
-                        </td>
-                        <td>
-                            <?php echo esc_html($type_label); ?>
-                            <?php if ($is_sc_default): ?>
-                                <span class="mypco-badge-default"><?php _e('Default', 'mypco-online'); ?></span>
-                            <?php endif; ?>
-                        </td>
-                        <td><?php echo esc_html($sc_name); ?></td>
-                        <td><?php echo esc_html($sc['event_name'] ?? ''); ?></td>
-                        <td>
-                            <a href="<?php echo esc_url($page_url . '&action=edit&id=' . $sc_id); ?>" class="button button-small">
-                                <?php _e('Edit', 'mypco-online'); ?>
+                    <td><strong><?php echo esc_html($sc_id); ?></strong></td>
+                    <td>
+                        <code class="mypco-shortcode-code"><?php echo esc_html($sc_code); ?></code>
+                        <button type="button" class="button button-small mypco-copy-btn" data-copy="<?php echo esc_attr($sc_code); ?>">
+                            <?php _e('Copy', 'mypco-online'); ?>
+                        </button>
+                    </td>
+                    <td class="column-description">
+                        <?php if (!empty($sc_description)): ?>
+                            <?php echo esc_html($sc_description); ?>
+                        <?php else: ?>
+                            <span class="mypco-no-description">&mdash;</span>
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <?php echo esc_html($type_label); ?>
+                        <?php if ($is_sc_default): ?>
+                            <span class="mypco-badge-default"><?php _e('Default', 'mypco-online'); ?></span>
+                        <?php endif; ?>
+                    </td>
+                    <td><?php echo esc_html($sc['event_name'] ?? ''); ?></td>
+                    <td>
+                        <a href="<?php echo esc_url($page_url . '&action=edit&id=' . $sc_id); ?>" class="button button-small">
+                            <?php _e('Edit', 'mypco-online'); ?>
+                        </a>
+                        <?php if (!$is_sc_default): ?>
+                            <a href="<?php echo esc_url(wp_nonce_url($page_url . '&action=delete&id=' . $sc_id, 'mypco_delete_shortcode_' . $sc_id)); ?>"
+                               class="button button-small button-link-delete"
+                               onclick="return confirm('<?php echo esc_js(__('Are you sure you want to delete this shortcode?', 'mypco-online')); ?>');">
+                                <?php _e('Delete', 'mypco-online'); ?>
                             </a>
-                            <?php if (!$is_sc_default): ?>
-                                <a href="<?php echo esc_url(wp_nonce_url($page_url . '&action=delete&id=' . $sc_id, 'mypco_delete_shortcode_' . $sc_id)); ?>"
-                                   class="button button-small button-link-delete"
-                                   onclick="return confirm('<?php echo esc_js(__('Are you sure you want to delete this shortcode?', 'mypco-online')); ?>');">
-                                    <?php _e('Delete', 'mypco-online'); ?>
-                                </a>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-            </tbody>
-        </table>
-    </div>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        <?php endif; ?>
+        </tbody>
+    </table>
 
     <div class="card">
         <h2><?php _e('Cache Management', 'mypco-online'); ?></h2>
