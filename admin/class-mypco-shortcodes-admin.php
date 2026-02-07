@@ -592,40 +592,39 @@ class MyPCO_Shortcodes_Admin {
      */
     private function render_edit_page() {
         $action = sanitize_text_field($_GET['action']);
-        $id = isset($_GET['id']) ? absint($_GET['id']) : 0;
         $types = self::get_shortcode_types();
+        $page_url = admin_url('admin.php?page=mypco-shortcodes');
 
-        if ($action === 'edit' && $id > 0) {
-            $shortcode = $this->get_shortcode($id);
-            if (!$shortcode) {
-                wp_redirect(admin_url('admin.php?page=mypco-shortcodes'));
-                exit;
-            }
-            $type_slug = $shortcode['shortcode_type'];
-            $type_def = isset($types[$type_slug]) ? $types[$type_slug] : null;
-        } else {
-            // New shortcode — type must be provided via dropdown on list page
-            $type_slug = isset($_GET['type']) ? sanitize_text_field($_GET['type']) : '';
-            if (empty($type_slug) || !isset($types[$type_slug])) {
-                wp_redirect(admin_url('admin.php?page=mypco-shortcodes'));
-                exit;
-            }
-
-            $type_def = $types[$type_slug];
-            $shortcode = array_merge($type_def['defaults'], [
-                'shortcode_type' => $type_slug,
-            ]);
-            $id = 0;
+        if ($action === 'new') {
+            // Two-panel builder — no specific type needed up front
+            $data = [
+                'action'   => 'new',
+                'types'    => $types,
+                'modules'  => self::get_available_modules(),
+                'page_url' => $page_url,
+            ];
+            $this->load_template('shortcodes-page', $data);
+            return;
         }
 
+        // Edit existing shortcode
+        $id = isset($_GET['id']) ? absint($_GET['id']) : 0;
+        $shortcode = $this->get_shortcode($id);
+        if (!$shortcode) {
+            wp_redirect($page_url);
+            exit;
+        }
+        $type_slug = $shortcode['shortcode_type'];
+        $type_def = isset($types[$type_slug]) ? $types[$type_slug] : null;
+
         $data = [
-            'action'    => $action,
+            'action'    => 'edit',
             'id'        => $id,
             'shortcode' => $shortcode,
             'type_slug' => $type_slug,
             'type_def'  => $type_def,
             'types'     => $types,
-            'page_url'  => admin_url('admin.php?page=mypco-shortcodes'),
+            'page_url'  => $page_url,
         ];
 
         $this->load_template('shortcodes-page', $data);
