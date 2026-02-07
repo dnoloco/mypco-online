@@ -312,7 +312,7 @@ $is_edit_view = isset($action) && in_array($action, ['edit', 'new']);
                 <optgroup label="<?php echo esc_attr($mod_types[array_key_first($mod_types)]['module_name']); ?>">
                     <?php foreach ($mod_types as $slug => $type): ?>
                         <option value="<?php echo esc_attr($slug); ?>">
-                            <?php echo esc_html($type['name']); ?> &mdash; [<?php echo esc_html($type['tag']); ?>]
+                            <?php echo esc_html($type['name']); ?>
                         </option>
                     <?php endforeach; ?>
                 </optgroup>
