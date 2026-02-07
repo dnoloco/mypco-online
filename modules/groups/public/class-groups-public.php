@@ -63,9 +63,23 @@ class MyPCO_Groups_Public {
     public function render_groups_shortcode($atts) {
         // Parse attributes
         $atts = shortcode_atts([
-            'count' => 10,
-            'campus' => null
+            'id'     => 0,
+            'count'  => '',
+            'campus' => '',
         ], $atts);
+
+        // Load centralized shortcode settings when id is provided
+        $id = absint($atts['id']);
+        if ($id > 0) {
+            require_once MYPCO_PLUGIN_DIR . 'admin/class-mypco-shortcodes-admin.php';
+            $settings = MyPCO_Shortcodes_Admin::get_shortcode_settings($id, 'mypco_groups');
+        } else {
+            $settings = [];
+        }
+
+        // Allow shortcode attributes to override stored settings, then fall back to defaults
+        $atts['count']  = !empty($atts['count']) ? (int) $atts['count'] : ($settings['count'] ?? 10);
+        $atts['campus'] = !empty($atts['campus']) ? $atts['campus'] : ($settings['campus'] ?? null);
 
         // Fetch groups data
         $groups_data = $this->fetch_groups($atts);

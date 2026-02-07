@@ -44,6 +44,7 @@ class MyPCO {
         require_once MYPCO_PLUGIN_DIR . 'admin/class-mypco-admin.php';
         require_once MYPCO_PLUGIN_DIR . 'admin/class-mypco-settings-page.php';
         require_once MYPCO_PLUGIN_DIR . 'admin/class-mypco-license-page.php';
+        require_once MYPCO_PLUGIN_DIR . 'admin/class-mypco-shortcodes-admin.php';
 
         // Public functionality
         require_once MYPCO_PLUGIN_DIR . 'public/class-mypco-public.php';
@@ -115,15 +116,19 @@ class MyPCO {
         // This means active module menus appear after Dashboard
         $this->load_modules();
 
-        // 3. Add Modules menu at later priority (after active module menus)
+        // 3. Initialize the centralized Shortcodes admin page
+        $shortcodes_admin = new MyPCO_Shortcodes_Admin($this->loader, $this->api_model);
+        $shortcodes_admin->init();
+
+        // 4. Add Modules menu at later priority (after active module menus)
         $this->loader->add_action('admin_menu', $plugin_admin, 'add_modules_menu', 99);
 
-        // 4. Initialize the API Settings Page at later priority (after Modules)
+        // 5. Initialize the API Settings Page at later priority (after Modules)
         $plugin_settings = new MyPCO_Settings_Page($this->plugin_name, $this->version, $this->api_model);
         $this->loader->add_action('admin_menu', $plugin_settings, 'add_settings_menu', 99);
         $this->loader->add_action('admin_init', $plugin_settings, 'handle_settings_save');
 
-        // 5. Initialize the License Page (hidden from menu)
+        // 6. Initialize the License Page (hidden from menu)
         $license_page = new MyPCO_License_Page($this->plugin_name, $this->version);
         $license_page->init($this->loader);
     }

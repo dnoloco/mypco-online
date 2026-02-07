@@ -89,9 +89,23 @@ class MyPCO_Calendar_Public {
      */
     public function render_calendar_shortcode($atts) {
         $atts = shortcode_atts([
-            'count' => 100,
-            'view' => 'list', // Default view: list, month, gallery
+            'id'    => 0,
+            'count' => '',
+            'view'  => '',
         ], $atts, 'mypco_calendar');
+
+        // Load centralized shortcode settings when id is provided
+        $id = absint($atts['id']);
+        if ($id > 0) {
+            require_once MYPCO_PLUGIN_DIR . 'admin/class-mypco-shortcodes-admin.php';
+            $settings = MyPCO_Shortcodes_Admin::get_shortcode_settings($id, 'mypco_calendar');
+        } else {
+            $settings = [];
+        }
+
+        // Allow shortcode attributes to override stored settings, then fall back to defaults
+        $atts['count'] = !empty($atts['count']) ? (int) $atts['count'] : ($settings['count'] ?? 100);
+        $atts['view']  = !empty($atts['view']) ? $atts['view'] : ($settings['view'] ?? 'list');
 
         // Fetch data from API
         $events_data = $this->fetch_calendar_data($atts);
