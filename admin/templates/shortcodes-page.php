@@ -2,8 +2,7 @@
 /**
  * Shortcodes Admin Page Template
  *
- * Renders the shortcode list view, edit/new view, or type selector
- * based on which variables are available.
+ * Renders the shortcode list view or edit/new view.
  *
  * List view variables:
  * - $shortcodes (array) - All shortcode configurations
@@ -25,65 +24,17 @@
  * - $type_def (array) - Shortcode type definition
  * - $types (array)
  * - $page_url (string)
- *
- * Type selector variables:
- * - $action (string) - 'select_type'
- * - $types (array)
- * - $modules (array)
- * - $page_url (string)
  */
 
 defined('ABSPATH') || exit;
 
 // Determine which view to render
 $is_edit_view = isset($action) && in_array($action, ['edit', 'new']);
-$is_type_selector = isset($action) && $action === 'select_type';
 ?>
 
 <div class="wrap mypco-shortcodes-admin">
 
-<?php if ($is_type_selector): ?>
-    <?php // ================================================================
-          // TYPE SELECTOR VIEW
-          // ================================================================ ?>
-
-    <h1>
-        <?php _e('Add New Shortcode', 'mypco-online'); ?>
-        <a href="<?php echo esc_url($page_url); ?>" class="page-title-action"><?php _e('Back to Shortcodes', 'mypco-online'); ?></a>
-    </h1>
-
-    <hr class="wp-header-end">
-
-    <p><?php _e('Select a shortcode type to create:', 'mypco-online'); ?></p>
-
-    <?php
-    // Group types by module
-    $grouped = [];
-    foreach ($types as $slug => $type) {
-        $mod = $type['module'];
-        if (!isset($grouped[$mod])) {
-            $grouped[$mod] = [];
-        }
-        $grouped[$mod][$slug] = $type;
-    }
-    ?>
-
-    <?php foreach ($grouped as $mod_key => $mod_types): ?>
-        <div class="card mypco-type-group">
-            <h2><?php echo esc_html($mod_types[array_key_first($mod_types)]['module_name']); ?></h2>
-            <div class="mypco-type-cards">
-                <?php foreach ($mod_types as $slug => $type): ?>
-                    <a href="<?php echo esc_url($page_url . '&action=new&type=' . $slug); ?>" class="mypco-type-card">
-                        <strong><?php echo esc_html($type['name']); ?></strong>
-                        <code>[<?php echo esc_html($type['tag']); ?>]</code>
-                        <span class="description"><?php echo esc_html($type['description']); ?></span>
-                    </a>
-                <?php endforeach; ?>
-            </div>
-        </div>
-    <?php endforeach; ?>
-
-<?php elseif ($is_edit_view): ?>
+<?php if ($is_edit_view): ?>
     <?php // ================================================================
           // EDIT / NEW SHORTCODE VIEW
           // ================================================================ ?>
@@ -339,9 +290,36 @@ $is_type_selector = isset($action) && $action === 'select_type';
           // ================================================================ ?>
 
     <h1 class="wp-heading-inline"><?php _e('Shortcodes', 'mypco-online'); ?></h1>
-    <a href="<?php echo esc_url($page_url . '&action=new'); ?>" class="page-title-action"><?php _e('Add New', 'mypco-online'); ?></a>
 
     <hr class="wp-header-end">
+
+    <!-- Add New Shortcode (inline) -->
+    <div class="mypco-add-new-bar">
+        <?php
+        // Group types by module for the optgroup dropdown
+        $grouped_types = [];
+        foreach ($types as $slug => $type) {
+            $mod = $type['module'];
+            if (!isset($grouped_types[$mod])) {
+                $grouped_types[$mod] = [];
+            }
+            $grouped_types[$mod][$slug] = $type;
+        }
+        ?>
+        <select id="mypco-new-shortcode-type">
+            <option value=""><?php _e('Select shortcode type...', 'mypco-online'); ?></option>
+            <?php foreach ($grouped_types as $mod_key => $mod_types): ?>
+                <optgroup label="<?php echo esc_attr($mod_types[array_key_first($mod_types)]['module_name']); ?>">
+                    <?php foreach ($mod_types as $slug => $type): ?>
+                        <option value="<?php echo esc_attr($slug); ?>">
+                            <?php echo esc_html($type['name']); ?> &mdash; [<?php echo esc_html($type['tag']); ?>]
+                        </option>
+                    <?php endforeach; ?>
+                </optgroup>
+            <?php endforeach; ?>
+        </select>
+        <a href="#" id="mypco-add-new-btn" class="button button-primary"><?php _e('Add New', 'mypco-online'); ?></a>
+    </div>
 
     <?php if ($settings_saved): ?>
         <div class="notice notice-success is-dismissible">
@@ -538,6 +516,17 @@ $is_type_selector = isset($action) && $action === 'select_type';
                     }, 2000);
                 });
             }
+        });
+
+        // Add New shortcode dropdown
+        $('#mypco-add-new-btn').on('click', function(e) {
+            e.preventDefault();
+            var selected = $('#mypco-new-shortcode-type').val();
+            if (!selected) {
+                $('#mypco-new-shortcode-type').focus();
+                return;
+            }
+            window.location.href = '<?php echo esc_js($page_url); ?>&action=new&type=' + selected;
         });
     })(jQuery);
     </script>
