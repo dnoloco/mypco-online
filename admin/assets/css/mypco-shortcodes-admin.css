@@ -1,0 +1,222 @@
+/**
+ * Shortcodes Admin Styles
+ *
+ * Styles for the centralized Shortcodes admin page (list, edit, and type selector views).
+ * Mirrors the pattern from the Locations module admin styles.
+ */
+
+.mypco-shortcodes-admin .card {
+    max-width: 800px;
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+.mypco-shortcodes-admin h2 {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.mypco-shortcodes-admin .form-table th {
+    width: 200px;
+    padding-top: 15px;
+}
+
+.mypco-shortcodes-admin .form-table td {
+    padding-top: 15px;
+}
+
+/* Color picker styling */
+.mypco-shortcodes-admin input[type="color"] {
+    width: 50px;
+    height: 34px;
+    padding: 2px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.mypco-shortcodes-admin .mypco-color-preview {
+    margin-left: 10px;
+    font-family: monospace;
+    font-size: 13px;
+    color: #666;
+    vertical-align: middle;
+}
+
+/* Shortcode table */
+.mypco-shortcodes-admin .wp-list-table {
+    margin-top: 0;
+}
+
+.mypco-shortcodes-admin .wp-list-table code {
+    background: #f0f0f1;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+.mypco-shortcodes-admin .column-shortcode {
+    width: 30%;
+}
+
+.mypco-shortcodes-admin .column-description {
+    width: 30%;
+}
+
+.mypco-shortcodes-admin .column-module {
+    width: 15%;
+}
+
+.mypco-shortcodes-admin .column-type {
+    width: 15%;
+}
+
+/* Row title link */
+.mypco-shortcodes-admin .row-title code {
+    color: #2271b1;
+}
+
+.mypco-shortcodes-admin .row-title:hover code {
+    color: #135e96;
+}
+
+/* Row actions */
+.mypco-shortcodes-admin .row-actions {
+    color: #787c82;
+}
+
+.mypco-shortcodes-admin .row-actions .trash a {
+    color: #b32d2e;
+}
+
+.mypco-shortcodes-admin .row-actions .trash a:hover {
+    color: #a00;
+}
+
+/* Empty description placeholder */
+.mypco-shortcodes-admin .mypco-no-description {
+    color: #a7aaad;
+}
+
+/* Description column */
+.mypco-shortcodes-admin .column-description {
+    color: #50575e;
+}
+
+/* Shortcode preview bar on edit page */
+.mypco-shortcode-preview-bar {
+    background: #f0f6fc;
+    border: 1px solid #c3c4c7;
+    border-left: 4px solid #2271b1;
+    padding: 12px 16px;
+    margin: 15px 0;
+    max-width: 800px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 2px;
+}
+
+.mypco-shortcode-preview-bar code {
+    background: #fff;
+    padding: 4px 10px;
+    border-radius: 3px;
+    font-size: 13px;
+    border: 1px solid #ddd;
+}
+
+/* Description text */
+.mypco-shortcodes-admin .description {
+    color: #666;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+/* Submit button spacing */
+.mypco-shortcodes-admin .submit {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+/* Select inputs */
+.mypco-shortcodes-admin select {
+    min-width: 250px;
+}
+
+/* Number inputs */
+.mypco-shortcodes-admin .small-text {
+    width: 60px;
+}
+
+/* Checkbox labels */
+.mypco-shortcodes-admin label input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+/* Notice styling */
+.mypco-shortcodes-admin .notice {
+    margin: 15px 0;
+    max-width: 800px;
+}
+
+/* ====================================================================
+ * Type Selector View
+ * ==================================================================== */
+
+.mypco-type-group {
+    max-width: 900px;
+}
+
+.mypco-type-group h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.mypco-type-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+}
+
+.mypco-type-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.mypco-type-card:hover {
+    border-color: #2271b1;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    color: inherit;
+}
+
+.mypco-type-card strong {
+    font-size: 15px;
+    color: #1d2327;
+}
+
+.mypco-type-card code {
+    background: #e9ecef;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #2271b1;
+    align-self: flex-start;
+}
+
+.mypco-type-card .description {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+    line-height: 1.4;
+}
