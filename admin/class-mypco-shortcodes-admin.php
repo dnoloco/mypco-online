@@ -604,18 +604,11 @@ class MyPCO_Shortcodes_Admin {
             $type_slug = $shortcode['shortcode_type'];
             $type_def = isset($types[$type_slug]) ? $types[$type_slug] : null;
         } else {
-            // New shortcode
+            // New shortcode — type must be provided via dropdown on list page
             $type_slug = isset($_GET['type']) ? sanitize_text_field($_GET['type']) : '';
             if (empty($type_slug) || !isset($types[$type_slug])) {
-                // Show type selector
-                $data = [
-                    'action'   => 'select_type',
-                    'types'    => $types,
-                    'modules'  => self::get_available_modules(),
-                    'page_url' => admin_url('admin.php?page=mypco-shortcodes'),
-                ];
-                $this->load_template('shortcodes-page', $data);
-                return;
+                wp_redirect(admin_url('admin.php?page=mypco-shortcodes'));
+                exit;
             }
 
             $type_def = $types[$type_slug];

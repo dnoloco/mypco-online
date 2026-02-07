@@ -1,9 +1,22 @@
 /**
  * Shortcodes Admin Styles
  *
- * Styles for the centralized Shortcodes admin page (list, edit, and type selector views).
+ * Styles for the centralized Shortcodes admin page (list and edit views).
  * Mirrors the pattern from the Locations module admin styles.
  */
+
+/* Add New bar — dropdown + button inline */
+.mypco-add-new-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 0 4px;
+}
+
+.mypco-add-new-bar select {
+    min-width: 320px;
+    max-width: 420px;
+}
 
 .mypco-shortcodes-admin .card {
     max-width: 800px;
@@ -162,61 +175,3 @@
     max-width: 800px;
 }
 
-/* ====================================================================
- * Type Selector View
- * ==================================================================== */
-
-.mypco-type-group {
-    max-width: 900px;
-}
-
-.mypco-type-group h2 {
-    margin-top: 0;
-    margin-bottom: 15px;
-}
-
-.mypco-type-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 15px;
-}
-
-.mypco-type-card {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 20px;
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    text-decoration: none;
-    color: inherit;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.mypco-type-card:hover {
-    border-color: #2271b1;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-    color: inherit;
-}
-
-.mypco-type-card strong {
-    font-size: 15px;
-    color: #1d2327;
-}
-
-.mypco-type-card code {
-    background: #e9ecef;
-    padding: 3px 8px;
-    border-radius: 3px;
-    font-size: 12px;
-    color: #2271b1;
-    align-self: flex-start;
-}
-
-.mypco-type-card .description {
-    font-size: 13px;
-    color: #666;
-    margin: 0;
-    line-height: 1.4;
-}
