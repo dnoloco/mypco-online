@@ -90,10 +90,7 @@ class MyPCO_Module_Manager {
                         'basic_shortcode',
                         'list_view',
                         'month_view',
-                        'gallery_view',
-                        'custom_event_shortcode',
-                        'custom_list_shortcode',
-                        'google_maps_links'
+                        'gallery_view'
                     ],
                     'premium' => [
                         'custom_css',
@@ -160,6 +157,24 @@ class MyPCO_Module_Manager {
                 ],
                 'file' => 'messages/class-messages-module.php',
                 'class' => 'MyPCO_Messages_Module'
+            ],
+            'calendar_shortcodes' => [
+                'name' => 'Calendar Shortcodes',
+                'description' => 'Custom single event and event list shortcodes for Planning Center Calendar.',
+                'tier' => 'freemium',
+                'requires_license' => false,
+                'min_license_tier' => 'starter',
+                'is_addon' => true,
+                'features' => [
+                    'free' => [
+                        'custom_event_shortcode',
+                        'custom_list_shortcode',
+                        'google_maps_links'
+                    ],
+                    'premium' => []
+                ],
+                'file' => 'calendar-shortcodes/class-calendar-shortcodes-module.php',
+                'class' => 'MyPCO_Calendar_Shortcodes_Module'
             ],
         ];
     }

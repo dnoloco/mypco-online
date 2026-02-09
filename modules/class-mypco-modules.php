@@ -139,7 +139,10 @@ class MyPCO_Modules {
         // Determine badge
         $badge = '';
         $badge_style = '';
-        if ($module['tier'] === 'freemium') {
+        if (!empty($module['is_addon'])) {
+            $badge = 'ADDON';
+            $badge_style = 'background: #00a32a; color: #fff;';
+        } elseif ($module['tier'] === 'freemium') {
             $badge = 'FREEMIUM';
             $badge_style = 'background: #2271b1; color: #fff;';
         } elseif ($module['tier'] === 'premium') {
