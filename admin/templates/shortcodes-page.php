@@ -470,9 +470,9 @@ $is_edit_view = isset($action) && $action === 'edit';
                 <tr class="no-items"><td class="colspanchange" colspan="5"><?php _e('No shortcodes found. Click "Add New" to create one.', 'mypco-online'); ?></td></tr>
             <?php else: ?>
                 <?php foreach ($shortcodes as $sc_id => $sc):
-                    $sc_type_slug = $sc['shortcode_type'] ?? '';
+                    $sc_type_slug = MyPCO_Shortcodes_Admin::resolve_legacy_type($sc['shortcode_type'] ?? '', $sc);
                     $sc_type      = $types[$sc_type_slug] ?? null;
-                    $sc_tag       = $sc_type ? $sc_type['tag'] : $sc_type_slug;
+                    $sc_tag       = $sc_type ? $sc_type['tag'] : ($sc['shortcode_type'] ?? $sc_type_slug);
                     $sc_code      = '[' . $sc_tag . ' id="' . $sc_id . '"]';
                     $sc_desc      = $sc['description'] ?? '';
                     $mod_name     = $sc_type ? $sc_type['module_name'] : __('Unknown', 'mypco-online');

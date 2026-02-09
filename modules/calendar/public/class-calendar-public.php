@@ -98,7 +98,7 @@ class MyPCO_Calendar_Public {
         $id = absint($atts['id']);
         if ($id > 0) {
             require_once MYPCO_PLUGIN_DIR . 'admin/class-mypco-shortcodes-admin.php';
-            $settings = MyPCO_Shortcodes_Admin::get_shortcode_settings($id, 'mypco_calendar');
+            $settings = MyPCO_Shortcodes_Admin::get_shortcode_settings($id, 'mypco_calendar_list');
         } else {
             $settings = [];
         }

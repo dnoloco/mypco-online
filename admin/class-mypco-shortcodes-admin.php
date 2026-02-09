@@ -51,11 +51,11 @@ class MyPCO_Shortcodes_Admin {
      */
     public static function get_shortcode_types() {
         $types = [
-            'mypco_calendar' => [
+            'mypco_calendar_list' => [
                 'module'      => 'calendar',
                 'module_name' => 'Calendar',
-                'name'        => 'Calendar',
-                'description' => 'Display Planning Center calendar events with list, month, or gallery views.',
+                'name'        => 'Event List',
+                'description' => 'Chronological list of upcoming events.',
                 'tag'         => 'mypco_calendar',
                 'defaults'    => [
                     'description'      => '',
@@ -76,23 +76,66 @@ class MyPCO_Shortcodes_Admin {
                         'max'         => 100,
                         'description' => 'Maximum number of events to fetch from Planning Center.',
                     ],
+                ],
+            ],
+            'mypco_calendar_month' => [
+                'module'      => 'calendar',
+                'module_name' => 'Calendar',
+                'name'        => 'Monthly Calendar',
+                'description' => 'Calendar grid view of events by month.',
+                'tag'         => 'mypco_calendar',
+                'defaults'    => [
+                    'description'      => '',
+                    'count'            => 100,
+                    'view'             => 'month',
+                    'custom_class'     => '',
+                    'primary_color'    => '#333333',
+                    'text_color'       => '#333333',
+                    'background_color' => '#ffffff',
+                    'border_radius'    => 8,
+                ],
+                'fields' => [
                     [
-                        'key'         => 'view',
-                        'label'       => 'Default View',
-                        'type'        => 'select',
-                        'options'     => [
-                            'list'    => 'List - Chronological event list',
-                            'month'   => 'Month - Calendar grid view',
-                            'gallery' => 'Gallery - Card-based image layout',
-                        ],
-                        'description' => 'The default view when the calendar loads.',
+                        'key'         => 'count',
+                        'label'       => 'Number of Events',
+                        'type'        => 'number',
+                        'min'         => 1,
+                        'max'         => 100,
+                        'description' => 'Maximum number of events to fetch from Planning Center.',
+                    ],
+                ],
+            ],
+            'mypco_calendar_gallery' => [
+                'module'      => 'calendar',
+                'module_name' => 'Calendar',
+                'name'        => 'Event Gallery',
+                'description' => 'Card-based image layout of events.',
+                'tag'         => 'mypco_calendar',
+                'defaults'    => [
+                    'description'      => '',
+                    'count'            => 100,
+                    'view'             => 'gallery',
+                    'custom_class'     => '',
+                    'primary_color'    => '#333333',
+                    'text_color'       => '#333333',
+                    'background_color' => '#ffffff',
+                    'border_radius'    => 8,
+                ],
+                'fields' => [
+                    [
+                        'key'         => 'count',
+                        'label'       => 'Number of Events',
+                        'type'        => 'number',
+                        'min'         => 1,
+                        'max'         => 100,
+                        'description' => 'Maximum number of events to fetch from Planning Center.',
                     ],
                 ],
             ],
             'mypco_groups' => [
                 'module'      => 'groups',
                 'module_name' => 'Groups',
-                'name'        => 'Groups',
+                'name'        => 'Group Directory',
                 'description' => 'Display Planning Center groups with filtering options.',
                 'tag'         => 'mypco_groups',
                 'defaults'    => [
@@ -334,6 +377,28 @@ class MyPCO_Shortcodes_Admin {
     }
 
     /**
+     * Resolve a legacy shortcode type slug to the current slug.
+     *
+     * Handles backward compatibility when type slugs are renamed or split.
+     *
+     * @param string $type_slug  Original type slug.
+     * @param array  $settings   Saved shortcode settings (used to determine the correct variant).
+     * @return string Resolved type slug.
+     */
+    public static function resolve_legacy_type($type_slug, $settings = []) {
+        if ($type_slug === 'mypco_calendar') {
+            $view = $settings['view'] ?? 'list';
+            $map = [
+                'list'    => 'mypco_calendar_list',
+                'month'   => 'mypco_calendar_month',
+                'gallery' => 'mypco_calendar_gallery',
+            ];
+            return $map[$view] ?? 'mypco_calendar_list';
+        }
+        return $type_slug;
+    }
+
+    /**
      * Get a single shortcode type definition.
      *
      * @param string $type_slug Shortcode type slug.
@@ -341,7 +406,15 @@ class MyPCO_Shortcodes_Admin {
      */
     public static function get_shortcode_type($type_slug) {
         $types = self::get_shortcode_types();
-        return isset($types[$type_slug]) ? $types[$type_slug] : null;
+        if (isset($types[$type_slug])) {
+            return $types[$type_slug];
+        }
+        // Try resolving as a legacy type
+        $resolved = self::resolve_legacy_type($type_slug);
+        if ($resolved !== $type_slug && isset($types[$resolved])) {
+            return $types[$resolved];
+        }
+        return null;
     }
 
     /**
@@ -549,7 +622,7 @@ class MyPCO_Shortcodes_Admin {
             $counts_by_module[$mod_key] = 0;
         }
         foreach ($all_shortcodes as $sc) {
-            $sc_type_slug = $sc['shortcode_type'] ?? '';
+            $sc_type_slug = self::resolve_legacy_type($sc['shortcode_type'] ?? '', $sc);
             $sc_type = isset($types[$sc_type_slug]) ? $types[$sc_type_slug] : null;
             if ($sc_type) {
                 $mod_key = $sc_type['module'];
@@ -565,7 +638,7 @@ class MyPCO_Shortcodes_Admin {
 
         if (!empty($filter) && isset($modules[$filter])) {
             $shortcodes = array_filter($all_shortcodes, function($sc) use ($types, $filter) {
-                $sc_type_slug = $sc['shortcode_type'] ?? '';
+                $sc_type_slug = self::resolve_legacy_type($sc['shortcode_type'] ?? '', $sc);
                 $sc_type = isset($types[$sc_type_slug]) ? $types[$sc_type_slug] : null;
                 return $sc_type && $sc_type['module'] === $filter;
             });
@@ -614,7 +687,7 @@ class MyPCO_Shortcodes_Admin {
             wp_redirect($page_url);
             exit;
         }
-        $type_slug = $shortcode['shortcode_type'];
+        $type_slug = self::resolve_legacy_type($shortcode['shortcode_type'], $shortcode);
         $type_def = isset($types[$type_slug]) ? $types[$type_slug] : null;
 
         $data = [
@@ -652,6 +725,8 @@ class MyPCO_Shortcodes_Admin {
         $type_slug = isset($_POST['shortcode_type']) ? sanitize_text_field($_POST['shortcode_type']) : '';
 
         $types = self::get_shortcode_types();
+        // Resolve legacy type slugs (e.g. mypco_calendar → mypco_calendar_list)
+        $type_slug = self::resolve_legacy_type($type_slug);
         if (!isset($types[$type_slug])) {
             wp_redirect(admin_url('admin.php?page=mypco-shortcodes'));
             exit;
@@ -685,6 +760,13 @@ class MyPCO_Shortcodes_Admin {
                 default:
                     $settings[$key] = isset($_POST[$key]) ? sanitize_text_field($_POST[$key]) : ($type_def['defaults'][$key] ?? '');
                     break;
+            }
+        }
+
+        // Merge any type defaults not covered by form fields (e.g. view for calendar types)
+        foreach ($type_def['defaults'] as $key => $default_value) {
+            if (!isset($settings[$key])) {
+                $settings[$key] = $default_value;
             }
         }
 
