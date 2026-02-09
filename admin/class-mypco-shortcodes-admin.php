@@ -54,7 +54,7 @@ class MyPCO_Shortcodes_Admin {
             'mypco_calendar_list' => [
                 'module'      => 'calendar',
                 'module_name' => 'Calendar',
-                'name'        => 'Event List',
+                'name'        => 'PCO Event List',
                 'description' => 'Chronological list of upcoming events.',
                 'tag'         => 'mypco_calendar',
                 'defaults'    => [
@@ -81,7 +81,7 @@ class MyPCO_Shortcodes_Admin {
             'mypco_calendar_month' => [
                 'module'      => 'calendar',
                 'module_name' => 'Calendar',
-                'name'        => 'Monthly Calendar',
+                'name'        => 'PCO Monthly Calendar',
                 'description' => 'Calendar grid view of events by month.',
                 'tag'         => 'mypco_calendar',
                 'defaults'    => [
@@ -108,7 +108,7 @@ class MyPCO_Shortcodes_Admin {
             'mypco_calendar_gallery' => [
                 'module'      => 'calendar',
                 'module_name' => 'Calendar',
-                'name'        => 'Event Gallery',
+                'name'        => 'PCO Event Gallery',
                 'description' => 'Card-based image layout of events.',
                 'tag'         => 'mypco_calendar',
                 'defaults'    => [
@@ -182,10 +182,10 @@ class MyPCO_Shortcodes_Admin {
                 'fields' => [],
             ],
             'mypco_next_sunday' => [
-                'module'      => 'locations',
-                'module_name' => 'Locations',
-                'name'        => 'Next Sunday',
-                'description' => 'Show the next upcoming Sunday gathering event.',
+                'module'      => 'calendar',
+                'module_name' => 'Calendar',
+                'name'        => 'Custom Single Event',
+                'description' => 'Show the next upcoming event matching a custom filter.',
                 'tag'         => 'mypco_next_sunday',
                 'defaults'    => [
                     'description'      => '',
@@ -286,10 +286,10 @@ class MyPCO_Shortcodes_Admin {
                 ],
             ],
             'mypco_sunday_list' => [
-                'module'      => 'locations',
-                'module_name' => 'Locations',
-                'name'        => 'Sunday List',
-                'description' => 'List multiple upcoming Sunday gathering events.',
+                'module'      => 'calendar',
+                'module_name' => 'Calendar',
+                'name'        => 'Custom List',
+                'description' => 'List multiple upcoming events matching a custom filter.',
                 'tag'         => 'mypco_sunday_list',
                 'defaults'    => [
                     'description'      => '',
