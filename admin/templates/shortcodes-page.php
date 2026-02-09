@@ -58,15 +58,30 @@ $is_edit_view = isset($action) && $action === 'edit';
             <div id="mypco-type-lists">
                 <p class="mypco-builder-hint" id="mypco-type-hint"><?php _e('Select a module above.', 'mypco-online'); ?></p>
 
-                <?php foreach ($grouped as $mod_key => $mod_types): ?>
+                <?php foreach ($grouped as $mod_key => $mod_types):
+                    // Separate regular types from addon types
+                    $regular_types = array_filter($mod_types, function($t) { return empty($t['is_addon']); });
+                    $addon_types = array_filter($mod_types, function($t) { return !empty($t['is_addon']); });
+                ?>
                     <ul class="mypco-type-list" data-module="<?php echo esc_attr($mod_key); ?>">
-                        <?php foreach ($mod_types as $slug => $type): ?>
+                        <?php foreach ($regular_types as $slug => $type): ?>
                             <li>
                                 <a href="#" class="mypco-type-link" data-type="<?php echo esc_attr($slug); ?>">
                                     <?php echo esc_html($type['name']); ?>
                                 </a>
                             </li>
                         <?php endforeach; ?>
+                        <?php if (!empty($addon_types)): ?>
+                            <li class="mypco-type-list-addon-separator" aria-hidden="true">&nbsp;</li>
+                            <li class="mypco-type-list-addon-header"><?php _e('Addon', 'mypco-online'); ?></li>
+                            <?php foreach ($addon_types as $slug => $type): ?>
+                                <li>
+                                    <a href="#" class="mypco-type-link" data-type="<?php echo esc_attr($slug); ?>">
+                                        <?php echo esc_html($type['name']); ?>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </ul>
                 <?php endforeach; ?>
             </div>

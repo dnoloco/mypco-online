@@ -187,6 +187,22 @@
     font-weight: 600;
 }
 
+/* Addon separator and header within type lists */
+.mypco-type-list-addon-separator {
+    height: 12px;
+    line-height: 12px;
+    pointer-events: none;
+}
+
+.mypco-type-list-addon-header {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #50575e;
+    padding: 4px 12px 4px;
+}
+
 /* Right panel */
 .mypco-builder-right {
     flex: 1;
