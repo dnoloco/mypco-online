@@ -652,7 +652,7 @@ class MyPCO_Calendar_Public {
         }
 
         // Allow shortcode attributes to override stored settings
-        $event_name = !empty($atts['event']) ? $atts['event'] : ($settings['event_name'] ?? 'Sunday Gathering');
+        $event_name = !empty($atts['event']) ? $atts['event'] : ($settings['event_name'] ?? '');
         $layout = !empty($atts['layout']) ? $atts['layout'] : ($settings['layout_style'] ?? 'card');
 
         if ($atts['show_title'] !== '') {
@@ -670,18 +670,22 @@ class MyPCO_Calendar_Public {
         $show_time = $settings['show_time'] ?? true;
         $show_address = $settings['show_address'] ?? true;
 
-        // Fetch upcoming Sunday events
-        $sunday_events = $this->fetch_custom_events($event_name);
+        // Fetch upcoming events
+        $events = $this->fetch_custom_events($event_name);
 
-        if (empty($sunday_events)) {
+        if (empty($events)) {
             $empty_msg = !empty($settings['empty_message'])
                 ? $settings['empty_message']
-                : __('No upcoming Sunday gatherings found.', 'mypco-online');
+                : __('No upcoming events found.', 'mypco-online');
             return '<div class="mypco-location-empty">' . esc_html($empty_msg) . '</div>';
         }
 
         // Get the next event
-        $next_event = $sunday_events[0];
+        $next_event = $events[0];
+
+        // Resolve date/time formats (handle custom option)
+        $date_format = $this->resolve_format($settings['date_format'] ?? 'l, F j, Y', $settings['date_format_custom'] ?? '');
+        $time_format = $this->resolve_format($settings['time_format'] ?? 'g:i a', $settings['time_format_custom'] ?? '');
 
         // Build scoped styles
         $scope_class = 'mypco-sc-' . ($id > 0 ? $id : 'default-ns');
@@ -697,8 +701,8 @@ class MyPCO_Calendar_Public {
             'show_time'             => $show_time,
             'show_address'          => $show_address,
             'map_height'            => $settings['map_height'] ?? 200,
-            'date_format'           => $settings['date_format'] ?? 'l, F j, Y',
-            'time_format'           => $settings['time_format'] ?? 'g:i a',
+            'date_format'           => $date_format,
+            'time_format'           => $time_format,
             'settings'              => $settings,
             'scope_class'           => $scope_class,
             'custom_class'          => $custom_class,
@@ -731,25 +735,29 @@ class MyPCO_Calendar_Public {
         }
 
         // Allow shortcode attributes to override stored settings
-        $event_name = !empty($atts['event']) ? $atts['event'] : ($settings['event_name'] ?? 'Sunday Gathering');
+        $event_name = !empty($atts['event']) ? $atts['event'] : ($settings['event_name'] ?? '');
         $count = !empty($atts['count']) ? $atts['count'] : ($settings['count'] ?? 'auto');
 
         $show_time = $settings['show_time'] ?? true;
         $show_address = $settings['show_address'] ?? true;
 
-        // Fetch upcoming Sunday events
-        $sunday_events = $this->fetch_custom_events($event_name);
+        // Fetch upcoming events
+        $events = $this->fetch_custom_events($event_name);
 
-        if (empty($sunday_events)) {
+        if (empty($events)) {
             $empty_msg = !empty($settings['empty_message'])
                 ? $settings['empty_message']
-                : __('No upcoming Sunday gatherings found.', 'mypco-online');
+                : __('No upcoming events found.', 'mypco-online');
             return '<div class="mypco-location-empty">' . esc_html($empty_msg) . '</div>';
         }
 
-        // Determine how many Sundays to show
-        $display_count = $this->calculate_sunday_count($count);
-        $events_to_display = array_slice($sunday_events, 0, $display_count);
+        // Determine how many events to show
+        $display_count = $this->calculate_event_count($count);
+        $events_to_display = array_slice($events, 0, $display_count);
+
+        // Resolve date/time formats (handle custom option)
+        $date_format = $this->resolve_format($settings['date_format'] ?? 'l, F j, Y', $settings['date_format_custom'] ?? '');
+        $time_format = $this->resolve_format($settings['time_format'] ?? 'g:i a', $settings['time_format_custom'] ?? '');
 
         // Build scoped styles
         $scope_class = 'mypco-sc-' . ($id > 0 ? $id : 'default-sl');
@@ -759,8 +767,8 @@ class MyPCO_Calendar_Public {
         // Prepare data for template
         $data = [
             'events'       => $events_to_display,
-            'date_format'  => $settings['date_format'] ?? 'l, F j, Y',
-            'time_format'  => $settings['time_format'] ?? 'g:i a',
+            'date_format'  => $date_format,
+            'time_format'  => $time_format,
             'show_time'    => $show_time,
             'show_address' => $show_address,
             'settings'     => $settings,
@@ -773,25 +781,42 @@ class MyPCO_Calendar_Public {
     }
 
     /**
-     * Calculate how many Sundays to show based on the month.
+     * Resolve a format string, handling the 'custom' option.
+     *
+     * @param string $format        Selected format value.
+     * @param string $custom_format Custom format string.
+     * @return string Resolved format string.
+     */
+    private function resolve_format($format, $custom_format) {
+        if ($format === 'custom' && !empty($custom_format)) {
+            return $custom_format;
+        }
+        if ($format === 'custom') {
+            return 'l, F j, Y'; // Fallback when custom is selected but empty
+        }
+        return $format;
+    }
+
+    /**
+     * Calculate how many events to show based on the month.
      *
      * @param string|int $count User-specified count or 'auto'
-     * @return int Number of Sundays to show
+     * @return int Number of events to show
      */
-    private function calculate_sunday_count($count) {
+    private function calculate_event_count($count) {
         if ($count !== 'auto' && is_numeric($count)) {
             return absint($count);
         }
 
-        // Auto-calculate: 4 weeks normally, 5 if beginning of month with 5 Sundays
+        // Auto-calculate: 4 weeks normally, 5 if beginning of month with 5 matching weekdays
         $now = new DateTime('now', $this->timezone);
         $day_of_month = (int) $now->format('j');
         $current_month = (int) $now->format('n');
         $current_year = (int) $now->format('Y');
 
         if ($day_of_month <= 7) {
-            $sundays_in_month = $this->count_sundays_in_month($current_month, $current_year);
-            if ($sundays_in_month >= 5) {
+            $event_days = $this->count_event_days_in_month($current_month, $current_year);
+            if ($event_days >= 5) {
                 return 5;
             }
         }
@@ -800,34 +825,37 @@ class MyPCO_Calendar_Public {
     }
 
     /**
-     * Count the number of Sundays in a given month.
+     * Count the number of Sundays in a given month (event day count).
      *
      * @param int $month Month number (1-12)
      * @param int $year Year
      * @return int Number of Sundays
      */
-    private function count_sundays_in_month($month, $year) {
+    private function count_event_days_in_month($month, $year) {
         $first_day = new DateTime("$year-$month-01", $this->timezone);
         $last_day = new DateTime($first_day->format('Y-m-t'), $this->timezone);
 
-        $sundays = 0;
+        $count = 0;
         $current = clone $first_day;
 
         while ($current <= $last_day) {
             if ($current->format('w') == 0) {
-                $sundays++;
+                $count++;
             }
             $current->modify('+1 day');
         }
 
-        return $sundays;
+        return $count;
     }
 
     /**
      * Fetch custom events from Planning Center Calendar.
      *
+     * Filters events by name and returns only Sunday occurrences,
+     * deduplicated by date.
+     *
      * @param string $event_name Name to filter events by
-     * @return array Array of formatted Sunday events
+     * @return array Array of formatted event data
      */
     private function fetch_custom_events($event_name) {
         if (!$this->api_model) {
@@ -874,7 +902,7 @@ class MyPCO_Calendar_Public {
         }
 
         // Filter and format events
-        $sunday_events = [];
+        $matched_events = [];
         $seen_dates = [];
 
         foreach ($response['data'] as $instance) {
@@ -892,7 +920,7 @@ class MyPCO_Calendar_Public {
                 continue;
             }
 
-            // Check if this is on a Sunday
+            // Only include events on Sundays
             $starts_at = $instance['attributes']['starts_at'];
             try {
                 $event_date = new DateTime($starts_at, new DateTimeZone('UTC'));
@@ -902,23 +930,24 @@ class MyPCO_Calendar_Public {
                     continue;
                 }
 
+                // Deduplicate by date
                 $date_key = $event_date->format('Y-m-d');
                 if (isset($seen_dates[$date_key])) {
                     continue;
                 }
                 $seen_dates[$date_key] = true;
 
-                $sunday_events[] = $this->format_custom_event($instance, $parent, $event_date);
+                $matched_events[] = $this->format_custom_event($instance, $parent, $event_date);
             } catch (Exception $e) {
                 continue;
             }
         }
 
-        usort($sunday_events, function($a, $b) {
+        usort($matched_events, function($a, $b) {
             return strcmp($a['date_key'], $b['date_key']);
         });
 
-        return $sunday_events;
+        return $matched_events;
     }
 
     /**
@@ -937,7 +966,7 @@ class MyPCO_Calendar_Public {
 
         return [
             'id' => $instance['id'],
-            'name' => $parent['name'] ?? 'Sunday Gathering',
+            'name' => $parent['name'] ?? 'Event',
             'date_obj' => $event_date,
             'date_key' => $event_date->format('Y-m-d'),
             'day_of_week' => $event_date->format('l'),
