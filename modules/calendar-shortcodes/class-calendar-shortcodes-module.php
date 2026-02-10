@@ -152,7 +152,8 @@ class MyPCO_Calendar_Shortcodes_Module extends MyPCO_Module_Base {
                     'key'         => 'date_format_custom',
                     'label'       => 'Custom Date Format',
                     'type'        => 'text',
-                    'description' => 'Enter a custom PHP date format string. Only used when Date Format is set to Custom.',
+                    'description' => 'Enter a custom PHP date format string.',
+                    'show_when'   => ['field' => 'date_format', 'value' => 'custom'],
                 ],
                 [
                     'key'     => 'time_format',
@@ -170,7 +171,8 @@ class MyPCO_Calendar_Shortcodes_Module extends MyPCO_Module_Base {
                     'key'         => 'time_format_custom',
                     'label'       => 'Custom Time Format',
                     'type'        => 'text',
-                    'description' => 'Enter a custom PHP time format string. Only used when Time Format is set to Custom.',
+                    'description' => 'Enter a custom PHP time format string.',
+                    'show_when'   => ['field' => 'time_format', 'value' => 'custom'],
                 ],
             ],
         ];
@@ -254,7 +256,8 @@ class MyPCO_Calendar_Shortcodes_Module extends MyPCO_Module_Base {
                     'key'         => 'date_format_custom',
                     'label'       => 'Custom Date Format',
                     'type'        => 'text',
-                    'description' => 'Enter a custom PHP date format string. Only used when Date Format is set to Custom.',
+                    'description' => 'Enter a custom PHP date format string.',
+                    'show_when'   => ['field' => 'date_format', 'value' => 'custom'],
                 ],
                 [
                     'key'     => 'time_format',
@@ -272,7 +275,8 @@ class MyPCO_Calendar_Shortcodes_Module extends MyPCO_Module_Base {
                     'key'         => 'time_format_custom',
                     'label'       => 'Custom Time Format',
                     'type'        => 'text',
-                    'description' => 'Enter a custom PHP time format string. Only used when Time Format is set to Custom.',
+                    'description' => 'Enter a custom PHP time format string.',
+                    'show_when'   => ['field' => 'time_format', 'value' => 'custom'],
                 ],
             ],
         ];

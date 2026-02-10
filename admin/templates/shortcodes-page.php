@@ -105,7 +105,7 @@ $is_edit_view = isset($action) && $action === 'edit';
                 <div class="mypco-field">
                     <label for="shortcode_description"><?php _e('Description', 'mypco-online'); ?></label>
                     <input type="text" id="shortcode_description" name="shortcode_description" class="large-text"
-                           placeholder="<?php esc_attr_e('e.g., Homepage calendar', 'mypco-online'); ?>">
+                           >
                 </div>
 
                 <!-- Module-specific field groups (one per type, toggled by JS) -->
@@ -116,7 +116,7 @@ $is_edit_view = isset($action) && $action === 'edit';
                                 $field_id = $slug . '_' . $field['key'];
                                 $default  = $type_def['defaults'][$field['key']] ?? '';
                             ?>
-                                <div class="mypco-field">
+                                <div class="mypco-field"<?php if (!empty($field['show_when'])): ?> data-show-when-field="<?php echo esc_attr($slug . '_' . $field['show_when']['field']); ?>" data-show-when-value="<?php echo esc_attr($field['show_when']['value']); ?>" style="display:none;"<?php endif; ?>>
                                     <?php if ($field['type'] === 'checkbox'): ?>
                                         <label>
                                             <input type="checkbox" name="<?php echo esc_attr($field['key']); ?>"
@@ -242,9 +242,27 @@ $is_edit_view = isset($action) && $action === 'edit';
             $('.mypco-type-fields').hide().find(':input').prop('disabled', true);
             $('.mypco-type-fields[data-type="' + type + '"]').show().find(':input').prop('disabled', false);
 
+            // Apply conditional field visibility for active type
+            $('.mypco-type-fields[data-type="' + type + '"]').find('[data-show-when-field]').each(function() {
+                var $target = $(this);
+                var srcId = $target.data('show-when-field');
+                var val = $target.data('show-when-value');
+                var $src = $('#' + srcId);
+                $target.toggle($src.val() === val);
+            });
+
             // Show form
             $('#mypco-builder-placeholder').hide();
             $('#mypco-builder-form').show();
+        });
+
+        // Conditional field visibility: show/hide fields based on a select value
+        $('#mypco-builder-form').on('change', 'select', function() {
+            var selectId = $(this).attr('id');
+            $('[data-show-when-field="' + selectId + '"]').each(function() {
+                var val = $(this).data('show-when-value');
+                $(this).toggle($('#' + selectId).val() === val);
+            });
         });
     })(jQuery);
     </script>
@@ -292,7 +310,7 @@ $is_edit_view = isset($action) && $action === 'edit';
                     <td>
                         <input type="text" id="shortcode_description" name="shortcode_description"
                                value="<?php echo esc_attr($shortcode['description'] ?? ''); ?>"
-                               class="large-text" placeholder="<?php esc_attr_e('e.g., Homepage calendar widget', 'mypco-online'); ?>">
+                               class="large-text">
                     </td>
                 </tr>
                 <tr>
@@ -313,7 +331,7 @@ $is_edit_view = isset($action) && $action === 'edit';
                     <?php foreach ($type_def['fields'] as $field):
                         $value = $shortcode[$field['key']] ?? ($type_def['defaults'][$field['key']] ?? '');
                     ?>
-                        <tr>
+                        <tr<?php if (!empty($field['show_when'])): ?> data-show-when-field="<?php echo esc_attr($field['show_when']['field']); ?>" data-show-when-value="<?php echo esc_attr($field['show_when']['value']); ?>"<?php if (($shortcode[$field['show_when']['field']] ?? '') !== $field['show_when']['value']): ?> style="display:none;"<?php endif; ?><?php endif; ?>>
                             <th scope="row"><label for="<?php echo esc_attr($field['key']); ?>"><?php echo esc_html($field['label']); ?></label></th>
                             <td>
                                 <?php switch ($field['type']):
@@ -405,6 +423,14 @@ $is_edit_view = isset($action) && $action === 'edit';
         });
         $('input[type="color"]').on('input change', function() {
             $(this).next('.mypco-color-preview').text($(this).val());
+        });
+        // Conditional field visibility for edit view
+        $('select').on('change', function() {
+            var fieldName = $(this).attr('name');
+            $('[data-show-when-field="' + fieldName + '"]').each(function() {
+                var val = $(this).data('show-when-value');
+                $(this).toggle($('select[name="' + fieldName + '"]').val() === val);
+            });
         });
     })(jQuery);
     </script>
