@@ -264,6 +264,13 @@ $is_edit_view = isset($action) && $action === 'edit';
                 $(this).toggle($('#' + selectId).val() === val);
             });
         });
+
+        // Auto-select module from URL parameter
+        var urlParams = new URLSearchParams(window.location.search);
+        var preselectedModule = urlParams.get('module');
+        if (preselectedModule) {
+            $('#mypco-module-select').val(preselectedModule).trigger('change');
+        }
     })(jQuery);
     </script>
 
