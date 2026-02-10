@@ -109,6 +109,12 @@ class MyPCO_Calendar_Public {
         $atts['count'] = !empty($atts['count']) ? (int) $atts['count'] : ($settings['count'] ?? 100);
         $atts['view']  = !empty($atts['view']) ? $atts['view'] : ($settings['view'] ?? 'list');
 
+        // Featured event settings from shortcode config (defaults: 1 closest upcoming)
+        $featured_settings = [
+            'featured_count' => isset($settings['featured_count']) ? (int) $settings['featured_count'] : 1,
+            'featured_mode'  => $settings['featured_mode'] ?? 'upcoming',
+        ];
+
         // Fetch data from API
         $events_data = $this->fetch_calendar_data($atts);
 
@@ -120,7 +126,7 @@ class MyPCO_Calendar_Public {
         $tags = $this->fetch_tags();
 
         // Process the data
-        $processed_data = $this->process_calendar_data($events_data);
+        $processed_data = $this->process_calendar_data($events_data, $featured_settings);
 
         // Pass expanded events to JavaScript
         wp_localize_script('mypco-calendar-public', 'mypcoCalendarData', [
@@ -237,7 +243,7 @@ class MyPCO_Calendar_Public {
     /**
      * Process raw calendar data into display-ready format.
      */
-    private function process_calendar_data($response_data) {
+    private function process_calendar_data($response_data, $featured_settings = []) {
         $event_instances = $response_data['data'] ?? [];
         $included_items = $response_data['included'] ?? [];
 
@@ -285,7 +291,7 @@ class MyPCO_Calendar_Public {
         }
 
         // Deduplicate featured events (show only one per parent event for recurring)
-        $featured_events = $this->deduplicate_featured_events($featured_events_raw);
+        $featured_events = $this->deduplicate_featured_events($featured_events_raw, $featured_settings);
 
         // Build expanded events for month view JavaScript
         $expanded_events = $this->build_expanded_events($all_events_list, []);
@@ -310,11 +316,10 @@ class MyPCO_Calendar_Public {
      * Shows only one entry per parent event with date range info.
      * Returns ALL featured events but marks which should be initially visible.
      */
-    private function deduplicate_featured_events($featured_events) {
-        // Get settings
-        $settings = get_option('mypco_calendar_settings', []);
-        $max_featured = isset($settings['featured_count']) ? (int) $settings['featured_count'] : 2;
-        $display_mode = isset($settings['featured_mode']) ? $settings['featured_mode'] : 'upcoming';
+    private function deduplicate_featured_events($featured_events, $featured_settings = []) {
+        // Get settings from shortcode config, falling back to defaults
+        $max_featured = isset($featured_settings['featured_count']) ? (int) $featured_settings['featured_count'] : 1;
+        $display_mode = $featured_settings['featured_mode'] ?? 'upcoming';
 
         // Group by parent event, selecting the next upcoming instance
         $now = new DateTime('now', $this->timezone);

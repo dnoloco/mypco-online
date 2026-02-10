@@ -181,13 +181,16 @@ class MyPCO_Calendar_Shortcodes_Module extends MyPCO_Module_Base {
             'module'      => 'calendar',
             'module_name' => 'Calendar',
             'name'        => 'Custom Featured Event',
-            'description' => 'Display a single featured event with full details and optional signup.',
+            'description' => 'Display featured events from Planning Center with full details and optional signup.',
             'tag'         => 'mypco_featured_event',
             'is_addon'    => true,
             'addon_key'   => 'calendar_shortcodes',
             'addon_name'  => 'Calendar Shortcodes Addon',
             'defaults'    => [
                 'description'         => '',
+                'featured_count'      => 1,
+                'featured_mode'       => 'upcoming',
+                'category'            => '',
                 'event_name'          => '',
                 'layout_style'        => 'card',
                 'show_title'          => true,
@@ -208,6 +211,30 @@ class MyPCO_Calendar_Shortcodes_Module extends MyPCO_Module_Base {
                 'time_format_custom'  => '',
             ],
             'fields' => [
+                [
+                    'key'         => 'featured_count',
+                    'label'       => 'Number of Featured Events',
+                    'type'        => 'number',
+                    'min'         => 1,
+                    'max'         => 10,
+                    'description' => 'How many featured events to display.',
+                ],
+                [
+                    'key'     => 'featured_mode',
+                    'label'   => 'Display Mode',
+                    'type'    => 'select',
+                    'options' => [
+                        'upcoming' => 'Closest Upcoming',
+                        'random'   => 'Random',
+                    ],
+                    'description' => 'How to select featured events when there are more than the display limit.',
+                ],
+                [
+                    'key'         => 'category',
+                    'label'       => 'Category Filter',
+                    'type'        => 'text',
+                    'description' => 'Enter a category name to filter featured events. Must match a public category in Planning Center. Leave blank for all.',
+                ],
                 [
                     'key'         => 'event_name',
                     'label'       => 'Event Name Filter',

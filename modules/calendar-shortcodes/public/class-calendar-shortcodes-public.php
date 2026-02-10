@@ -157,7 +157,8 @@ class MyPCO_Calendar_Shortcodes_Public {
     /**
      * Render the custom featured event shortcode.
      *
-     * Same as the custom single event but adds optional signup/registration link support.
+     * Fetches events marked as "featured" in PCO, filters by category and name,
+     * applies count/mode settings, and renders each event using the custom-event template.
      */
     public function render_featured_event_shortcode($atts) {
         $atts = shortcode_atts([
@@ -176,8 +177,11 @@ class MyPCO_Calendar_Shortcodes_Public {
             $settings = [];
         }
 
-        $event_name = !empty($atts['event']) ? $atts['event'] : ($settings['event_name'] ?? '');
-        $layout = !empty($atts['layout']) ? $atts['layout'] : ($settings['layout_style'] ?? 'card');
+        $event_name     = !empty($atts['event']) ? $atts['event'] : ($settings['event_name'] ?? '');
+        $layout         = !empty($atts['layout']) ? $atts['layout'] : ($settings['layout_style'] ?? 'card');
+        $featured_count = isset($settings['featured_count']) ? (int) $settings['featured_count'] : 1;
+        $featured_mode  = $settings['featured_mode'] ?? 'upcoming';
+        $category       = $settings['category'] ?? '';
 
         if ($atts['show_title'] !== '') {
             $show_title = ($atts['show_title'] === 'yes' || $atts['show_title'] === '1' || $atts['show_title'] === true);
@@ -195,43 +199,207 @@ class MyPCO_Calendar_Shortcodes_Public {
         $show_address = $settings['show_address'] ?? true;
         $show_signup  = $settings['show_signup'] ?? false;
 
-        $events = $this->fetch_custom_events($event_name);
+        // Fetch featured events from the PCO Calendar API
+        $events = $this->fetch_featured_events($event_name, $category, $featured_count, $featured_mode);
 
         if (empty($events)) {
             $empty_msg = !empty($settings['empty_message'])
                 ? $settings['empty_message']
-                : __('No upcoming events found.', 'mypco-online');
+                : __('No upcoming featured events found.', 'mypco-online');
             return '<div class="mypco-location-empty">' . esc_html($empty_msg) . '</div>';
         }
-
-        $next_event = $events[0];
 
         $date_format = $this->resolve_format($settings['date_format'] ?? 'l, F j, Y', $settings['date_format_custom'] ?? '');
         $time_format = $this->resolve_format($settings['time_format'] ?? 'g:i a', $settings['time_format_custom'] ?? '');
 
-        $scope_class = 'mypco-sc-' . ($id > 0 ? $id : 'default-fe');
-        $custom_class = !empty($settings['custom_class']) ? ' ' . esc_attr($settings['custom_class']) : '';
-        $scoped_css = $this->build_scoped_styles($scope_class, $settings);
+        // Render each featured event
+        $output = '';
+        foreach ($events as $index => $event) {
+            $scope_class = 'mypco-sc-' . ($id > 0 ? $id : 'default-fe') . ($index > 0 ? '-' . $index : '');
+            $custom_class = !empty($settings['custom_class']) ? ' ' . esc_attr($settings['custom_class']) : '';
+            $scoped_css = $this->build_scoped_styles($scope_class, $settings);
 
-        $data = [
-            'event'                 => $next_event,
-            'layout'                => $layout,
-            'show_title'            => $show_title,
-            'show_map'              => $show_map,
-            'show_time'             => $show_time,
-            'show_address'          => $show_address,
-            'show_signup'           => $show_signup,
-            'map_height'            => $settings['map_height'] ?? 200,
-            'date_format'           => $date_format,
-            'time_format'           => $time_format,
-            'settings'              => $settings,
-            'scope_class'           => $scope_class,
-            'custom_class'          => $custom_class,
-            'scoped_css'            => $scoped_css,
-            'create_maps_embed_url' => [$this, 'create_maps_embed_url_public'],
+            $data = [
+                'event'                 => $event,
+                'layout'                => $layout,
+                'show_title'            => $show_title,
+                'show_map'              => $show_map,
+                'show_time'             => $show_time,
+                'show_address'          => $show_address,
+                'show_signup'           => $show_signup,
+                'map_height'            => $settings['map_height'] ?? 200,
+                'date_format'           => $date_format,
+                'time_format'           => $time_format,
+                'settings'              => $settings,
+                'scope_class'           => $scope_class,
+                'custom_class'          => $custom_class,
+                'scoped_css'            => $scoped_css,
+                'create_maps_embed_url' => [$this, 'create_maps_embed_url_public'],
+            ];
+
+            $output .= $this->load_template('custom-event', $data);
+        }
+
+        return $output;
+    }
+
+    /**
+     * Fetch featured events from the PCO Calendar API.
+     *
+     * @param string $event_name     Optional event name filter.
+     * @param string $category       Optional category/tag name filter.
+     * @param int    $featured_count Max number of featured events.
+     * @param string $featured_mode  'upcoming' or 'random'.
+     * @return array Formatted featured events.
+     */
+    private function fetch_featured_events($event_name = '', $category = '', $featured_count = 1, $featured_mode = 'upcoming') {
+        if (!$this->api_model) {
+            return [];
+        }
+
+        $now = new DateTime('now', $this->timezone);
+        $start_date = $now->format('Y-m-d\T00:00:00\Z');
+
+        $end_date_obj = clone $now;
+        $end_date_obj->modify('+6 weeks');
+        $end_date = $end_date_obj->format('Y-m-d\T23:59:59\Z');
+
+        $params = [
+            'where[starts_at][gte]' => $start_date,
+            'where[starts_at][lte]' => $end_date,
+            'order' => 'starts_at',
+            'per_page' => 100,
+            'include' => 'event,event.tags'
         ];
 
-        return $this->load_template('custom-event', $data);
+        $transient_key = 'mypco_featured_events_' . md5(serialize($params) . $event_name . $category);
+
+        $response = $this->api_model->get_data_with_caching(
+            'calendar',
+            '/v2/event_instances',
+            $params,
+            $transient_key,
+            HOUR_IN_SECONDS
+        );
+
+        if (isset($response['error']) || empty($response['data'])) {
+            return [];
+        }
+
+        // Build event map and tag maps from included data
+        $event_map = [];
+        $event_tags_map = [];
+        $tag_map = []; // tag_id => tag_name
+
+        if (!empty($response['included'])) {
+            foreach ($response['included'] as $item) {
+                if ($item['type'] === 'Event') {
+                    $event_map[$item['id']] = $item['attributes'];
+                    $tag_ids = [];
+                    if (!empty($item['relationships']['tags']['data'])) {
+                        foreach ($item['relationships']['tags']['data'] as $tag_ref) {
+                            $tag_ids[] = $tag_ref['id'];
+                        }
+                    }
+                    $event_tags_map[$item['id']] = $tag_ids;
+                } elseif ($item['type'] === 'Tag') {
+                    $tag_map[$item['id']] = $item['attributes']['name'] ?? '';
+                }
+            }
+        }
+
+        // Resolve category name to tag ID for filtering
+        $category_tag_id = null;
+        if (!empty($category)) {
+            foreach ($tag_map as $tid => $tname) {
+                if (strcasecmp($tname, $category) === 0) {
+                    $category_tag_id = $tid;
+                    break;
+                }
+            }
+        }
+
+        // Filter for featured events, optionally by name and category
+        $matched = [];
+        $seen_parents = [];
+
+        foreach ($response['data'] as $instance) {
+            $parent_id = $instance['relationships']['event']['data']['id'] ?? null;
+            $parent = $event_map[$parent_id] ?? null;
+
+            if (!$parent || empty($parent['featured'])) {
+                continue;
+            }
+
+            // Event name filter
+            if (!empty($event_name) && stripos($parent['name'] ?? '', $event_name) === false) {
+                continue;
+            }
+
+            // Category filter
+            if ($category_tag_id !== null) {
+                $tags = $event_tags_map[$parent_id] ?? [];
+                if (!in_array($category_tag_id, $tags)) {
+                    continue;
+                }
+            }
+
+            // Deduplicate: one entry per parent event (closest upcoming instance)
+            if (isset($seen_parents[$parent_id])) {
+                continue;
+            }
+            $seen_parents[$parent_id] = true;
+
+            $starts_at = $instance['attributes']['starts_at'];
+            try {
+                $event_date = new DateTime($starts_at, new DateTimeZone('UTC'));
+                $event_date->setTimezone($this->timezone);
+            } catch (Exception $e) {
+                continue;
+            }
+
+            $matched[] = $this->format_featured_event($instance, $parent, $event_date);
+        }
+
+        // Apply display mode
+        if ($featured_mode === 'random') {
+            shuffle($matched);
+        }
+        // 'upcoming' is already sorted by start date from API
+
+        // Limit to count
+        return array_slice($matched, 0, $featured_count);
+    }
+
+    /**
+     * Format a featured event instance for the custom-event template.
+     */
+    private function format_featured_event($instance, $parent, $event_date) {
+        $attr = $instance['attributes'];
+        $location_full = $attr['location'] ?? '';
+        $location_parts = $this->parse_custom_event_location($location_full);
+        $maps_url = $this->create_maps_url($location_full);
+
+        $registration_url = $attr['registration_url']
+            ?? $attr['signup_url']
+            ?? ($parent['registration_url'] ?? '')
+            ?? ($parent['signup_url'] ?? '');
+
+        return [
+            'id' => $instance['id'],
+            'name' => $parent['name'] ?? 'Event',
+            'date_obj' => $event_date,
+            'date_key' => $event_date->format('Y-m-d'),
+            'day_of_week' => $event_date->format('l'),
+            'day_short' => $event_date->format('D'),
+            'day_number' => $event_date->format('j'),
+            'month_short' => $event_date->format('M'),
+            'location_full' => $location_full,
+            'location_name' => $location_parts['name'],
+            'location_address' => $location_parts['address'],
+            'maps_url' => $maps_url,
+            'registration_url' => $registration_url,
+        ];
     }
 
     /**
