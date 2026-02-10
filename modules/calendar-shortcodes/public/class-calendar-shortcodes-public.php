@@ -29,6 +29,7 @@ class MyPCO_Calendar_Shortcodes_Public {
      */
     public function init() {
         add_shortcode('mypco_next_sunday', [$this, 'render_custom_event_shortcode']);
+        add_shortcode('mypco_featured_event', [$this, 'render_featured_event_shortcode']);
         add_shortcode('mypco_sunday_list', [$this, 'render_custom_list_shortcode']);
 
         $this->loader->add_action('wp_enqueue_scripts', $this, 'enqueue_public_assets');
@@ -45,6 +46,7 @@ class MyPCO_Calendar_Shortcodes_Public {
         }
 
         $has_custom_event = has_shortcode($post->post_content, 'mypco_next_sunday') ||
+                            has_shortcode($post->post_content, 'mypco_featured_event') ||
                             has_shortcode($post->post_content, 'mypco_sunday_list');
 
         if (!$has_custom_event) {
@@ -139,6 +141,86 @@ class MyPCO_Calendar_Shortcodes_Public {
             'show_map'              => $show_map,
             'show_time'             => $show_time,
             'show_address'          => $show_address,
+            'map_height'            => $settings['map_height'] ?? 200,
+            'date_format'           => $date_format,
+            'time_format'           => $time_format,
+            'settings'              => $settings,
+            'scope_class'           => $scope_class,
+            'custom_class'          => $custom_class,
+            'scoped_css'            => $scoped_css,
+            'create_maps_embed_url' => [$this, 'create_maps_embed_url_public'],
+        ];
+
+        return $this->load_template('custom-event', $data);
+    }
+
+    /**
+     * Render the custom featured event shortcode.
+     *
+     * Same as the custom single event but adds optional signup/registration link support.
+     */
+    public function render_featured_event_shortcode($atts) {
+        $atts = shortcode_atts([
+            'id'         => 0,
+            'event'      => '',
+            'layout'     => '',
+            'show_title' => '',
+            'show_map'   => '',
+        ], $atts, 'mypco_featured_event');
+
+        $id = absint($atts['id']);
+        if ($id > 0) {
+            require_once MYPCO_PLUGIN_DIR . 'admin/class-mypco-shortcodes-admin.php';
+            $settings = MyPCO_Shortcodes_Admin::get_shortcode_settings($id, 'mypco_featured_event');
+        } else {
+            $settings = [];
+        }
+
+        $event_name = !empty($atts['event']) ? $atts['event'] : ($settings['event_name'] ?? '');
+        $layout = !empty($atts['layout']) ? $atts['layout'] : ($settings['layout_style'] ?? 'card');
+
+        if ($atts['show_title'] !== '') {
+            $show_title = ($atts['show_title'] === 'yes' || $atts['show_title'] === '1' || $atts['show_title'] === true);
+        } else {
+            $show_title = $settings['show_title'] ?? true;
+        }
+
+        if ($atts['show_map'] !== '') {
+            $show_map = ($atts['show_map'] === 'yes' || $atts['show_map'] === '1' || $atts['show_map'] === true);
+        } else {
+            $show_map = $settings['show_map'] ?? true;
+        }
+
+        $show_time    = $settings['show_time'] ?? true;
+        $show_address = $settings['show_address'] ?? true;
+        $show_signup  = $settings['show_signup'] ?? false;
+
+        $events = $this->fetch_custom_events($event_name);
+
+        if (empty($events)) {
+            $empty_msg = !empty($settings['empty_message'])
+                ? $settings['empty_message']
+                : __('No upcoming events found.', 'mypco-online');
+            return '<div class="mypco-location-empty">' . esc_html($empty_msg) . '</div>';
+        }
+
+        $next_event = $events[0];
+
+        $date_format = $this->resolve_format($settings['date_format'] ?? 'l, F j, Y', $settings['date_format_custom'] ?? '');
+        $time_format = $this->resolve_format($settings['time_format'] ?? 'g:i a', $settings['time_format_custom'] ?? '');
+
+        $scope_class = 'mypco-sc-' . ($id > 0 ? $id : 'default-fe');
+        $custom_class = !empty($settings['custom_class']) ? ' ' . esc_attr($settings['custom_class']) : '';
+        $scoped_css = $this->build_scoped_styles($scope_class, $settings);
+
+        $data = [
+            'event'                 => $next_event,
+            'layout'                => $layout,
+            'show_title'            => $show_title,
+            'show_map'              => $show_map,
+            'show_time'             => $show_time,
+            'show_address'          => $show_address,
+            'show_signup'           => $show_signup,
             'map_height'            => $settings['map_height'] ?? 200,
             'date_format'           => $date_format,
             'time_format'           => $time_format,
@@ -379,6 +461,7 @@ class MyPCO_Calendar_Shortcodes_Public {
             'location_name' => $location_parts['name'],
             'location_address' => $location_parts['address'],
             'maps_url' => $maps_url,
+            'registration_url' => $parent['registration_url'] ?? ($attr['registration_url'] ?? ''),
         ];
     }
 

@@ -51,6 +51,35 @@ class MyPCO_Shortcodes_Admin {
      */
     public static function get_shortcode_types() {
         $types = [
+            'mypco_calendar_default' => [
+                'module'      => 'calendar',
+                'module_name' => 'Calendar',
+                'name'        => 'PCO Default Calendar',
+                'description' => 'Default calendar with list, month and gallery views. Includes the closest upcoming featured event.',
+                'tag'         => 'mypco_calendar',
+                'defaults'    => [
+                    'description'      => '',
+                    'count'            => 100,
+                    'view'             => 'list',
+                    'featured_count'   => 1,
+                    'featured_mode'    => 'upcoming',
+                    'custom_class'     => '',
+                    'primary_color'    => '#333333',
+                    'text_color'       => '#333333',
+                    'background_color' => '#ffffff',
+                    'border_radius'    => 8,
+                ],
+                'fields' => [
+                    [
+                        'key'         => 'count',
+                        'label'       => 'Number of Events',
+                        'type'        => 'number',
+                        'min'         => 1,
+                        'max'         => 100,
+                        'description' => 'Maximum number of events to fetch from Planning Center.',
+                    ],
+                ],
+            ],
             'mypco_calendar_list' => [
                 'module'      => 'calendar',
                 'module_name' => 'Calendar',

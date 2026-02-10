@@ -19,6 +19,7 @@
  * - $custom_class (string) - User-defined CSS class
  * - $scoped_css (string) - Inline <style> block
  * - $create_maps_embed_url (callable) - Function to create map embed URL
+ * - $show_signup (bool) - Whether to show the signup/registration link (optional, featured event only)
  */
 
 defined('ABSPATH') || exit;
@@ -92,6 +93,18 @@ $time_display = $event['date_obj']->format($time_format);
                 </div>
             <?php endif; ?>
         </div>
+
+        <?php if (!empty($show_signup) && !empty($event['registration_url'])): ?>
+            <!-- Signup / Registration -->
+            <div class="mypco-location-signup">
+                <a href="<?php echo esc_url($event['registration_url']); ?>"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="button mypco-location-signup-btn">
+                    <?php _e('Sign Up', 'mypco-online'); ?>
+                </a>
+            </div>
+        <?php endif; ?>
 
         <?php if ($has_location && $show_map && !empty($event['maps_url'])): ?>
             <!-- Embedded Map -->
