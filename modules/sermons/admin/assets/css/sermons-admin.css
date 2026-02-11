@@ -1,0 +1,74 @@
+/**
+ * Sermons Admin Styles
+ */
+
+/* Tabs */
+.mypco-sermons-tabs {
+    margin-bottom: 20px;
+}
+
+/* Speaker/Series thumbnails */
+.mypco-speaker-thumb,
+.mypco-series-thumb {
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.mypco-speaker-thumb {
+    border-radius: 50%;
+}
+
+/* No description placeholder */
+.mypco-no-description {
+    color: #999;
+}
+
+/* Required field indicator */
+.required {
+    color: #d63638;
+}
+
+/* Media icons in sermon list */
+.column-media .dashicons {
+    color: #2271b1;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    margin-right: 4px;
+}
+
+/* Column widths */
+.column-date {
+    width: 120px;
+}
+
+.column-speaker,
+.column-series {
+    width: 150px;
+}
+
+.column-scripture {
+    width: 140px;
+}
+
+.column-media {
+    width: 80px;
+}
+
+.column-image {
+    width: 80px;
+}
+
+.column-dates {
+    width: 200px;
+}
+
+/* Sermon form */
+.mypco-sermon-form .form-table th {
+    width: 150px;
+}
+
+/* Filter bar */
+.tablenav .button {
+    margin-left: 4px;
+}
