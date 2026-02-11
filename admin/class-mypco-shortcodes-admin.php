@@ -246,6 +246,13 @@ class MyPCO_Shortcodes_Admin {
             ],
         ];
 
+        // Filter out shortcode types for disabled modules
+        $active_modules = get_option('mypco_active_modules', []);
+        $types = array_filter($types, function($type) use ($active_modules) {
+            $module_key = $type['module'] ?? '';
+            return isset($active_modules[$module_key]['enabled']) && $active_modules[$module_key]['enabled'] === true;
+        });
+
         /**
          * Allow modules and add-ons to register their own shortcode types.
          *
