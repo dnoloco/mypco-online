@@ -535,8 +535,7 @@ class MyPCO_Calendar_Shortcodes_Module extends MyPCO_Module_Base {
         });
 
         foreach ($tags as $tag) {
-            $label = !empty($tag['group_name']) ? $tag['group_name'] . ': ' . $tag['name'] : $tag['name'];
-            $options[$tag['id']] = $label;
+            $options[$tag['id']] = $tag['name'];
         }
 
         return $options;
