@@ -116,7 +116,9 @@ class MyPCO_Calendar_Shortcodes_Public {
         $show_time = $settings['show_time'] ?? true;
         $show_address = $settings['show_address'] ?? true;
 
-        $events = $this->fetch_custom_events($event_name);
+        $category = $settings['category'] ?? '';
+
+        $events = $this->fetch_custom_events($event_name, $category);
 
         if (empty($events)) {
             $empty_msg = !empty($settings['empty_message'])
@@ -247,7 +249,7 @@ class MyPCO_Calendar_Shortcodes_Public {
      * Fetch featured events from the PCO Calendar API.
      *
      * @param string $event_name     Optional event name filter.
-     * @param string $category       Optional category/tag name filter.
+     * @param string $category       Optional category tag ID to filter by.
      * @param int    $featured_count Max number of featured events.
      * @param string $featured_mode  'upcoming' or 'random'.
      * @return array Formatted featured events.
@@ -286,10 +288,9 @@ class MyPCO_Calendar_Shortcodes_Public {
             return [];
         }
 
-        // Build event map and tag maps from included data
+        // Build event map and event-to-tags map from included data
         $event_map = [];
         $event_tags_map = [];
-        $tag_map = []; // tag_id => tag_name
 
         if (!empty($response['included'])) {
             foreach ($response['included'] as $item) {
@@ -302,19 +303,6 @@ class MyPCO_Calendar_Shortcodes_Public {
                         }
                     }
                     $event_tags_map[$item['id']] = $tag_ids;
-                } elseif ($item['type'] === 'Tag') {
-                    $tag_map[$item['id']] = $item['attributes']['name'] ?? '';
-                }
-            }
-        }
-
-        // Resolve category name to tag ID for filtering
-        $category_tag_id = null;
-        if (!empty($category)) {
-            foreach ($tag_map as $tid => $tname) {
-                if (strcasecmp($tname, $category) === 0) {
-                    $category_tag_id = $tid;
-                    break;
                 }
             }
         }
@@ -336,10 +324,10 @@ class MyPCO_Calendar_Shortcodes_Public {
                 continue;
             }
 
-            // Category filter
-            if ($category_tag_id !== null) {
+            // Category/tag filter (category value is a tag ID from the dropdown)
+            if (!empty($category)) {
                 $tags = $event_tags_map[$parent_id] ?? [];
-                if (!in_array($category_tag_id, $tags)) {
+                if (!in_array($category, $tags)) {
                     continue;
                 }
             }
@@ -422,11 +410,12 @@ class MyPCO_Calendar_Shortcodes_Public {
 
         $event_name = !empty($atts['event']) ? $atts['event'] : ($settings['event_name'] ?? '');
         $count = !empty($atts['count']) ? $atts['count'] : ($settings['count'] ?? 'auto');
+        $category = $settings['category'] ?? '';
 
         $show_time = $settings['show_time'] ?? true;
         $show_address = $settings['show_address'] ?? true;
 
-        $events = $this->fetch_custom_events($event_name);
+        $events = $this->fetch_custom_events($event_name, $category);
 
         if (empty($events)) {
             $empty_msg = !empty($settings['empty_message'])
@@ -518,8 +507,12 @@ class MyPCO_Calendar_Shortcodes_Public {
 
     /**
      * Fetch custom events from Planning Center Calendar.
+     *
+     * @param string $event_name  Optional event name filter.
+     * @param string $category    Optional category tag ID to filter by.
+     * @return array Formatted events.
      */
-    private function fetch_custom_events($event_name) {
+    private function fetch_custom_events($event_name, $category = '') {
         if (!$this->api_model) {
             return [];
         }
@@ -536,10 +529,10 @@ class MyPCO_Calendar_Shortcodes_Public {
             'where[starts_at][lte]' => $end_date,
             'order' => 'starts_at',
             'per_page' => 50,
-            'include' => 'event'
+            'include' => 'event,event.tags'
         ];
 
-        $transient_key = 'mypco_custom_events_' . md5(serialize($params) . $event_name);
+        $transient_key = 'mypco_custom_events_' . md5(serialize($params) . $event_name . $category);
 
         $response = $this->api_model->get_data_with_caching(
             'calendar',
@@ -553,11 +546,21 @@ class MyPCO_Calendar_Shortcodes_Public {
             return [];
         }
 
+        // Build event map and event-to-tags map from included data
         $event_map = [];
+        $event_tags_map = [];
+
         if (!empty($response['included'])) {
             foreach ($response['included'] as $item) {
                 if ($item['type'] === 'Event') {
                     $event_map[$item['id']] = $item['attributes'];
+                    $tag_ids = [];
+                    if (!empty($item['relationships']['tags']['data'])) {
+                        foreach ($item['relationships']['tags']['data'] as $tag_ref) {
+                            $tag_ids[] = $tag_ref['id'];
+                        }
+                    }
+                    $event_tags_map[$item['id']] = $tag_ids;
                 }
             }
         }
@@ -577,6 +580,14 @@ class MyPCO_Calendar_Shortcodes_Public {
 
             if (!empty($event_name) && stripos($parent_name, $event_name) === false) {
                 continue;
+            }
+
+            // Category/tag filter
+            if (!empty($category)) {
+                $tags = $event_tags_map[$parent_id] ?? [];
+                if (!in_array($category, $tags)) {
+                    continue;
+                }
             }
 
             $starts_at = $instance['attributes']['starts_at'];
