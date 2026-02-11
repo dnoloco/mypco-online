@@ -44,6 +44,9 @@ class MyPCO_Activator {
         add_option('mypco_module_calendar_enabled', true);
         add_option('mypco_module_groups_enabled', true);
 
+        // Freemium modules
+        add_option('mypco_module_sermons_enabled', true);
+
         // Premium modules disabled by default (enable after license validation)
         add_option('mypco_module_services_enabled', true);
         add_option('mypco_module_messages_enabled', true);
@@ -136,10 +139,73 @@ class MyPCO_Activator {
             KEY status (status)
         ) $charset_collate;";
 
+        // Table for sermon speakers
+        $table_sermon_speakers = $wpdb->prefix . 'mypco_sermon_speakers';
+        $sql_sermon_speakers = "CREATE TABLE IF NOT EXISTS $table_sermon_speakers (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            name varchar(200) NOT NULL,
+            title varchar(200) DEFAULT NULL,
+            bio text DEFAULT NULL,
+            image_url text DEFAULT NULL,
+            PRIMARY KEY  (id),
+            KEY name (name)
+        ) $charset_collate;";
+
+        // Table for sermon series
+        $table_sermon_series = $wpdb->prefix . 'mypco_sermon_series';
+        $sql_sermon_series = "CREATE TABLE IF NOT EXISTS $table_sermon_series (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            title varchar(255) NOT NULL,
+            description text DEFAULT NULL,
+            image_url text DEFAULT NULL,
+            start_date date DEFAULT NULL,
+            end_date date DEFAULT NULL,
+            PRIMARY KEY  (id),
+            KEY title (title),
+            KEY start_date (start_date)
+        ) $charset_collate;";
+
+        // Table for sermon topics
+        $table_sermon_topics = $wpdb->prefix . 'mypco_sermon_topics';
+        $sql_sermon_topics = "CREATE TABLE IF NOT EXISTS $table_sermon_topics (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            name varchar(200) NOT NULL,
+            description text DEFAULT NULL,
+            PRIMARY KEY  (id),
+            KEY name (name)
+        ) $charset_collate;";
+
+        // Table for sermons
+        $table_sermons = $wpdb->prefix . 'mypco_sermons';
+        $sql_sermons = "CREATE TABLE IF NOT EXISTS $table_sermons (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            title varchar(255) NOT NULL,
+            sermon_date date NOT NULL,
+            speaker_id mediumint(9) DEFAULT 0,
+            series_id mediumint(9) DEFAULT 0,
+            topic_id mediumint(9) DEFAULT 0,
+            scripture varchar(255) DEFAULT NULL,
+            description text DEFAULT NULL,
+            audio_url text DEFAULT NULL,
+            video_url text DEFAULT NULL,
+            image_url text DEFAULT NULL,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY sermon_date (sermon_date),
+            KEY speaker_id (speaker_id),
+            KEY series_id (series_id),
+            KEY topic_id (topic_id)
+        ) $charset_collate;";
+
         // Execute table creation
         dbDelta($sql_signups);
         dbDelta($sql_registrations);
         dbDelta($sql_clearstream);
+        dbDelta($sql_sermon_speakers);
+        dbDelta($sql_sermon_series);
+        dbDelta($sql_sermon_topics);
+        dbDelta($sql_sermons);
     }
 
     /**

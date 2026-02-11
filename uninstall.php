@@ -39,6 +39,7 @@ function mypco_delete_options() {
     delete_option('mypco_module_services_enabled');
     delete_option('mypco_module_messages_enabled');
     delete_option('mypco_module_signups_enabled');
+    delete_option('mypco_module_sermons_enabled');
 
     // License options
     delete_option('mypco_license_services');
@@ -75,7 +76,11 @@ function mypco_drop_tables() {
     $tables = [
         $wpdb->prefix . 'mypco_signups',
         $wpdb->prefix . 'mypco_registrations',
-        $wpdb->prefix . 'mypco_clearstream_log'  // Fixed: was mypco_message_logs
+        $wpdb->prefix . 'mypco_clearstream_log',
+        $wpdb->prefix . 'mypco_sermons',
+        $wpdb->prefix . 'mypco_sermon_speakers',
+        $wpdb->prefix . 'mypco_sermon_series',
+        $wpdb->prefix . 'mypco_sermon_topics'
     ];
 
     foreach ($tables as $table) {

@@ -158,6 +158,32 @@ class MyPCO_Module_Manager {
                 'file' => 'messages/class-messages-module.php',
                 'class' => 'MyPCO_Messages_Module'
             ],
+            'sermons' => [
+                'name' => 'Sermons',
+                'description' => 'Manage and display sermon archives with series, speakers, topics, and media.',
+                'tier' => 'freemium',
+                'requires_license' => false,
+                'min_license_tier' => 'starter',
+                'features' => [
+                    'free' => [
+                        'manage_sermons',
+                        'manage_speakers',
+                        'manage_series',
+                        'manage_topics',
+                        'basic_shortcode',
+                        'sermon_list_view'
+                    ],
+                    'premium' => [
+                        'featured_message',
+                        'series_display',
+                        'custom_templates',
+                        'advanced_filtering',
+                        'custom_css'
+                    ]
+                ],
+                'file' => 'sermons/class-sermons-module.php',
+                'class' => 'MyPCO_Sermons_Module'
+            ],
             'calendar_shortcodes' => [
                 'name' => 'Calendar Shortcodes',
                 'description' => 'Custom single event and event list shortcodes for Planning Center Calendar.',

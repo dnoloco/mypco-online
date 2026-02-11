@@ -168,6 +168,33 @@ class MyPCO_Shortcodes_Admin {
                     ],
                 ],
             ],
+            'mypco_sermons_list' => [
+                'module'      => 'sermons',
+                'module_name' => 'Sermons',
+                'name'        => 'Sermon List',
+                'description' => 'Display a list of sermons with speaker, series, and media links.',
+                'tag'         => 'mypco_sermons',
+                'defaults'    => [
+                    'description'      => '',
+                    'count'            => 10,
+                    'view'             => 'list',
+                    'custom_class'     => '',
+                    'primary_color'    => '#333333',
+                    'text_color'       => '#333333',
+                    'background_color' => '#ffffff',
+                    'border_radius'    => 8,
+                ],
+                'fields' => [
+                    [
+                        'key'         => 'count',
+                        'label'       => 'Number of Sermons',
+                        'type'        => 'number',
+                        'min'         => 1,
+                        'max'         => 100,
+                        'description' => 'Maximum number of sermons to display.',
+                    ],
+                ],
+            ],
             'mypco_groups' => [
                 'module'      => 'groups',
                 'module_name' => 'Groups',

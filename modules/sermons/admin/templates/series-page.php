@@ -1,0 +1,105 @@
+<?php
+/**
+ * Series Management Page Template
+ *
+ * Available variables:
+ * - $all_series (array)
+ * - $success (string)
+ */
+
+defined('ABSPATH') || exit;
+
+$base_url = admin_url('admin.php?page=mypco-sermons');
+?>
+
+<div class="wrap">
+    <h1 class="wp-heading-inline"><?php _e('Series', 'mypco-online'); ?></h1>
+    <a href="<?php echo esc_url($base_url . '&view=series_edit'); ?>" class="page-title-action"><?php _e('Add New', 'mypco-online'); ?></a>
+
+    <?php if ($success): ?>
+        <div class="notice notice-success is-dismissible">
+            <p>
+                <?php
+                switch ($success) {
+                    case 'series_added':
+                        _e('Series added successfully.', 'mypco-online');
+                        break;
+                    case 'series_updated':
+                        _e('Series updated successfully.', 'mypco-online');
+                        break;
+                    case 'series_deleted':
+                        _e('Series deleted successfully.', 'mypco-online');
+                        break;
+                    default:
+                        _e('Operation completed.', 'mypco-online');
+                }
+                ?>
+            </p>
+        </div>
+    <?php endif; ?>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tab-wrapper mypco-sermons-tabs">
+        <a href="<?php echo esc_url($base_url); ?>" class="nav-tab"><?php _e('Sermons', 'mypco-online'); ?></a>
+        <a href="<?php echo esc_url($base_url . '&view=speakers'); ?>" class="nav-tab"><?php _e('Speakers', 'mypco-online'); ?></a>
+        <a href="<?php echo esc_url($base_url . '&view=series'); ?>" class="nav-tab nav-tab-active"><?php _e('Series', 'mypco-online'); ?></a>
+        <a href="<?php echo esc_url($base_url . '&view=topics'); ?>" class="nav-tab"><?php _e('Topics', 'mypco-online'); ?></a>
+    </nav>
+
+    <table class="wp-list-table widefat fixed striped table-view-list">
+        <thead>
+        <tr>
+            <th scope="col" class="manage-column column-title column-primary"><?php _e('Title', 'mypco-online'); ?></th>
+            <th scope="col" class="manage-column column-description"><?php _e('Description', 'mypco-online'); ?></th>
+            <th scope="col" class="manage-column column-dates"><?php _e('Dates', 'mypco-online'); ?></th>
+            <th scope="col" class="manage-column column-image"><?php _e('Image', 'mypco-online'); ?></th>
+        </tr>
+        </thead>
+        <tbody id="the-list">
+        <?php if (empty($all_series)): ?>
+            <tr class="no-items">
+                <td class="colspanchange" colspan="4">
+                    <?php _e('No series found.', 'mypco-online'); ?>
+                    <a href="<?php echo esc_url($base_url . '&view=series_edit'); ?>"><?php _e('Add your first series', 'mypco-online'); ?></a>
+                </td>
+            </tr>
+        <?php else: ?>
+            <?php foreach ($all_series as $series):
+                $edit_url = esc_url($base_url . '&view=series_edit&id=' . $series->id);
+                $delete_url = wp_nonce_url($base_url . '&action=delete_series&id=' . $series->id, 'mypco_delete_series_' . $series->id);
+
+                $date_display = '';
+                if (!empty($series->start_date)) {
+                    $date_display = date_i18n(get_option('date_format'), strtotime($series->start_date));
+                    if (!empty($series->end_date)) {
+                        $date_display .= ' &ndash; ' . date_i18n(get_option('date_format'), strtotime($series->end_date));
+                    }
+                }
+            ?>
+                <tr>
+                    <td class="title column-title has-row-actions column-primary">
+                        <strong><a class="row-title" href="<?php echo $edit_url; ?>"><?php echo esc_html($series->title); ?></a></strong>
+                        <div class="row-actions">
+                            <span class="edit"><a href="<?php echo $edit_url; ?>"><?php _e('Edit', 'mypco-online'); ?></a></span>
+                            | <span class="trash"><a href="<?php echo esc_url($delete_url); ?>" class="submitdelete" onclick="return confirm('<?php esc_attr_e('Are you sure you want to delete this series?', 'mypco-online'); ?>')"><?php _e('Delete', 'mypco-online'); ?></a></span>
+                        </div>
+                    </td>
+                    <td class="description column-description">
+                        <?php echo !empty($series->description) ? esc_html(wp_trim_words($series->description, 15)) : '<span class="mypco-no-description">&mdash;</span>'; ?>
+                    </td>
+                    <td class="dates column-dates">
+                        <?php echo !empty($date_display) ? $date_display : '<span class="mypco-no-description">&mdash;</span>'; ?>
+                    </td>
+                    <td class="image column-image">
+                        <?php if (!empty($series->image_url)): ?>
+                            <img src="<?php echo esc_url($series->image_url); ?>" alt="<?php echo esc_attr($series->title); ?>" class="mypco-series-thumb" width="60" height="40">
+                        <?php else: ?>
+                            <span class="mypco-no-description">&mdash;</span>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        <?php endif; ?>
+        </tbody>
+    </table>
+</div>
