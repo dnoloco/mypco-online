@@ -139,13 +139,21 @@ $page_title = $is_edit ? __('Edit Sermon', 'mypco-online') : __('Add New Sermon'
             </tr>
             <tr>
                 <th scope="row">
-                    <label for="sermon_image_url"><?php _e('Image URL', 'mypco-online'); ?></label>
+                    <label for="sermon_image_url"><?php _e('Image', 'mypco-online'); ?></label>
                 </th>
                 <td>
-                    <input type="url" name="sermon_image_url" id="sermon_image_url" class="large-text"
-                           value="<?php echo esc_url($is_edit ? $sermon->image_url : ''); ?>"
-                           placeholder="<?php esc_attr_e('https://example.com/sermon-image.jpg', 'mypco-online'); ?>">
-                    <p class="description"><?php _e('Featured image for this sermon. If empty, the series image will be used.', 'mypco-online'); ?></p>
+                    <div class="mypco-image-upload" data-upload-type="sermons">
+                        <div class="mypco-image-preview <?php echo ($is_edit && !empty($sermon->image_url)) ? 'has-image' : ''; ?>">
+                            <?php if ($is_edit && !empty($sermon->image_url)): ?>
+                                <img src="<?php echo esc_url($sermon->image_url); ?>" alt="">
+                            <?php endif; ?>
+                        </div>
+                        <input type="hidden" name="sermon_image_url" id="sermon_image_url"
+                               value="<?php echo esc_url($is_edit ? $sermon->image_url : ''); ?>">
+                        <button type="button" class="button mypco-upload-btn"><?php _e('Upload Image', 'mypco-online'); ?></button>
+                        <button type="button" class="button mypco-remove-btn" <?php echo ($is_edit && !empty($sermon->image_url)) ? '' : 'style="display:none;"'; ?>><?php _e('Remove', 'mypco-online'); ?></button>
+                        <p class="description"><?php _e('Featured image for this sermon. If empty, the series image will be used.', 'mypco-online'); ?></p>
+                    </div>
                 </td>
             </tr>
         </table>

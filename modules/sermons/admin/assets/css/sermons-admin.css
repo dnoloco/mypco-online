@@ -68,6 +68,47 @@
     width: 150px;
 }
 
+/* Image upload widget */
+.mypco-image-upload .mypco-upload-btn,
+.mypco-image-upload .mypco-remove-btn {
+    margin-top: 8px;
+}
+
+.mypco-image-upload .mypco-remove-btn {
+    color: #b32d2e;
+}
+
+.mypco-image-preview {
+    max-width: 300px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f0f0f1;
+    border: 1px dashed #c3c4c7;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mypco-image-preview:not(.has-image)::after {
+    content: "No image selected";
+    color: #999;
+    font-size: 13px;
+    padding: 16px;
+}
+
+.mypco-image-preview.has-image {
+    border-style: solid;
+    background: #000;
+    min-height: 0;
+}
+
+.mypco-image-preview img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
 /* Filter bar */
 .tablenav .button {
     margin-left: 4px;
