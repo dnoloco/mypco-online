@@ -13,6 +13,7 @@ defined('ABSPATH') || exit;
 /**
  * Parse a video URL into an embeddable URL and thumbnail.
  */
+if (!function_exists('mypco_parse_video_url')):
 function mypco_parse_video_url($url) {
     if (empty($url)) {
         return null;
@@ -55,6 +56,7 @@ function mypco_parse_video_url($url) {
 
     return null;
 }
+endif;
 ?>
 
 <div class="mypco-sermons-wrapper">
