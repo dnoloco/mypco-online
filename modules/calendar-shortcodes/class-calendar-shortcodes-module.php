@@ -50,6 +50,8 @@ class MyPCO_Calendar_Shortcodes_Module extends MyPCO_Module_Base {
      * @return array Modified shortcode types.
      */
     public function register_shortcode_types($types) {
+        $category_options = $this->fetch_category_options();
+
         $types['mypco_next_sunday'] = [
             'module'      => 'calendar',
             'module_name' => 'Calendar',
@@ -61,6 +63,7 @@ class MyPCO_Calendar_Shortcodes_Module extends MyPCO_Module_Base {
             'addon_name'  => 'Calendar Shortcodes Addon',
             'defaults'    => [
                 'description'         => '',
+                'category'            => '',
                 'event_name'          => '',
                 'layout_style'        => 'card',
                 'show_title'          => true,
@@ -80,6 +83,13 @@ class MyPCO_Calendar_Shortcodes_Module extends MyPCO_Module_Base {
                 'time_format_custom'  => '',
             ],
             'fields' => [
+                [
+                    'key'         => 'category',
+                    'label'       => 'Category',
+                    'type'        => 'select',
+                    'options'     => $category_options,
+                    'description' => 'Filter events by Planning Center category.',
+                ],
                 [
                     'key'         => 'event_name',
                     'label'       => 'Event Name Filter',
@@ -231,9 +241,10 @@ class MyPCO_Calendar_Shortcodes_Module extends MyPCO_Module_Base {
                 ],
                 [
                     'key'         => 'category',
-                    'label'       => 'Category Filter',
-                    'type'        => 'text',
-                    'description' => 'Enter a category name to filter featured events. Must match a public category in Planning Center. Leave blank for all.',
+                    'label'       => 'Category',
+                    'type'        => 'select',
+                    'options'     => $category_options,
+                    'description' => 'Filter featured events by Planning Center category.',
                 ],
                 [
                     'key'         => 'event_name',
@@ -349,6 +360,7 @@ class MyPCO_Calendar_Shortcodes_Module extends MyPCO_Module_Base {
             'addon_name'  => 'Calendar Shortcodes Addon',
             'defaults'    => [
                 'description'         => '',
+                'category'            => '',
                 'event_name'          => '',
                 'count'               => 'auto',
                 'show_time'           => true,
@@ -365,6 +377,13 @@ class MyPCO_Calendar_Shortcodes_Module extends MyPCO_Module_Base {
                 'time_format_custom'  => '',
             ],
             'fields' => [
+                [
+                    'key'         => 'category',
+                    'label'       => 'Category',
+                    'type'        => 'select',
+                    'options'     => $category_options,
+                    'description' => 'Filter events by Planning Center category.',
+                ],
                 [
                     'key'         => 'event_name',
                     'label'       => 'Event Name Filter',
@@ -443,6 +462,84 @@ class MyPCO_Calendar_Shortcodes_Module extends MyPCO_Module_Base {
         ];
 
         return $types;
+    }
+
+    /**
+     * Fetch public categories from the PCO Calendar API for the category dropdown.
+     *
+     * Only returns tags where church_center_category is true.
+     * Results are cached via the API model's transient caching.
+     *
+     * @return array Select options keyed by tag ID with display labels.
+     */
+    private function fetch_category_options() {
+        if (!$this->api_model) {
+            return ['' => 'All Categories'];
+        }
+
+        $params = [
+            'per_page' => 100,
+            'include'  => 'tag_group',
+        ];
+
+        // Use same transient key as the calendar public component for shared cache
+        $transient_key = 'mypco_calendar_tags_' . md5(serialize($params));
+
+        $response = $this->api_model->get_data_with_caching(
+            'calendar',
+            '/v2/tags',
+            $params,
+            $transient_key
+        );
+
+        $options = ['' => 'All Categories'];
+
+        if (isset($response['error']) || empty($response['data'])) {
+            return $options;
+        }
+
+        // Build tag group map
+        $tag_groups = [];
+        if (!empty($response['included'])) {
+            foreach ($response['included'] as $item) {
+                if ($item['type'] === 'TagGroup') {
+                    $tag_groups[$item['id']] = $item['attributes']['name'] ?? '';
+                }
+            }
+        }
+
+        // Collect public categories, sorted by group then name
+        $tags = [];
+        foreach ($response['data'] as $tag) {
+            $is_public = $tag['attributes']['church_center_category'] ?? false;
+            if (!$is_public) {
+                continue;
+            }
+
+            $tag_id = $tag['id'];
+            $tag_name = $tag['attributes']['name'] ?? '';
+            $tag_group_id = $tag['relationships']['tag_group']['data']['id'] ?? null;
+            $group_name = $tag_group_id ? ($tag_groups[$tag_group_id] ?? '') : '';
+
+            $tags[] = [
+                'id'         => $tag_id,
+                'name'       => $tag_name,
+                'group_name' => $group_name,
+            ];
+        }
+
+        usort($tags, function ($a, $b) {
+            $group_cmp = strcmp($a['group_name'], $b['group_name']);
+            if ($group_cmp !== 0) return $group_cmp;
+            return strcmp($a['name'], $b['name']);
+        });
+
+        foreach ($tags as $tag) {
+            $label = !empty($tag['group_name']) ? $tag['group_name'] . ': ' . $tag['name'] : $tag['name'];
+            $options[$tag['id']] = $label;
+        }
+
+        return $options;
     }
 
     /**
