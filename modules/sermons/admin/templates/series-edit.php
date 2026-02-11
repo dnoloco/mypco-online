@@ -44,12 +44,21 @@ $page_title = $is_edit ? __('Edit Series', 'mypco-online') : __('Add New Series'
             </tr>
             <tr>
                 <th scope="row">
-                    <label for="series_image_url"><?php _e('Image URL', 'mypco-online'); ?></label>
+                    <label for="series_image_url"><?php _e('Cover Image', 'mypco-online'); ?></label>
                 </th>
                 <td>
-                    <input type="url" name="series_image_url" id="series_image_url" class="large-text"
-                           value="<?php echo esc_url($is_edit ? $series->image_url : ''); ?>">
-                    <p class="description"><?php _e('Cover image for this series.', 'mypco-online'); ?></p>
+                    <div class="mypco-image-upload" data-upload-type="series">
+                        <div class="mypco-image-preview <?php echo ($is_edit && !empty($series->image_url)) ? 'has-image' : ''; ?>">
+                            <?php if ($is_edit && !empty($series->image_url)): ?>
+                                <img src="<?php echo esc_url($series->image_url); ?>" alt="">
+                            <?php endif; ?>
+                        </div>
+                        <input type="hidden" name="series_image_url" id="series_image_url"
+                               value="<?php echo esc_url($is_edit ? $series->image_url : ''); ?>">
+                        <button type="button" class="button mypco-upload-btn"><?php _e('Upload Image', 'mypco-online'); ?></button>
+                        <button type="button" class="button mypco-remove-btn" <?php echo ($is_edit && !empty($series->image_url)) ? '' : 'style="display:none;"'; ?>><?php _e('Remove', 'mypco-online'); ?></button>
+                        <p class="description"><?php _e('Cover image for this series.', 'mypco-online'); ?></p>
+                    </div>
                 </td>
             </tr>
             <tr>

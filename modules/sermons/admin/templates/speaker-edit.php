@@ -54,12 +54,20 @@ $page_title = $is_edit ? __('Edit Speaker', 'mypco-online') : __('Add New Speake
             </tr>
             <tr>
                 <th scope="row">
-                    <label for="speaker_image_url"><?php _e('Image URL', 'mypco-online'); ?></label>
+                    <label for="speaker_image_url"><?php _e('Photo', 'mypco-online'); ?></label>
                 </th>
                 <td>
-                    <input type="url" name="speaker_image_url" id="speaker_image_url" class="large-text"
-                           value="<?php echo esc_url($is_edit ? $speaker->image_url : ''); ?>">
-                    <p class="description"><?php _e('URL to the speaker\'s photo.', 'mypco-online'); ?></p>
+                    <div class="mypco-image-upload" data-upload-type="speakers">
+                        <div class="mypco-image-preview <?php echo ($is_edit && !empty($speaker->image_url)) ? 'has-image' : ''; ?>">
+                            <?php if ($is_edit && !empty($speaker->image_url)): ?>
+                                <img src="<?php echo esc_url($speaker->image_url); ?>" alt="">
+                            <?php endif; ?>
+                        </div>
+                        <input type="hidden" name="speaker_image_url" id="speaker_image_url"
+                               value="<?php echo esc_url($is_edit ? $speaker->image_url : ''); ?>">
+                        <button type="button" class="button mypco-upload-btn"><?php _e('Upload Image', 'mypco-online'); ?></button>
+                        <button type="button" class="button mypco-remove-btn" <?php echo ($is_edit && !empty($speaker->image_url)) ? '' : 'style="display:none;"'; ?>><?php _e('Remove', 'mypco-online'); ?></button>
+                    </div>
                 </td>
             </tr>
         </table>

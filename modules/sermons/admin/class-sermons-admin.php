@@ -27,6 +27,7 @@ class MyPCO_Sermons_Admin {
         $this->loader->add_action('admin_menu', $this, 'add_admin_pages');
         $this->loader->add_action('admin_enqueue_scripts', $this, 'enqueue_admin_assets');
         $this->loader->add_action('admin_init', $this, 'handle_form_submissions');
+        $this->loader->add_filter('upload_dir', $this, 'custom_upload_dir');
     }
 
     // =========================================================================
@@ -54,6 +55,8 @@ class MyPCO_Sermons_Admin {
         if (strpos($hook, 'mypco-sermons') === false) {
             return;
         }
+
+        wp_enqueue_media();
 
         wp_enqueue_style(
             'mypco-sermons-admin',
@@ -661,6 +664,32 @@ class MyPCO_Sermons_Admin {
     // =========================================================================
     // Helper Methods
     // =========================================================================
+
+    /**
+     * Customize the upload directory for sermon module uploads.
+     *
+     * When uploads come from our admin pages with a mypco_upload_type param,
+     * route them into organised subdirectories:
+     *   wp-content/uploads/mypco-sermons/speakers/
+     *   wp-content/uploads/mypco-sermons/sermons/
+     *   wp-content/uploads/mypco-sermons/series/
+     */
+    public function custom_upload_dir($uploads) {
+        $type = isset($_REQUEST['mypco_upload_type']) ? sanitize_key($_REQUEST['mypco_upload_type']) : '';
+
+        $allowed = ['speakers', 'sermons', 'series'];
+        if (empty($type) || !in_array($type, $allowed, true)) {
+            return $uploads;
+        }
+
+        $subdir = '/mypco-sermons/' . $type;
+
+        $uploads['subdir'] = $subdir;
+        $uploads['path']   = $uploads['basedir'] . $subdir;
+        $uploads['url']    = $uploads['baseurl'] . $subdir;
+
+        return $uploads;
+    }
 
     /**
      * Load a template file.
