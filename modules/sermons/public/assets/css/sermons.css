@@ -220,11 +220,10 @@
         flex-direction: column;
     }
 
-    .mypco-sermon-video-player {
-        width: 100%;
-    }
-
+    /* On mobile, show the video above the text content */
+    .mypco-sermon-video-player,
     .mypco-sermon-image {
+        order: -1;
         width: 100%;
     }
 
