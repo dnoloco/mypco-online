@@ -109,9 +109,12 @@ class MyPCO_Calendar_Public {
         $atts['count'] = !empty($atts['count']) ? (int) $atts['count'] : ($settings['count'] ?? 100);
         $atts['view']  = !empty($atts['view']) ? $atts['view'] : ($settings['view'] ?? 'list');
 
-        // Featured event settings from shortcode config (defaults: 1 closest upcoming)
+        // Featured event settings from shortcode config
+        // show_featured controls whether featured events appear in the list view
+        $show_featured = $settings['show_featured'] ?? true;
         $featured_settings = [
-            'featured_count' => isset($settings['featured_count']) ? (int) $settings['featured_count'] : 1,
+            'show_featured'  => $show_featured,
+            'featured_count' => $show_featured ? (isset($settings['featured_count']) ? (int) $settings['featured_count'] : 1) : 0,
             'featured_mode'  => $settings['featured_mode'] ?? 'upcoming',
         ];
 
@@ -320,6 +323,11 @@ class MyPCO_Calendar_Public {
         // Get settings from shortcode config, falling back to defaults
         $max_featured = isset($featured_settings['featured_count']) ? (int) $featured_settings['featured_count'] : 1;
         $display_mode = $featured_settings['featured_mode'] ?? 'upcoming';
+
+        // If featured events are disabled, return empty
+        if ($max_featured <= 0) {
+            return [];
+        }
 
         // Group by parent event, selecting the next upcoming instance
         $now = new DateTime('now', $this->timezone);
