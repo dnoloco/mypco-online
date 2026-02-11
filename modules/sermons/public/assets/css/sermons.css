@@ -2,65 +2,114 @@
  * Sermons Public Styles
  */
 
-/* Wrapper */
-.mypco-sermons-wrapper {
-    max-width: 900px;
-    margin: 0 auto;
-}
+/* =========================================================================
+   Empty state
+   ========================================================================= */
 
-/* Empty state */
 .mypco-sermons-empty {
     text-align: center;
     padding: 40px 20px;
     color: #666;
 }
 
-/* Individual sermon item */
-.mypco-sermon-item {
-    display: flex;
-    gap: 20px;
-    padding: 20px 0;
-    border-bottom: 1px solid #e5e7eb;
+/* =========================================================================
+   Gallery View (card grid)
+   ========================================================================= */
+
+.mypco-sermons-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.mypco-sermon-item:last-child {
-    border-bottom: none;
+.mypco-sermon-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.2s, transform 0.2s;
 }
 
-/* Sermon image (no-video fallback) */
-.mypco-sermon-image {
-    flex-shrink: 0;
-    width: 160px;
+.mypco-sermon-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
 }
 
-.mypco-sermon-image img {
+.mypco-sermon-card-image {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #e5e7eb;
+}
+
+.mypco-sermon-card-image img {
     width: 100%;
-    height: auto;
-    border-radius: 6px;
+    height: 100%;
+    object-fit: cover;
     display: block;
 }
 
+.mypco-sermon-card-body {
+    padding: 12px 16px 16px;
+}
+
+.mypco-sermon-card-title {
+    margin: 0;
+    font-size: 1em;
+    line-height: 1.4;
+    font-weight: 600;
+}
+
 /* =========================================================================
-   Video Player
+   Single Sermon Detail
    ========================================================================= */
 
-.mypco-sermon-video-player {
-    flex-shrink: 0;
-    width: 320px;
+.mypco-sermon-single {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Back link */
+.mypco-sermon-back {
+    display: inline-block;
+    margin-bottom: 16px;
+    font-size: 0.9em;
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.mypco-sermon-back:hover {
+    text-decoration: underline;
+}
+
+/* Title */
+.mypco-sermon-single-title {
+    margin: 0 0 20px 0;
+    font-size: 1.6em;
+    line-height: 1.3;
+}
+
+/* Video player (full-width) */
+.mypco-sermon-single-video {
+    width: 100%;
     border-radius: 8px;
     overflow: hidden;
     background: #000;
+    margin-bottom: 20px;
 }
 
-/* Thumbnail overlay (before play) */
-.mypco-sermon-video-thumb {
+.mypco-sermon-single-video .mypco-sermon-video-thumb {
     position: relative;
     width: 100%;
     padding-top: 56.25%; /* 16:9 */
     cursor: pointer;
 }
 
-.mypco-sermon-video-thumb img {
+.mypco-sermon-single-video .mypco-sermon-video-thumb img {
     position: absolute;
     top: 0;
     left: 0;
@@ -79,7 +128,19 @@
     background: #1a1a1a;
 }
 
-/* Play button */
+.mypco-sermon-single-video iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    display: block;
+    border: 0;
+}
+
+.mypco-sermon-single-video-element {
+    width: 100%;
+    display: block;
+}
+
+/* Play button (shared between list and single) */
 .mypco-sermon-play-btn {
     position: absolute;
     top: 50%;
@@ -102,7 +163,144 @@
     fill-opacity: 1;
 }
 
-/* Embedded iframe (after play) */
+/* Audio link area */
+.mypco-sermon-single-audio {
+    margin-bottom: 24px;
+}
+
+/* Sermon info section */
+.mypco-sermon-single-info {
+    margin-top: 4px;
+}
+
+.mypco-sermon-single-description {
+    font-size: 0.95em;
+    line-height: 1.7;
+    color: #374151;
+    margin-bottom: 24px;
+}
+
+.mypco-sermon-single-description p:last-child {
+    margin-bottom: 0;
+}
+
+/* Meta rows (label: value) */
+.mypco-sermon-single-meta {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 16px;
+}
+
+.mypco-sermon-single-meta-row {
+    display: flex;
+    gap: 12px;
+    padding: 8px 0;
+    font-size: 0.9em;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.mypco-sermon-single-meta-row:last-child {
+    border-bottom: none;
+}
+
+.mypco-sermon-single-label {
+    flex-shrink: 0;
+    width: 80px;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.mypco-sermon-single-value {
+    color: #374151;
+}
+
+/* =========================================================================
+   Shared link styles (audio button)
+   ========================================================================= */
+
+.mypco-sermon-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 20px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.mypco-sermon-audio {
+    background: #f0f7ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+}
+
+.mypco-sermon-audio:hover {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.mypco-icon-audio::before {
+    content: "\1F3A7";
+}
+
+/* =========================================================================
+   List View (original layout, kept for view="list")
+   ========================================================================= */
+
+.mypco-sermons-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.mypco-sermon-item {
+    display: flex;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.mypco-sermon-item:last-child {
+    border-bottom: none;
+}
+
+.mypco-sermon-image {
+    flex-shrink: 0;
+    width: 160px;
+}
+
+.mypco-sermon-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    display: block;
+}
+
+.mypco-sermon-video-player {
+    flex-shrink: 0;
+    width: 320px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #000;
+}
+
+.mypco-sermon-video-player .mypco-sermon-video-thumb {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%;
+    cursor: pointer;
+}
+
+.mypco-sermon-video-player .mypco-sermon-video-thumb img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
 .mypco-sermon-video-player iframe {
     width: 100%;
     aspect-ratio: 16 / 9;
@@ -110,16 +308,11 @@
     border: 0;
 }
 
-/* Direct video element */
 .mypco-sermon-video-element {
     width: 100%;
     display: block;
     border-radius: 8px;
 }
-
-/* =========================================================================
-   Sermon Content
-   ========================================================================= */
 
 .mypco-sermon-content {
     flex: 1;
@@ -132,7 +325,6 @@
     line-height: 1.3;
 }
 
-/* Meta info */
 .mypco-sermon-meta {
     display: flex;
     flex-wrap: wrap;
@@ -162,14 +354,12 @@
     content: "\1F3F7\FE0F";
 }
 
-/* Scripture */
 .mypco-sermon-scripture {
     font-size: 0.9em;
     margin-bottom: 8px;
     color: #555;
 }
 
-/* Description */
 .mypco-sermon-description {
     font-size: 0.9em;
     color: #555;
@@ -177,38 +367,9 @@
     line-height: 1.5;
 }
 
-/* Media links */
 .mypco-sermon-links {
     display: flex;
     gap: 12px;
-}
-
-.mypco-sermon-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 16px;
-    border-radius: 4px;
-    font-size: 0.85em;
-    font-weight: 500;
-    text-decoration: none;
-    transition: background-color 0.2s, color 0.2s;
-}
-
-.mypco-sermon-audio {
-    background: #f0f7ff;
-    color: #2563eb;
-    border: 1px solid #bfdbfe;
-}
-
-.mypco-sermon-audio:hover {
-    background: #dbeafe;
-    color: #1d4ed8;
-}
-
-/* Icons */
-.mypco-icon-audio::before {
-    content: "\1F3A7";
 }
 
 /* =========================================================================
@@ -216,11 +377,16 @@
    ========================================================================= */
 
 @media (max-width: 768px) {
+    /* Gallery: 1 column on small screens */
+    .mypco-sermons-gallery {
+        grid-template-columns: 1fr;
+    }
+
+    /* List view stacking */
     .mypco-sermon-item {
         flex-direction: column;
     }
 
-    /* On mobile, show the video above the text content */
     .mypco-sermon-video-player,
     .mypco-sermon-image {
         order: -1;
@@ -230,5 +396,19 @@
     .mypco-sermon-meta {
         flex-direction: column;
         gap: 4px;
+    }
+
+    /* Single view */
+    .mypco-sermon-single-title {
+        font-size: 1.3em;
+    }
+
+    .mypco-sermon-single-meta-row {
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .mypco-sermon-single-label {
+        width: auto;
     }
 }

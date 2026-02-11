@@ -59,7 +59,17 @@ class MyPCO_Sermons_Public {
     }
 
     /**
+     * Get the URL for the default placeholder image.
+     */
+    public function get_placeholder_url() {
+        return MYPCO_PLUGIN_URL . 'modules/sermons/public/assets/images/sermon-placeholder.svg';
+    }
+
+    /**
      * Render the sermons shortcode.
+     *
+     * If ?mypco_sermon=ID is present, renders the single sermon detail page.
+     * Otherwise, renders the gallery of sermon cards.
      *
      * @param array $atts Shortcode attributes
      * @return string HTML output
@@ -67,11 +77,11 @@ class MyPCO_Sermons_Public {
     public function render_sermons_shortcode($atts) {
         $atts = shortcode_atts([
             'id'      => 0,
-            'count'   => 10,
+            'count'   => 12,
             'series'  => '',
             'speaker' => '',
             'topic'   => '',
-            'view'    => 'list',
+            'view'    => 'gallery',
             'orderby' => 'date',
             'order'   => 'DESC',
         ], $atts, 'mypco_sermons');
@@ -90,6 +100,12 @@ class MyPCO_Sermons_Public {
         $view = !empty($settings['view']) ? $settings['view'] : $atts['view'];
         $order = strtoupper($atts['order']) === 'ASC' ? 'ASC' : 'DESC';
 
+        // Check for single sermon view
+        $single_id = isset($_GET['mypco_sermon']) ? absint($_GET['mypco_sermon']) : 0;
+        if ($single_id > 0) {
+            return $this->render_single_sermon($single_id);
+        }
+
         // Fetch sermons from database
         $sermons = $this->fetch_sermons([
             'count'   => $count,
@@ -104,11 +120,63 @@ class MyPCO_Sermons_Public {
             return '<div class="mypco-sermons-empty"><p>' . esc_html__('No sermons found.', 'mypco-online') . '</p></div>';
         }
 
-        return $this->load_template('sermons-list', [
-            'sermons' => $sermons,
-            'view'    => $view,
-            'atts'    => $atts,
+        $template = ($view === 'list') ? 'sermons-list' : 'sermons-gallery';
+
+        return $this->load_template($template, [
+            'sermons'         => $sermons,
+            'view'            => $view,
+            'atts'            => $atts,
+            'placeholder_url' => $this->get_placeholder_url(),
         ]);
+    }
+
+    /**
+     * Render a single sermon detail page.
+     *
+     * @param int $sermon_id Sermon ID.
+     * @return string HTML output.
+     */
+    private function render_single_sermon($sermon_id) {
+        $sermon = $this->fetch_single_sermon($sermon_id);
+
+        if (!$sermon) {
+            return '<div class="mypco-sermons-empty"><p>' . esc_html__('Sermon not found.', 'mypco-online') . '</p></div>';
+        }
+
+        return $this->load_template('sermon-single', [
+            'sermon'          => $sermon,
+            'placeholder_url' => $this->get_placeholder_url(),
+        ]);
+    }
+
+    /**
+     * Fetch a single sermon by ID with all joined data.
+     *
+     * @param int $sermon_id Sermon ID.
+     * @return object|null Sermon object or null.
+     */
+    private function fetch_single_sermon($sermon_id) {
+        global $wpdb;
+
+        $table_sermons = $wpdb->prefix . 'mypco_sermons';
+        $table_speakers = $wpdb->prefix . 'mypco_sermon_speakers';
+        $table_series = $wpdb->prefix . 'mypco_sermon_series';
+        $table_topics = $wpdb->prefix . 'mypco_sermon_topics';
+
+        $query = "SELECT s.*,
+                    sp.name AS speaker_name,
+                    sp.title AS speaker_title,
+                    sp.image_url AS speaker_image_url,
+                    sr.title AS series_title,
+                    sr.image_url AS series_image_url,
+                    t.name AS topic_name
+                  FROM {$table_sermons} s
+                  LEFT JOIN {$table_speakers} sp ON s.speaker_id = sp.id
+                  LEFT JOIN {$table_series} sr ON s.series_id = sr.id
+                  LEFT JOIN {$table_topics} t ON s.topic_id = t.id
+                  WHERE s.id = %d";
+
+        return $wpdb->get_row($wpdb->prepare($query, $sermon_id));
     }
 
     /**
