@@ -9,12 +9,12 @@
 
 defined('ABSPATH') || exit;
 
-$base_url = admin_url('admin.php?page=mypco-sermons');
+$base_url = admin_url('admin.php?page=mypco-sermon-speakers');
 ?>
 
 <div class="wrap">
     <h1 class="wp-heading-inline"><?php _e('Speakers', 'mypco-online'); ?></h1>
-    <a href="<?php echo esc_url($base_url . '&view=speaker_edit'); ?>" class="page-title-action"><?php _e('Add New', 'mypco-online'); ?></a>
+    <a href="<?php echo esc_url($base_url . '&view=edit'); ?>" class="page-title-action"><?php _e('Add New', 'mypco-online'); ?></a>
 
     <?php if ($success): ?>
         <div class="notice notice-success is-dismissible">
@@ -38,14 +38,6 @@ $base_url = admin_url('admin.php?page=mypco-sermons');
         </div>
     <?php endif; ?>
 
-    <!-- Navigation Tabs -->
-    <nav class="nav-tab-wrapper mypco-sermons-tabs">
-        <a href="<?php echo esc_url($base_url); ?>" class="nav-tab"><?php _e('Sermons', 'mypco-online'); ?></a>
-        <a href="<?php echo esc_url($base_url . '&view=speakers'); ?>" class="nav-tab nav-tab-active"><?php _e('Speakers', 'mypco-online'); ?></a>
-        <a href="<?php echo esc_url($base_url . '&view=series'); ?>" class="nav-tab"><?php _e('Series', 'mypco-online'); ?></a>
-        <a href="<?php echo esc_url($base_url . '&view=topics'); ?>" class="nav-tab"><?php _e('Topics', 'mypco-online'); ?></a>
-    </nav>
-
     <table class="wp-list-table widefat fixed striped table-view-list">
         <thead>
         <tr>
@@ -59,12 +51,12 @@ $base_url = admin_url('admin.php?page=mypco-sermons');
             <tr class="no-items">
                 <td class="colspanchange" colspan="3">
                     <?php _e('No speakers found.', 'mypco-online'); ?>
-                    <a href="<?php echo esc_url($base_url . '&view=speaker_edit'); ?>"><?php _e('Add your first speaker', 'mypco-online'); ?></a>
+                    <a href="<?php echo esc_url($base_url . '&view=edit'); ?>"><?php _e('Add your first speaker', 'mypco-online'); ?></a>
                 </td>
             </tr>
         <?php else: ?>
             <?php foreach ($speakers as $speaker):
-                $edit_url = esc_url($base_url . '&view=speaker_edit&id=' . $speaker->id);
+                $edit_url = esc_url($base_url . '&view=edit&id=' . $speaker->id);
                 $delete_url = wp_nonce_url($base_url . '&action=delete_speaker&id=' . $speaker->id, 'mypco_delete_speaker_' . $speaker->id);
             ?>
                 <tr>

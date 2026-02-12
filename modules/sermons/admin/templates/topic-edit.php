@@ -9,13 +9,13 @@
 
 defined('ABSPATH') || exit;
 
-$base_url = admin_url('admin.php?page=mypco-sermons');
+$base_url = admin_url('admin.php?page=mypco-sermon-topics');
 $page_title = $is_edit ? __('Edit Topic', 'mypco-online') : __('Add New Topic', 'mypco-online');
 ?>
 
 <div class="wrap">
     <h1 class="wp-heading-inline"><?php echo esc_html($page_title); ?></h1>
-    <a href="<?php echo esc_url($base_url . '&view=topics'); ?>" class="page-title-action"><?php _e('Back to Topics', 'mypco-online'); ?></a>
+    <a href="<?php echo esc_url($base_url); ?>" class="page-title-action"><?php _e('Back to Topics', 'mypco-online'); ?></a>
 
     <form method="post" action="">
         <?php wp_nonce_field('mypco_save_topic'); ?>

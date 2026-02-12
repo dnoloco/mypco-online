@@ -43,14 +43,6 @@ $base_url = admin_url('admin.php?page=mypco-sermons');
         </div>
     <?php endif; ?>
 
-    <!-- Navigation Tabs -->
-    <nav class="nav-tab-wrapper mypco-sermons-tabs">
-        <a href="<?php echo esc_url($base_url); ?>" class="nav-tab nav-tab-active"><?php _e('Sermons', 'mypco-online'); ?></a>
-        <a href="<?php echo esc_url($base_url . '&view=speakers'); ?>" class="nav-tab"><?php _e('Speakers', 'mypco-online'); ?></a>
-        <a href="<?php echo esc_url($base_url . '&view=series'); ?>" class="nav-tab"><?php _e('Series', 'mypco-online'); ?></a>
-        <a href="<?php echo esc_url($base_url . '&view=topics'); ?>" class="nav-tab"><?php _e('Topics', 'mypco-online'); ?></a>
-    </nav>
-
     <!-- Filters -->
     <div class="tablenav top">
         <form method="get" action="">

@@ -35,16 +35,58 @@ class MyPCO_Sermons_Admin {
     // =========================================================================
 
     /**
-     * Add admin menu pages.
+     * Add top-level Sermons menu with submenus.
      */
     public function add_admin_pages() {
-        add_submenu_page(
-            'mypco-dashboard',
+        // Top-level menu
+        add_menu_page(
             __('Sermons', 'mypco-online'),
             __('Sermons', 'mypco-online'),
             'edit_posts',
             'mypco-sermons',
-            [$this, 'render_page']
+            [$this, 'render_sermons_page'],
+            'dashicons-microphone',
+            26
+        );
+
+        // Submenu: All Sermons (replaces the auto-generated first item)
+        add_submenu_page(
+            'mypco-sermons',
+            __('All Sermons', 'mypco-online'),
+            __('All Sermons', 'mypco-online'),
+            'edit_posts',
+            'mypco-sermons',
+            [$this, 'render_sermons_page']
+        );
+
+        // Submenu: Speakers
+        add_submenu_page(
+            'mypco-sermons',
+            __('Speakers', 'mypco-online'),
+            __('Speakers', 'mypco-online'),
+            'edit_posts',
+            'mypco-sermon-speakers',
+            [$this, 'render_speakers_submenu']
+        );
+
+        // Submenu: Series
+        add_submenu_page(
+            'mypco-sermons',
+            __('Series', 'mypco-online'),
+            __('Series', 'mypco-online'),
+            'edit_posts',
+            'mypco-sermon-series',
+            [$this, 'render_series_submenu']
+        );
+
+        // Submenu: Topics
+        add_submenu_page(
+            'mypco-sermons',
+            __('Topics', 'mypco-online'),
+            __('Topics', 'mypco-online'),
+            'edit_posts',
+            'mypco-sermon-topics',
+            [$this, 'render_topics_submenu']
         );
     }
 
@@ -52,7 +94,8 @@ class MyPCO_Sermons_Admin {
      * Enqueue admin-specific assets.
      */
     public function enqueue_admin_assets($hook) {
-        if (strpos($hook, 'mypco-sermons') === false) {
+        // Match any of our sermon admin pages
+        if (strpos($hook, 'mypco-sermon') === false) {
             return;
         }
 
@@ -75,41 +118,58 @@ class MyPCO_Sermons_Admin {
     }
 
     // =========================================================================
-    // Page Routing
+    // Submenu Render Callbacks
     // =========================================================================
 
     /**
-     * Render the admin page (routes to the correct view).
+     * Render the Sermons submenu (list or add/edit).
      */
-    public function render_page() {
+    public function render_sermons_page() {
         $view = isset($_GET['view']) ? sanitize_text_field($_GET['view']) : 'list';
 
-        switch ($view) {
-            case 'add':
-            case 'edit':
-                $this->render_sermon_edit_page();
-                break;
-            case 'speakers':
-                $this->render_speakers_page();
-                break;
-            case 'speaker_edit':
-                $this->render_speaker_edit_page();
-                break;
-            case 'series':
-                $this->render_series_page();
-                break;
-            case 'series_edit':
-                $this->render_series_edit_page();
-                break;
-            case 'topics':
-                $this->render_topics_page();
-                break;
-            case 'topic_edit':
-                $this->render_topic_edit_page();
-                break;
-            default:
-                $this->render_sermons_list_page();
-                break;
+        if ($view === 'add' || $view === 'edit') {
+            $this->render_sermon_edit_page();
+        } else {
+            $this->render_sermons_list_page();
+        }
+    }
+
+    /**
+     * Render the Speakers submenu (list or add/edit).
+     */
+    public function render_speakers_submenu() {
+        $view = isset($_GET['view']) ? sanitize_text_field($_GET['view']) : 'list';
+
+        if ($view === 'edit') {
+            $this->render_speaker_edit_page();
+        } else {
+            $this->render_speakers_page();
+        }
+    }
+
+    /**
+     * Render the Series submenu (list or add/edit).
+     */
+    public function render_series_submenu() {
+        $view = isset($_GET['view']) ? sanitize_text_field($_GET['view']) : 'list';
+
+        if ($view === 'edit') {
+            $this->render_series_edit_page();
+        } else {
+            $this->render_series_page();
+        }
+    }
+
+    /**
+     * Render the Topics submenu (list or add/edit).
+     */
+    public function render_topics_submenu() {
+        $view = isset($_GET['view']) ? sanitize_text_field($_GET['view']) : 'list';
+
+        if ($view === 'edit') {
+            $this->render_topic_edit_page();
+        } else {
+            $this->render_topics_page();
         }
     }
 
@@ -482,7 +542,7 @@ class MyPCO_Sermons_Admin {
             $success = 'speaker_added';
         }
 
-        wp_redirect(admin_url('admin.php?page=mypco-sermons&view=speakers&success=' . $success));
+        wp_redirect(admin_url('admin.php?page=mypco-sermon-speakers&success=' . $success));
         exit;
     }
 
@@ -519,7 +579,7 @@ class MyPCO_Sermons_Admin {
             $success = 'series_added';
         }
 
-        wp_redirect(admin_url('admin.php?page=mypco-sermons&view=series&success=' . $success));
+        wp_redirect(admin_url('admin.php?page=mypco-sermon-series&success=' . $success));
         exit;
     }
 
@@ -553,7 +613,7 @@ class MyPCO_Sermons_Admin {
             $success = 'topic_added';
         }
 
-        wp_redirect(admin_url('admin.php?page=mypco-sermons&view=topics&success=' . $success));
+        wp_redirect(admin_url('admin.php?page=mypco-sermon-topics&success=' . $success));
         exit;
     }
 
@@ -587,7 +647,7 @@ class MyPCO_Sermons_Admin {
      * Handle deleting a speaker.
      */
     private function handle_delete_speaker() {
-        if (!isset($_GET['page']) || $_GET['page'] !== 'mypco-sermons') {
+        if (!isset($_GET['page']) || $_GET['page'] !== 'mypco-sermon-speakers') {
             return;
         }
 
@@ -605,7 +665,7 @@ class MyPCO_Sermons_Admin {
         global $wpdb;
         $wpdb->delete($wpdb->prefix . 'mypco_sermon_speakers', ['id' => $id], ['%d']);
 
-        wp_redirect(admin_url('admin.php?page=mypco-sermons&view=speakers&success=speaker_deleted'));
+        wp_redirect(admin_url('admin.php?page=mypco-sermon-speakers&success=speaker_deleted'));
         exit;
     }
 
@@ -613,7 +673,7 @@ class MyPCO_Sermons_Admin {
      * Handle deleting a series.
      */
     private function handle_delete_series() {
-        if (!isset($_GET['page']) || $_GET['page'] !== 'mypco-sermons') {
+        if (!isset($_GET['page']) || $_GET['page'] !== 'mypco-sermon-series') {
             return;
         }
 
@@ -631,7 +691,7 @@ class MyPCO_Sermons_Admin {
         global $wpdb;
         $wpdb->delete($wpdb->prefix . 'mypco_sermon_series', ['id' => $id], ['%d']);
 
-        wp_redirect(admin_url('admin.php?page=mypco-sermons&view=series&success=series_deleted'));
+        wp_redirect(admin_url('admin.php?page=mypco-sermon-series&success=series_deleted'));
         exit;
     }
 
@@ -639,7 +699,7 @@ class MyPCO_Sermons_Admin {
      * Handle deleting a topic.
      */
     private function handle_delete_topic() {
-        if (!isset($_GET['page']) || $_GET['page'] !== 'mypco-sermons') {
+        if (!isset($_GET['page']) || $_GET['page'] !== 'mypco-sermon-topics') {
             return;
         }
 
@@ -657,7 +717,7 @@ class MyPCO_Sermons_Admin {
         global $wpdb;
         $wpdb->delete($wpdb->prefix . 'mypco_sermon_topics', ['id' => $id], ['%d']);
 
-        wp_redirect(admin_url('admin.php?page=mypco-sermons&view=topics&success=topic_deleted'));
+        wp_redirect(admin_url('admin.php?page=mypco-sermon-topics&success=topic_deleted'));
         exit;
     }
 
