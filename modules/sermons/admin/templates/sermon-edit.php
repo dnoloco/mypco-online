@@ -60,7 +60,7 @@ $page_title = $is_edit ? __('Edit Sermon', 'mypco-online') : __('Add New Sermon'
                             </option>
                         <?php endforeach; ?>
                     </select>
-                    <a href="<?php echo esc_url($base_url . '&view=speaker_edit'); ?>" class="button button-small"><?php _e('+ New Speaker', 'mypco-online'); ?></a>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=mypco-sermon-speakers&view=edit')); ?>" class="button button-small"><?php _e('+ New Speaker', 'mypco-online'); ?></a>
                 </td>
             </tr>
             <tr>
@@ -77,7 +77,7 @@ $page_title = $is_edit ? __('Edit Sermon', 'mypco-online') : __('Add New Sermon'
                             </option>
                         <?php endforeach; ?>
                     </select>
-                    <a href="<?php echo esc_url($base_url . '&view=series_edit'); ?>" class="button button-small"><?php _e('+ New Series', 'mypco-online'); ?></a>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=mypco-sermon-series&view=edit')); ?>" class="button button-small"><?php _e('+ New Series', 'mypco-online'); ?></a>
                 </td>
             </tr>
             <tr>
@@ -94,7 +94,7 @@ $page_title = $is_edit ? __('Edit Sermon', 'mypco-online') : __('Add New Sermon'
                             </option>
                         <?php endforeach; ?>
                     </select>
-                    <a href="<?php echo esc_url($base_url . '&view=topic_edit'); ?>" class="button button-small"><?php _e('+ New Topic', 'mypco-online'); ?></a>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=mypco-sermon-topics&view=edit')); ?>" class="button button-small"><?php _e('+ New Topic', 'mypco-online'); ?></a>
                 </td>
             </tr>
             <tr>

@@ -9,12 +9,12 @@
 
 defined('ABSPATH') || exit;
 
-$base_url = admin_url('admin.php?page=mypco-sermons');
+$base_url = admin_url('admin.php?page=mypco-sermon-series');
 ?>
 
 <div class="wrap">
     <h1 class="wp-heading-inline"><?php _e('Series', 'mypco-online'); ?></h1>
-    <a href="<?php echo esc_url($base_url . '&view=series_edit'); ?>" class="page-title-action"><?php _e('Add New', 'mypco-online'); ?></a>
+    <a href="<?php echo esc_url($base_url . '&view=edit'); ?>" class="page-title-action"><?php _e('Add New', 'mypco-online'); ?></a>
 
     <?php if ($success): ?>
         <div class="notice notice-success is-dismissible">
@@ -38,14 +38,6 @@ $base_url = admin_url('admin.php?page=mypco-sermons');
         </div>
     <?php endif; ?>
 
-    <!-- Navigation Tabs -->
-    <nav class="nav-tab-wrapper mypco-sermons-tabs">
-        <a href="<?php echo esc_url($base_url); ?>" class="nav-tab"><?php _e('Sermons', 'mypco-online'); ?></a>
-        <a href="<?php echo esc_url($base_url . '&view=speakers'); ?>" class="nav-tab"><?php _e('Speakers', 'mypco-online'); ?></a>
-        <a href="<?php echo esc_url($base_url . '&view=series'); ?>" class="nav-tab nav-tab-active"><?php _e('Series', 'mypco-online'); ?></a>
-        <a href="<?php echo esc_url($base_url . '&view=topics'); ?>" class="nav-tab"><?php _e('Topics', 'mypco-online'); ?></a>
-    </nav>
-
     <table class="wp-list-table widefat fixed striped table-view-list">
         <thead>
         <tr>
@@ -60,12 +52,12 @@ $base_url = admin_url('admin.php?page=mypco-sermons');
             <tr class="no-items">
                 <td class="colspanchange" colspan="4">
                     <?php _e('No series found.', 'mypco-online'); ?>
-                    <a href="<?php echo esc_url($base_url . '&view=series_edit'); ?>"><?php _e('Add your first series', 'mypco-online'); ?></a>
+                    <a href="<?php echo esc_url($base_url . '&view=edit'); ?>"><?php _e('Add your first series', 'mypco-online'); ?></a>
                 </td>
             </tr>
         <?php else: ?>
             <?php foreach ($all_series as $series):
-                $edit_url = esc_url($base_url . '&view=series_edit&id=' . $series->id);
+                $edit_url = esc_url($base_url . '&view=edit&id=' . $series->id);
                 $delete_url = wp_nonce_url($base_url . '&action=delete_series&id=' . $series->id, 'mypco_delete_series_' . $series->id);
 
                 $date_display = '';
