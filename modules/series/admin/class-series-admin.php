@@ -1,16 +1,16 @@
 <?php
 /**
- * Sermons Admin Component
+ * Series Admin Component
  *
- * Handles all backend/admin functionality for the Sermons module.
- * Provides CRUD operations for sermons, speakers, series, and topics.
+ * Handles all backend/admin functionality for the Series module.
+ * Provides CRUD operations for series, messages, speakers, and topics.
  */
 
 if (!defined('ABSPATH')) {
     exit;
 }
 
-class MyPCO_Sermons_Admin {
+class MyPCO_Series_Admin {
 
     private $loader;
     private $api_model;
@@ -35,57 +35,47 @@ class MyPCO_Sermons_Admin {
     // =========================================================================
 
     /**
-     * Add top-level Messages menu with submenus.
+     * Add top-level Series menu with submenus.
      */
     public function add_admin_pages() {
         // Top-level menu
         add_menu_page(
-            __('Messages', 'mypco-online'),
-            __('Messages', 'mypco-online'),
+            __('Series', 'mypco-online'),
+            __('Series', 'mypco-online'),
             'edit_posts',
-            'mypco-sermons',
-            [$this, 'render_sermons_page'],
+            'mypco-series',
+            [$this, 'render_series_submenu'],
             'dashicons-microphone',
             26
         );
 
-        // Submenu: All Messages (replaces the auto-generated first item)
+        // Submenu: Edit Series (replaces the auto-generated first item)
         add_submenu_page(
-            'mypco-sermons',
-            __('All Messages', 'mypco-online'),
-            __('All Messages', 'mypco-online'),
+            'mypco-series',
+            __('Edit Series', 'mypco-online'),
+            __('Edit Series', 'mypco-online'),
             'edit_posts',
-            'mypco-sermons',
-            [$this, 'render_sermons_page']
-        );
-
-        // Submenu: Speakers
-        add_submenu_page(
-            'mypco-sermons',
-            __('Speakers', 'mypco-online'),
-            __('Speakers', 'mypco-online'),
-            'edit_posts',
-            'mypco-sermon-speakers',
-            [$this, 'render_speakers_submenu']
-        );
-
-        // Submenu: Series
-        add_submenu_page(
-            'mypco-sermons',
-            __('Series', 'mypco-online'),
-            __('Series', 'mypco-online'),
-            'edit_posts',
-            'mypco-sermon-series',
+            'mypco-series',
             [$this, 'render_series_submenu']
         );
 
-        // Submenu: Topics
+        // Submenu: Edit Speakers
         add_submenu_page(
-            'mypco-sermons',
-            __('Topics', 'mypco-online'),
-            __('Topics', 'mypco-online'),
+            'mypco-series',
+            __('Edit Speakers', 'mypco-online'),
+            __('Edit Speakers', 'mypco-online'),
             'edit_posts',
-            'mypco-sermon-topics',
+            'mypco-series-speakers',
+            [$this, 'render_speakers_submenu']
+        );
+
+        // Submenu: Edit Topics
+        add_submenu_page(
+            'mypco-series',
+            __('Edit Topics', 'mypco-online'),
+            __('Edit Topics', 'mypco-online'),
+            'edit_posts',
+            'mypco-series-topics',
             [$this, 'render_topics_submenu']
         );
     }
@@ -94,23 +84,23 @@ class MyPCO_Sermons_Admin {
      * Enqueue admin-specific assets.
      */
     public function enqueue_admin_assets($hook) {
-        // Match any of our sermon admin pages
-        if (strpos($hook, 'mypco-sermon') === false) {
+        // Match any of our series admin pages
+        if (strpos($hook, 'mypco-series') === false) {
             return;
         }
 
         wp_enqueue_media();
 
         wp_enqueue_style(
-            'mypco-sermons-admin',
-            MYPCO_PLUGIN_URL . 'modules/sermons/admin/assets/css/sermons-admin.css',
+            'mypco-series-admin',
+            MYPCO_PLUGIN_URL . 'modules/series/admin/assets/css/series-admin.css',
             [],
             MYPCO_VERSION
         );
 
         wp_enqueue_script(
-            'mypco-sermons-admin',
-            MYPCO_PLUGIN_URL . 'modules/sermons/admin/assets/js/sermons-admin.js',
+            'mypco-series-admin',
+            MYPCO_PLUGIN_URL . 'modules/series/admin/assets/js/series-admin.js',
             ['jquery'],
             MYPCO_VERSION,
             true
@@ -122,15 +112,17 @@ class MyPCO_Sermons_Admin {
     // =========================================================================
 
     /**
-     * Render the Sermons submenu (list or add/edit).
+     * Render the Series submenu (list, add/edit series, or add/edit message).
      */
-    public function render_sermons_page() {
+    public function render_series_submenu() {
         $view = isset($_GET['view']) ? sanitize_text_field($_GET['view']) : 'list';
 
-        if ($view === 'add' || $view === 'edit') {
-            $this->render_sermon_edit_page();
+        if ($view === 'edit' || $view === 'add_series') {
+            $this->render_series_edit_page();
+        } elseif ($view === 'edit_message' || $view === 'add_message') {
+            $this->render_message_edit_page();
         } else {
-            $this->render_sermons_list_page();
+            $this->render_series_list_page();
         }
     }
 
@@ -148,19 +140,6 @@ class MyPCO_Sermons_Admin {
     }
 
     /**
-     * Render the Series submenu (list or add/edit).
-     */
-    public function render_series_submenu() {
-        $view = isset($_GET['view']) ? sanitize_text_field($_GET['view']) : 'list';
-
-        if ($view === 'edit') {
-            $this->render_series_edit_page();
-        } else {
-            $this->render_series_page();
-        }
-    }
-
-    /**
      * Render the Topics submenu (list or add/edit).
      */
     public function render_topics_submenu() {
@@ -174,117 +153,126 @@ class MyPCO_Sermons_Admin {
     }
 
     // =========================================================================
-    // Sermons List
+    // Series List (Main Page)
     // =========================================================================
 
     /**
-     * Render the sermons list page.
+     * Render the series list page (main page).
      */
-    private function render_sermons_list_page() {
+    private function render_series_list_page() {
         global $wpdb;
-        $table_sermons = $wpdb->prefix . 'mypco_sermons';
-        $table_speakers = $wpdb->prefix . 'mypco_sermon_speakers';
-        $table_series = $wpdb->prefix . 'mypco_sermon_series';
+        $table_series = $wpdb->prefix . 'mypco_series';
+        $table_messages = $wpdb->prefix . 'mypco_messages';
 
-        // Filters
-        $filter_series = isset($_GET['filter_series']) ? absint($_GET['filter_series']) : 0;
-        $filter_speaker = isset($_GET['filter_speaker']) ? absint($_GET['filter_speaker']) : 0;
-        $search = isset($_GET['s']) ? sanitize_text_field($_GET['s']) : '';
-
-        $where = '1=1';
-        $params = [];
-
-        if ($filter_series > 0) {
-            $where .= ' AND s.series_id = %d';
-            $params[] = $filter_series;
-        }
-
-        if ($filter_speaker > 0) {
-            $where .= ' AND s.speaker_id = %d';
-            $params[] = $filter_speaker;
-        }
-
-        if (!empty($search)) {
-            $where .= ' AND s.title LIKE %s';
-            $params[] = '%' . $wpdb->esc_like($search) . '%';
-        }
-
-        $query = "SELECT s.*,
-                    sp.name AS speaker_name,
-                    sr.title AS series_title
-                  FROM {$table_sermons} s
-                  LEFT JOIN {$table_speakers} sp ON s.speaker_id = sp.id
-                  LEFT JOIN {$table_series} sr ON s.series_id = sr.id
-                  WHERE {$where}
-                  ORDER BY s.sermon_date DESC";
-
-        if (!empty($params)) {
-            $sermons = $wpdb->get_results($wpdb->prepare($query, $params));
-        } else {
-            $sermons = $wpdb->get_results($query);
-        }
-
-        // Get all speakers and series for filter dropdowns
-        $speakers = $wpdb->get_results("SELECT id, name FROM {$table_speakers} ORDER BY name ASC");
-        $all_series = $wpdb->get_results("SELECT id, title FROM {$table_series} ORDER BY title ASC");
+        $all_series = $wpdb->get_results(
+            "SELECT s.*, COUNT(m.id) AS message_count
+             FROM {$table_series} s
+             LEFT JOIN {$table_messages} m ON m.series_id = s.id
+             GROUP BY s.id
+             ORDER BY s.start_date DESC"
+        );
 
         $data = [
-            'sermons'        => $sermons,
-            'speakers'       => $speakers,
-            'all_series'     => $all_series,
-            'filter_series'  => $filter_series,
-            'filter_speaker' => $filter_speaker,
-            'search'         => $search,
-            'success'        => isset($_GET['success']) ? sanitize_text_field($_GET['success']) : '',
+            'all_series' => $all_series,
+            'success'    => isset($_GET['success']) ? sanitize_text_field($_GET['success']) : '',
         ];
 
-        $this->load_template('sermons-page', $data);
+        $this->load_template('series-page', $data);
     }
 
     // =========================================================================
-    // Sermon Add/Edit
+    // Series Add/Edit (with Messages)
     // =========================================================================
 
     /**
-     * Render the sermon add/edit page.
+     * Render the series add/edit page.
      */
-    private function render_sermon_edit_page() {
+    private function render_series_edit_page() {
         global $wpdb;
-        $table_sermons = $wpdb->prefix . 'mypco_sermons';
-        $table_speakers = $wpdb->prefix . 'mypco_sermon_speakers';
-        $table_series = $wpdb->prefix . 'mypco_sermon_series';
-        $table_topics = $wpdb->prefix . 'mypco_sermon_topics';
+        $table_series = $wpdb->prefix . 'mypco_series';
+        $table_messages = $wpdb->prefix . 'mypco_messages';
+        $table_speakers = $wpdb->prefix . 'mypco_speakers';
 
-        $view = sanitize_text_field($_GET['view']);
-        $sermon = null;
+        $series = null;
+        $messages = [];
+        $id = isset($_GET['id']) ? absint($_GET['id']) : 0;
 
-        if ($view === 'edit') {
-            $id = isset($_GET['id']) ? absint($_GET['id']) : 0;
-            if ($id > 0) {
-                $sermon = $wpdb->get_row($wpdb->prepare(
-                    "SELECT * FROM {$table_sermons} WHERE id = %d",
+        if ($id > 0) {
+            $series = $wpdb->get_row($wpdb->prepare(
+                "SELECT * FROM {$table_series} WHERE id = %d",
+                $id
+            ));
+
+            if ($series) {
+                // Fetch messages in this series
+                $messages = $wpdb->get_results($wpdb->prepare(
+                    "SELECT m.*, sp.name AS speaker_name
+                     FROM {$table_messages} m
+                     LEFT JOIN {$table_speakers} sp ON m.speaker_id = sp.id
+                     WHERE m.series_id = %d
+                     ORDER BY m.message_date DESC",
                     $id
                 ));
             }
-            if (!$sermon) {
-                wp_redirect(admin_url('admin.php?page=mypco-sermons'));
+        }
+
+        $data = [
+            'series'   => $series,
+            'messages' => $messages,
+            'is_edit'  => ($id > 0 && $series),
+        ];
+
+        $this->load_template('series-edit', $data);
+    }
+
+    // =========================================================================
+    // Message Add/Edit
+    // =========================================================================
+
+    /**
+     * Render the message add/edit page.
+     */
+    private function render_message_edit_page() {
+        global $wpdb;
+        $table_messages = $wpdb->prefix . 'mypco_messages';
+        $table_speakers = $wpdb->prefix . 'mypco_speakers';
+        $table_series = $wpdb->prefix . 'mypco_series';
+        $table_topics = $wpdb->prefix . 'mypco_topics';
+
+        $view = sanitize_text_field($_GET['view']);
+        $message = null;
+
+        if ($view === 'edit_message') {
+            $id = isset($_GET['id']) ? absint($_GET['id']) : 0;
+            if ($id > 0) {
+                $message = $wpdb->get_row($wpdb->prepare(
+                    "SELECT * FROM {$table_messages} WHERE id = %d",
+                    $id
+                ));
+            }
+            if (!$message) {
+                wp_redirect(admin_url('admin.php?page=mypco-series'));
                 exit;
             }
         }
+
+        // Pre-select series if coming from a series edit page
+        $preselect_series = isset($_GET['series_id']) ? absint($_GET['series_id']) : 0;
 
         $speakers = $wpdb->get_results("SELECT id, name FROM {$table_speakers} ORDER BY name ASC");
         $all_series = $wpdb->get_results("SELECT id, title FROM {$table_series} ORDER BY title ASC");
         $topics = $wpdb->get_results("SELECT id, name FROM {$table_topics} ORDER BY name ASC");
 
         $data = [
-            'sermon'     => $sermon,
-            'speakers'   => $speakers,
-            'all_series' => $all_series,
-            'topics'     => $topics,
-            'is_edit'    => ($view === 'edit'),
+            'message'          => $message,
+            'speakers'         => $speakers,
+            'all_series'       => $all_series,
+            'topics'           => $topics,
+            'is_edit'          => ($view === 'edit_message'),
+            'preselect_series' => $preselect_series,
         ];
 
-        $this->load_template('sermon-edit', $data);
+        $this->load_template('message-edit', $data);
     }
 
     // =========================================================================
@@ -296,7 +284,7 @@ class MyPCO_Sermons_Admin {
      */
     private function render_speakers_page() {
         global $wpdb;
-        $table = $wpdb->prefix . 'mypco_sermon_speakers';
+        $table = $wpdb->prefix . 'mypco_speakers';
 
         $speakers = $wpdb->get_results("SELECT * FROM {$table} ORDER BY name ASC");
 
@@ -313,7 +301,7 @@ class MyPCO_Sermons_Admin {
      */
     private function render_speaker_edit_page() {
         global $wpdb;
-        $table = $wpdb->prefix . 'mypco_sermon_speakers';
+        $table = $wpdb->prefix . 'mypco_speakers';
 
         $speaker = null;
         $id = isset($_GET['id']) ? absint($_GET['id']) : 0;
@@ -334,52 +322,6 @@ class MyPCO_Sermons_Admin {
     }
 
     // =========================================================================
-    // Series
-    // =========================================================================
-
-    /**
-     * Render the series management page.
-     */
-    private function render_series_page() {
-        global $wpdb;
-        $table = $wpdb->prefix . 'mypco_sermon_series';
-
-        $all_series = $wpdb->get_results("SELECT * FROM {$table} ORDER BY start_date DESC");
-
-        $data = [
-            'all_series' => $all_series,
-            'success'    => isset($_GET['success']) ? sanitize_text_field($_GET['success']) : '',
-        ];
-
-        $this->load_template('series-page', $data);
-    }
-
-    /**
-     * Render the series add/edit page.
-     */
-    private function render_series_edit_page() {
-        global $wpdb;
-        $table = $wpdb->prefix . 'mypco_sermon_series';
-
-        $series = null;
-        $id = isset($_GET['id']) ? absint($_GET['id']) : 0;
-
-        if ($id > 0) {
-            $series = $wpdb->get_row($wpdb->prepare(
-                "SELECT * FROM {$table} WHERE id = %d",
-                $id
-            ));
-        }
-
-        $data = [
-            'series'  => $series,
-            'is_edit' => ($id > 0 && $series),
-        ];
-
-        $this->load_template('series-edit', $data);
-    }
-
-    // =========================================================================
     // Topics
     // =========================================================================
 
@@ -388,7 +330,7 @@ class MyPCO_Sermons_Admin {
      */
     private function render_topics_page() {
         global $wpdb;
-        $table = $wpdb->prefix . 'mypco_sermon_topics';
+        $table = $wpdb->prefix . 'mypco_topics';
 
         $topics = $wpdb->get_results("SELECT * FROM {$table} ORDER BY name ASC");
 
@@ -405,7 +347,7 @@ class MyPCO_Sermons_Admin {
      */
     private function render_topic_edit_page() {
         global $wpdb;
-        $table = $wpdb->prefix . 'mypco_sermon_topics';
+        $table = $wpdb->prefix . 'mypco_topics';
 
         $topic = null;
         $id = isset($_GET['id']) ? absint($_GET['id']) : 0;
@@ -433,8 +375,8 @@ class MyPCO_Sermons_Admin {
      * Handle all form submissions.
      */
     public function handle_form_submissions() {
-        if (isset($_POST['mypco_save_sermon'])) {
-            $this->handle_save_sermon();
+        if (isset($_POST['mypco_save_message'])) {
+            $this->handle_save_message();
         }
 
         if (isset($_POST['mypco_save_speaker'])) {
@@ -449,8 +391,8 @@ class MyPCO_Sermons_Admin {
             $this->handle_save_topic();
         }
 
-        if (isset($_GET['action']) && $_GET['action'] === 'delete_sermon') {
-            $this->handle_delete_sermon();
+        if (isset($_GET['action']) && $_GET['action'] === 'delete_message') {
+            $this->handle_delete_message();
         }
 
         if (isset($_GET['action']) && $_GET['action'] === 'delete_speaker') {
@@ -467,46 +409,52 @@ class MyPCO_Sermons_Admin {
     }
 
     /**
-     * Handle saving a sermon.
+     * Handle saving a message.
      */
-    private function handle_save_sermon() {
-        check_admin_referer('mypco_save_sermon');
+    private function handle_save_message() {
+        check_admin_referer('mypco_save_message');
 
         if (!current_user_can('edit_posts')) {
             return;
         }
 
         global $wpdb;
-        $table = $wpdb->prefix . 'mypco_sermons';
+        $table = $wpdb->prefix . 'mypco_messages';
 
-        $id = isset($_POST['sermon_id']) ? absint($_POST['sermon_id']) : 0;
+        $id = isset($_POST['message_id']) ? absint($_POST['message_id']) : 0;
+        $series_id = absint($_POST['series_id'] ?? 0);
 
         $data = [
-            'title'       => sanitize_text_field($_POST['sermon_title'] ?? ''),
-            'sermon_date' => sanitize_text_field($_POST['sermon_date'] ?? ''),
-            'speaker_id'  => absint($_POST['speaker_id'] ?? 0),
-            'series_id'   => absint($_POST['series_id'] ?? 0),
-            'topic_id'    => absint($_POST['topic_id'] ?? 0),
-            'scripture'   => sanitize_text_field($_POST['sermon_scripture'] ?? ''),
-            'description' => sanitize_textarea_field($_POST['sermon_description'] ?? ''),
-            'audio_url'   => esc_url_raw($_POST['sermon_audio_url'] ?? ''),
-            'video_url'   => esc_url_raw($_POST['sermon_video_url'] ?? ''),
-            'image_url'   => esc_url_raw($_POST['sermon_image_url'] ?? ''),
+            'title'        => sanitize_text_field($_POST['message_title'] ?? ''),
+            'message_date' => sanitize_text_field($_POST['message_date'] ?? ''),
+            'speaker_id'   => absint($_POST['speaker_id'] ?? 0),
+            'series_id'    => $series_id,
+            'topic_id'     => absint($_POST['topic_id'] ?? 0),
+            'scripture'    => sanitize_text_field($_POST['message_scripture'] ?? ''),
+            'description'  => sanitize_textarea_field($_POST['message_description'] ?? ''),
+            'audio_url'    => esc_url_raw($_POST['message_audio_url'] ?? ''),
+            'video_url'    => esc_url_raw($_POST['message_video_url'] ?? ''),
+            'image_url'    => esc_url_raw($_POST['message_image_url'] ?? ''),
         ];
 
         $format = ['%s', '%s', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s'];
 
         if ($id > 0) {
             $wpdb->update($table, $data, ['id' => $id], $format, ['%d']);
-            $success = 'sermon_updated';
+            $success = 'message_updated';
         } else {
             $data['created_at'] = current_time('mysql');
             $format[] = '%s';
             $wpdb->insert($table, $data, $format);
-            $success = 'sermon_added';
+            $success = 'message_added';
         }
 
-        wp_redirect(admin_url('admin.php?page=mypco-sermons&success=' . $success));
+        // Redirect back to series edit page if we have a series_id
+        if ($series_id > 0) {
+            wp_redirect(admin_url('admin.php?page=mypco-series&view=edit&id=' . $series_id . '&success=' . $success));
+        } else {
+            wp_redirect(admin_url('admin.php?page=mypco-series&success=' . $success));
+        }
         exit;
     }
 
@@ -521,7 +469,7 @@ class MyPCO_Sermons_Admin {
         }
 
         global $wpdb;
-        $table = $wpdb->prefix . 'mypco_sermon_speakers';
+        $table = $wpdb->prefix . 'mypco_speakers';
 
         $id = isset($_POST['speaker_id']) ? absint($_POST['speaker_id']) : 0;
 
@@ -542,7 +490,7 @@ class MyPCO_Sermons_Admin {
             $success = 'speaker_added';
         }
 
-        wp_redirect(admin_url('admin.php?page=mypco-sermon-speakers&success=' . $success));
+        wp_redirect(admin_url('admin.php?page=mypco-series-speakers&success=' . $success));
         exit;
     }
 
@@ -557,7 +505,7 @@ class MyPCO_Sermons_Admin {
         }
 
         global $wpdb;
-        $table = $wpdb->prefix . 'mypco_sermon_series';
+        $table = $wpdb->prefix . 'mypco_series';
 
         $id = isset($_POST['series_id']) ? absint($_POST['series_id']) : 0;
 
@@ -574,12 +522,13 @@ class MyPCO_Sermons_Admin {
         if ($id > 0) {
             $wpdb->update($table, $data, ['id' => $id], $format, ['%d']);
             $success = 'series_updated';
+            wp_redirect(admin_url('admin.php?page=mypco-series&view=edit&id=' . $id . '&success=' . $success));
         } else {
             $wpdb->insert($table, $data, $format);
+            $new_id = $wpdb->insert_id;
             $success = 'series_added';
+            wp_redirect(admin_url('admin.php?page=mypco-series&view=edit&id=' . $new_id . '&success=' . $success));
         }
-
-        wp_redirect(admin_url('admin.php?page=mypco-sermon-series&success=' . $success));
         exit;
     }
 
@@ -594,7 +543,7 @@ class MyPCO_Sermons_Admin {
         }
 
         global $wpdb;
-        $table = $wpdb->prefix . 'mypco_sermon_topics';
+        $table = $wpdb->prefix . 'mypco_topics';
 
         $id = isset($_POST['topic_id']) ? absint($_POST['topic_id']) : 0;
 
@@ -613,15 +562,15 @@ class MyPCO_Sermons_Admin {
             $success = 'topic_added';
         }
 
-        wp_redirect(admin_url('admin.php?page=mypco-sermon-topics&success=' . $success));
+        wp_redirect(admin_url('admin.php?page=mypco-series-topics&success=' . $success));
         exit;
     }
 
     /**
-     * Handle deleting a sermon.
+     * Handle deleting a message.
      */
-    private function handle_delete_sermon() {
-        if (!isset($_GET['page']) || $_GET['page'] !== 'mypco-sermons') {
+    private function handle_delete_message() {
+        if (!isset($_GET['page']) || $_GET['page'] !== 'mypco-series') {
             return;
         }
 
@@ -630,16 +579,27 @@ class MyPCO_Sermons_Admin {
             return;
         }
 
-        check_admin_referer('mypco_delete_sermon_' . $id);
+        check_admin_referer('mypco_delete_message_' . $id);
 
         if (!current_user_can('edit_posts')) {
             return;
         }
 
         global $wpdb;
-        $wpdb->delete($wpdb->prefix . 'mypco_sermons', ['id' => $id], ['%d']);
+        // Get the series_id before deleting so we can redirect back
+        $message = $wpdb->get_row($wpdb->prepare(
+            "SELECT series_id FROM {$wpdb->prefix}mypco_messages WHERE id = %d",
+            $id
+        ));
+        $series_id = $message ? $message->series_id : 0;
 
-        wp_redirect(admin_url('admin.php?page=mypco-sermons&success=sermon_deleted'));
+        $wpdb->delete($wpdb->prefix . 'mypco_messages', ['id' => $id], ['%d']);
+
+        if ($series_id > 0) {
+            wp_redirect(admin_url('admin.php?page=mypco-series&view=edit&id=' . $series_id . '&success=message_deleted'));
+        } else {
+            wp_redirect(admin_url('admin.php?page=mypco-series&success=message_deleted'));
+        }
         exit;
     }
 
@@ -647,7 +607,7 @@ class MyPCO_Sermons_Admin {
      * Handle deleting a speaker.
      */
     private function handle_delete_speaker() {
-        if (!isset($_GET['page']) || $_GET['page'] !== 'mypco-sermon-speakers') {
+        if (!isset($_GET['page']) || $_GET['page'] !== 'mypco-series-speakers') {
             return;
         }
 
@@ -663,9 +623,9 @@ class MyPCO_Sermons_Admin {
         }
 
         global $wpdb;
-        $wpdb->delete($wpdb->prefix . 'mypco_sermon_speakers', ['id' => $id], ['%d']);
+        $wpdb->delete($wpdb->prefix . 'mypco_speakers', ['id' => $id], ['%d']);
 
-        wp_redirect(admin_url('admin.php?page=mypco-sermon-speakers&success=speaker_deleted'));
+        wp_redirect(admin_url('admin.php?page=mypco-series-speakers&success=speaker_deleted'));
         exit;
     }
 
@@ -673,7 +633,7 @@ class MyPCO_Sermons_Admin {
      * Handle deleting a series.
      */
     private function handle_delete_series() {
-        if (!isset($_GET['page']) || $_GET['page'] !== 'mypco-sermon-series') {
+        if (!isset($_GET['page']) || $_GET['page'] !== 'mypco-series') {
             return;
         }
 
@@ -689,9 +649,9 @@ class MyPCO_Sermons_Admin {
         }
 
         global $wpdb;
-        $wpdb->delete($wpdb->prefix . 'mypco_sermon_series', ['id' => $id], ['%d']);
+        $wpdb->delete($wpdb->prefix . 'mypco_series', ['id' => $id], ['%d']);
 
-        wp_redirect(admin_url('admin.php?page=mypco-sermon-series&success=series_deleted'));
+        wp_redirect(admin_url('admin.php?page=mypco-series&success=series_deleted'));
         exit;
     }
 
@@ -699,7 +659,7 @@ class MyPCO_Sermons_Admin {
      * Handle deleting a topic.
      */
     private function handle_delete_topic() {
-        if (!isset($_GET['page']) || $_GET['page'] !== 'mypco-sermon-topics') {
+        if (!isset($_GET['page']) || $_GET['page'] !== 'mypco-series-topics') {
             return;
         }
 
@@ -715,9 +675,9 @@ class MyPCO_Sermons_Admin {
         }
 
         global $wpdb;
-        $wpdb->delete($wpdb->prefix . 'mypco_sermon_topics', ['id' => $id], ['%d']);
+        $wpdb->delete($wpdb->prefix . 'mypco_topics', ['id' => $id], ['%d']);
 
-        wp_redirect(admin_url('admin.php?page=mypco-sermon-topics&success=topic_deleted'));
+        wp_redirect(admin_url('admin.php?page=mypco-series-topics&success=topic_deleted'));
         exit;
     }
 
@@ -726,23 +686,23 @@ class MyPCO_Sermons_Admin {
     // =========================================================================
 
     /**
-     * Customize the upload directory for sermon module uploads.
+     * Customize the upload directory for series module uploads.
      *
      * When uploads come from our admin pages with a mypco_upload_type param,
      * route them into organised subdirectories:
-     *   wp-content/uploads/mypco-sermons/speakers/
-     *   wp-content/uploads/mypco-sermons/sermons/
-     *   wp-content/uploads/mypco-sermons/series/
+     *   wp-content/uploads/mypco-series/speakers/
+     *   wp-content/uploads/mypco-series/messages/
+     *   wp-content/uploads/mypco-series/series/
      */
     public function custom_upload_dir($uploads) {
         $type = isset($_REQUEST['mypco_upload_type']) ? sanitize_key($_REQUEST['mypco_upload_type']) : '';
 
-        $allowed = ['speakers', 'sermons', 'series'];
+        $allowed = ['speakers', 'messages', 'series'];
         if (empty($type) || !in_array($type, $allowed, true)) {
             return $uploads;
         }
 
-        $subdir = '/mypco-sermons/' . $type;
+        $subdir = '/mypco-series/' . $type;
 
         $uploads['subdir'] = $subdir;
         $uploads['path']   = $uploads['basedir'] . $subdir;
@@ -756,7 +716,7 @@ class MyPCO_Sermons_Admin {
      */
     private function load_template($template_name, $data = []) {
         extract($data);
-        $template_path = MYPCO_PLUGIN_DIR . 'modules/sermons/admin/templates/' . $template_name . '.php';
+        $template_path = MYPCO_PLUGIN_DIR . 'modules/series/admin/templates/' . $template_name . '.php';
 
         if (file_exists($template_path)) {
             include $template_path;

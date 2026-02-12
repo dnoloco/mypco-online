@@ -1,9 +1,9 @@
 /**
- * Sermons Public JavaScript
+ * Series Public JavaScript
  *
  * Handles inline video playback - replaces thumbnail with embedded iframe
  * when the play button is clicked. Works on both the list view and the
- * single sermon detail page.
+ * single message detail page.
  */
 (function($) {
     'use strict';
@@ -11,9 +11,9 @@
     $(document).ready(function() {
 
         // Play button click: swap thumbnail for embedded iframe
-        // Matches video containers in both list view (.mypco-sermon-video-player)
-        // and single view (.mypco-sermon-single-video)
-        $(document).on('click', '.mypco-sermon-video-thumb', function() {
+        // Matches video containers in both list view (.mypco-message-video-player)
+        // and single view (.mypco-message-single-video)
+        $(document).on('click', '.mypco-message-video-thumb', function() {
             var $player = $(this).closest('[data-embed-url]');
             var embedUrl = $player.data('embed-url');
 

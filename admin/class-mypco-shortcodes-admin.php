@@ -168,9 +168,9 @@ class MyPCO_Shortcodes_Admin {
                     ],
                 ],
             ],
-            'mypco_sermons_list' => [
-                'module'      => 'sermons',
-                'module_name' => 'Messages',
+            'mypco_messages_list' => [
+                'module'      => 'series',
+                'module_name' => 'Series',
                 'name'        => 'Message List',
                 'description' => 'Display a list of messages with speaker, series, and media links.',
                 'tag'         => 'mypco_messages',

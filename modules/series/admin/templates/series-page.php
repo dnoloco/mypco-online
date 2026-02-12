@@ -1,20 +1,22 @@
 <?php
 /**
- * Series Management Page Template
+ * Series List Page Template (Main Page)
  *
  * Available variables:
- * - $all_series (array)
+ * - $all_series (array) - includes message_count
  * - $success (string)
  */
 
 defined('ABSPATH') || exit;
 
-$base_url = admin_url('admin.php?page=mypco-sermon-series');
+$base_url = admin_url('admin.php?page=mypco-series');
 ?>
 
 <div class="wrap">
     <h1 class="wp-heading-inline"><?php _e('Series', 'mypco-online'); ?></h1>
-    <a href="<?php echo esc_url($base_url . '&view=edit'); ?>" class="page-title-action"><?php _e('Add New', 'mypco-online'); ?></a>
+    <a href="<?php echo esc_url($base_url . '&view=add_series'); ?>" class="page-title-action"><?php _e('Add New', 'mypco-online'); ?></a>
+
+    <p class="mypco-page-description"><?php _e('Manage your message series here. Create a series, then add messages within it.', 'mypco-online'); ?></p>
 
     <?php if ($success): ?>
         <div class="notice notice-success is-dismissible">
@@ -30,6 +32,15 @@ $base_url = admin_url('admin.php?page=mypco-sermon-series');
                     case 'series_deleted':
                         _e('Series deleted successfully.', 'mypco-online');
                         break;
+                    case 'message_added':
+                        _e('Message added successfully.', 'mypco-online');
+                        break;
+                    case 'message_updated':
+                        _e('Message updated successfully.', 'mypco-online');
+                        break;
+                    case 'message_deleted':
+                        _e('Message deleted successfully.', 'mypco-online');
+                        break;
                     default:
                         _e('Operation completed.', 'mypco-online');
                 }
@@ -43,16 +54,18 @@ $base_url = admin_url('admin.php?page=mypco-sermon-series');
         <tr>
             <th scope="col" class="manage-column column-title column-primary"><?php _e('Title', 'mypco-online'); ?></th>
             <th scope="col" class="manage-column column-description"><?php _e('Description', 'mypco-online'); ?></th>
+            <th scope="col" class="manage-column column-messages" style="width:100px;"><?php _e('Messages', 'mypco-online'); ?></th>
             <th scope="col" class="manage-column column-dates"><?php _e('Dates', 'mypco-online'); ?></th>
             <th scope="col" class="manage-column column-image"><?php _e('Image', 'mypco-online'); ?></th>
+            <th scope="col" class="manage-column column-delete" style="width:60px;"><?php _e('Delete', 'mypco-online'); ?></th>
         </tr>
         </thead>
         <tbody id="the-list">
         <?php if (empty($all_series)): ?>
             <tr class="no-items">
-                <td class="colspanchange" colspan="4">
+                <td class="colspanchange" colspan="6">
                     <?php _e('No series found.', 'mypco-online'); ?>
-                    <a href="<?php echo esc_url($base_url . '&view=edit'); ?>"><?php _e('Add your first series', 'mypco-online'); ?></a>
+                    <a href="<?php echo esc_url($base_url . '&view=add_series'); ?>"><?php _e('Add your first series', 'mypco-online'); ?></a>
                 </td>
             </tr>
         <?php else: ?>
@@ -73,11 +86,13 @@ $base_url = admin_url('admin.php?page=mypco-sermon-series');
                         <strong><a class="row-title" href="<?php echo $edit_url; ?>"><?php echo esc_html($series->title); ?></a></strong>
                         <div class="row-actions">
                             <span class="edit"><a href="<?php echo $edit_url; ?>"><?php _e('Edit', 'mypco-online'); ?></a></span>
-                            | <span class="trash"><a href="<?php echo esc_url($delete_url); ?>" class="submitdelete" onclick="return confirm('<?php esc_attr_e('Are you sure you want to delete this series?', 'mypco-online'); ?>')"><?php _e('Delete', 'mypco-online'); ?></a></span>
                         </div>
                     </td>
                     <td class="description column-description">
                         <?php echo !empty($series->description) ? esc_html(wp_trim_words($series->description, 15)) : '<span class="mypco-no-description">&mdash;</span>'; ?>
+                    </td>
+                    <td class="messages column-messages">
+                        <?php echo absint($series->message_count); ?>
                     </td>
                     <td class="dates column-dates">
                         <?php echo !empty($date_display) ? $date_display : '<span class="mypco-no-description">&mdash;</span>'; ?>
@@ -88,6 +103,11 @@ $base_url = admin_url('admin.php?page=mypco-sermon-series');
                         <?php else: ?>
                             <span class="mypco-no-description">&mdash;</span>
                         <?php endif; ?>
+                    </td>
+                    <td class="delete column-delete">
+                        <a href="<?php echo esc_url($delete_url); ?>" class="submitdelete" onclick="return confirm('<?php esc_attr_e('Are you sure you want to delete this series and all its messages?', 'mypco-online'); ?>')" title="<?php esc_attr_e('Delete', 'mypco-online'); ?>">
+                            <span class="dashicons dashicons-trash"></span>
+                        </a>
                     </td>
                 </tr>
             <?php endforeach; ?>

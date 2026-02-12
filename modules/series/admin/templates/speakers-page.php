@@ -9,7 +9,7 @@
 
 defined('ABSPATH') || exit;
 
-$base_url = admin_url('admin.php?page=mypco-sermon-speakers');
+$base_url = admin_url('admin.php?page=mypco-series-speakers');
 ?>
 
 <div class="wrap">

@@ -37,13 +37,13 @@ function mypco_delete_options() {
     delete_option('mypco_module_calendar_enabled');
     delete_option('mypco_module_groups_enabled');
     delete_option('mypco_module_services_enabled');
-    delete_option('mypco_module_messages_enabled');
+    delete_option('mypco_module_contacts_enabled');
     delete_option('mypco_module_signups_enabled');
-    delete_option('mypco_module_sermons_enabled');
+    delete_option('mypco_module_series_enabled');
 
     // License options
     delete_option('mypco_license_services');
-    delete_option('mypco_license_messages');
+    delete_option('mypco_license_series');
 
     // Other options
     delete_option('mypco_version');
@@ -77,10 +77,10 @@ function mypco_drop_tables() {
         $wpdb->prefix . 'mypco_signups',
         $wpdb->prefix . 'mypco_registrations',
         $wpdb->prefix . 'mypco_clearstream_log',
-        $wpdb->prefix . 'mypco_sermons',
-        $wpdb->prefix . 'mypco_sermon_speakers',
-        $wpdb->prefix . 'mypco_sermon_series',
-        $wpdb->prefix . 'mypco_sermon_topics'
+        $wpdb->prefix . 'mypco_messages',
+        $wpdb->prefix . 'mypco_speakers',
+        $wpdb->prefix . 'mypco_series',
+        $wpdb->prefix . 'mypco_topics'
     ];
 
     foreach ($tables as $table) {

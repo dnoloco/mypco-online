@@ -1,9 +1,9 @@
 /**
- * Sermons Admin Styles
+ * Series Admin Styles
  */
 
 /* Tabs */
-.mypco-sermons-tabs {
+.mypco-series-tabs {
     margin-bottom: 20px;
 }
 
@@ -28,7 +28,7 @@
     color: #d63638;
 }
 
-/* Media icons in sermon list */
+/* Media icons in message list */
 .column-media .dashicons {
     color: #2271b1;
     font-size: 18px;
@@ -63,8 +63,8 @@
     width: 200px;
 }
 
-/* Sermon form */
-.mypco-sermon-form .form-table th {
+/* Message form */
+.mypco-message-form .form-table th {
     width: 150px;
 }
 

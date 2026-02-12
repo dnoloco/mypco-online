@@ -1,16 +1,16 @@
 <?php
 /**
- * Messages Module (Premium)
+ * Contacts Module (Premium)
  *
  * Handles Clearstream SMS integration for sending messages to team members.
  */
 
 require_once MYPCO_PLUGIN_DIR . 'includes/class-mypco-module-base.php';
 
-class MyPCO_Messages_Module extends MyPCO_Module_Base {
+class MyPCO_Contacts_Module extends MyPCO_Module_Base {
 
-    protected $module_key = 'messages';
-    protected $module_name = 'Messages';
+    protected $module_key = 'contacts';
+    protected $module_name = 'Contacts';
     protected $module_description = 'Send mass SMS via Clearstream integration.';
 
     /**
@@ -39,29 +39,29 @@ class MyPCO_Messages_Module extends MyPCO_Module_Base {
     ];
 
     /**
-     * Initialize the Messages module.
+     * Initialize the Contacts module.
      */
     public function init() {
-        // Register admin menu page for Messages info/documentation
+        // Register admin menu page for Contacts info/documentation
         $this->loader->add_action('admin_menu', $this, 'add_info_page');
     }
 
     /**
-     * Add info page for Messages module.
+     * Add info page for Contacts module.
      */
     public function add_info_page() {
         add_submenu_page(
                 'mypco-settings',
-                __('Messages', 'mypco-online'),
-                __('Messages', 'mypco-online'),
+                __('Contacts', 'mypco-online'),
+                __('Contacts', 'mypco-online'),
                 'manage_options',
-                'mypco-messages',
+                'mypco-contacts',
                 [$this, 'render_info_page']
         );
     }
 
     /**
-     * Render Messages info page.
+     * Render Contacts info page.
      */
     public function render_info_page() {
         if (!current_user_can('manage_options')) {
@@ -75,7 +75,7 @@ class MyPCO_Messages_Module extends MyPCO_Module_Base {
 
         ?>
         <div class="wrap">
-            <h1><?php _e('Messages Module', 'mypco-online'); ?></h1>
+            <h1><?php _e('Contacts Module', 'mypco-online'); ?></h1>
 
             <?php if (!$is_configured): ?>
                 <div class="notice notice-warning">
@@ -100,8 +100,8 @@ class MyPCO_Messages_Module extends MyPCO_Module_Base {
             <?php endif; ?>
 
             <div class="card">
-                <h2><?php _e('About the Messages Module', 'mypco-online'); ?></h2>
-                <p><?php _e('The Messages module integrates with Clearstream to send SMS messages to team members scheduled in Planning Center Services.', 'mypco-online'); ?></p>
+                <h2><?php _e('About the Contacts Module', 'mypco-online'); ?></h2>
+                <p><?php _e('The Contacts module integrates with Clearstream to send SMS messages to team members scheduled in Planning Center Services.', 'mypco-online'); ?></p>
 
                 <h3><?php _e('Features', 'mypco-online'); ?></h3>
                 <ul>

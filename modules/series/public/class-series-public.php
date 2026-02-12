@@ -1,16 +1,16 @@
 <?php
 /**
- * Sermons Public Component
+ * Series Public Component
  *
- * Handles all frontend/public functionality for the Sermons module.
- * Provides shortcodes for displaying sermons in various formats.
+ * Handles all frontend/public functionality for the Series module.
+ * Provides shortcodes for displaying messages in various formats.
  */
 
 if (!defined('ABSPATH')) {
     exit;
 }
 
-class MyPCO_Sermons_Public {
+class MyPCO_Series_Public {
 
     private $loader;
     private $api_model;
@@ -24,8 +24,8 @@ class MyPCO_Sermons_Public {
      * Initialize public functionality.
      */
     public function init() {
-        add_shortcode('mypco_messages', [$this, 'render_sermons_shortcode']);
-        add_shortcode('mypco_sermons', [$this, 'render_sermons_shortcode']); // backward compat
+        add_shortcode('mypco_messages', [$this, 'render_messages_shortcode']);
+        add_shortcode('mypco_sermons', [$this, 'render_messages_shortcode']); // backward compat
         $this->loader->add_action('wp_enqueue_scripts', $this, 'enqueue_public_assets');
     }
 
@@ -44,15 +44,15 @@ class MyPCO_Sermons_Public {
         }
 
         wp_enqueue_style(
-            'mypco-sermons-public',
-            MYPCO_PLUGIN_URL . 'modules/sermons/public/assets/css/sermons.css',
+            'mypco-series-public',
+            MYPCO_PLUGIN_URL . 'modules/series/public/assets/css/series.css',
             [],
             MYPCO_VERSION
         );
 
         wp_enqueue_script(
-            'mypco-sermons-public',
-            MYPCO_PLUGIN_URL . 'modules/sermons/public/assets/js/sermons.js',
+            'mypco-series-public',
+            MYPCO_PLUGIN_URL . 'modules/series/public/assets/js/series.js',
             ['jquery'],
             MYPCO_VERSION,
             true
@@ -63,19 +63,19 @@ class MyPCO_Sermons_Public {
      * Get the URL for the default placeholder image.
      */
     public function get_placeholder_url() {
-        return MYPCO_PLUGIN_URL . 'modules/sermons/public/assets/images/sermon-placeholder.svg';
+        return MYPCO_PLUGIN_URL . 'modules/series/public/assets/images/series-placeholder.svg';
     }
 
     /**
-     * Render the sermons shortcode.
+     * Render the messages shortcode.
      *
-     * If ?mypco_sermon=ID is present, renders the single sermon detail page.
-     * Otherwise, renders the gallery of sermon cards.
+     * If ?mypco_message=ID is present, renders the single message detail page.
+     * Otherwise, renders the gallery of message cards.
      *
      * @param array $atts Shortcode attributes
      * @return string HTML output
      */
-    public function render_sermons_shortcode($atts) {
+    public function render_messages_shortcode($atts) {
         $atts = shortcode_atts([
             'id'      => 0,
             'count'   => 12,
@@ -91,7 +91,7 @@ class MyPCO_Sermons_Public {
         $id = absint($atts['id']);
         if ($id > 0) {
             require_once MYPCO_PLUGIN_DIR . 'admin/class-mypco-shortcodes-admin.php';
-            $settings = MyPCO_Shortcodes_Admin::get_shortcode_settings($id, 'mypco_sermons_list');
+            $settings = MyPCO_Shortcodes_Admin::get_shortcode_settings($id, 'mypco_messages_list');
         } else {
             $settings = [];
         }
@@ -101,14 +101,14 @@ class MyPCO_Sermons_Public {
         $view = !empty($settings['view']) ? $settings['view'] : $atts['view'];
         $order = strtoupper($atts['order']) === 'ASC' ? 'ASC' : 'DESC';
 
-        // Check for single sermon view
-        $single_id = isset($_GET['mypco_sermon']) ? absint($_GET['mypco_sermon']) : 0;
+        // Check for single message view
+        $single_id = isset($_GET['mypco_message']) ? absint($_GET['mypco_message']) : 0;
         if ($single_id > 0) {
-            return $this->render_single_sermon($single_id);
+            return $this->render_single_message($single_id);
         }
 
-        // Fetch sermons from database
-        $sermons = $this->fetch_sermons([
+        // Fetch messages from database
+        $messages = $this->fetch_messages([
             'count'   => $count,
             'series'  => $atts['series'],
             'speaker' => $atts['speaker'],
@@ -117,14 +117,14 @@ class MyPCO_Sermons_Public {
             'order'   => $order,
         ]);
 
-        if (empty($sermons)) {
-            return '<div class="mypco-sermons-empty"><p>' . esc_html__('No messages found.', 'mypco-online') . '</p></div>';
+        if (empty($messages)) {
+            return '<div class="mypco-messages-empty"><p>' . esc_html__('No messages found.', 'mypco-online') . '</p></div>';
         }
 
-        $template = ($view === 'list') ? 'sermons-list' : 'sermons-gallery';
+        $template = ($view === 'list') ? 'messages-list' : 'messages-gallery';
 
         return $this->load_template($template, [
-            'sermons'         => $sermons,
+            'messages'        => $messages,
             'view'            => $view,
             'atts'            => $atts,
             'placeholder_url' => $this->get_placeholder_url(),
@@ -132,67 +132,67 @@ class MyPCO_Sermons_Public {
     }
 
     /**
-     * Render a single sermon detail page.
+     * Render a single message detail page.
      *
-     * @param int $sermon_id Sermon ID.
+     * @param int $message_id Message ID.
      * @return string HTML output.
      */
-    private function render_single_sermon($sermon_id) {
-        $sermon = $this->fetch_single_sermon($sermon_id);
+    private function render_single_message($message_id) {
+        $message = $this->fetch_single_message($message_id);
 
-        if (!$sermon) {
-            return '<div class="mypco-sermons-empty"><p>' . esc_html__('Message not found.', 'mypco-online') . '</p></div>';
+        if (!$message) {
+            return '<div class="mypco-messages-empty"><p>' . esc_html__('Message not found.', 'mypco-online') . '</p></div>';
         }
 
-        return $this->load_template('sermon-single', [
-            'sermon'          => $sermon,
+        return $this->load_template('message-single', [
+            'message'         => $message,
             'placeholder_url' => $this->get_placeholder_url(),
         ]);
     }
 
     /**
-     * Fetch a single sermon by ID with all joined data.
+     * Fetch a single message by ID with all joined data.
      *
-     * @param int $sermon_id Sermon ID.
-     * @return object|null Sermon object or null.
+     * @param int $message_id Message ID.
+     * @return object|null Message object or null.
      */
-    private function fetch_single_sermon($sermon_id) {
+    private function fetch_single_message($message_id) {
         global $wpdb;
 
-        $table_sermons = $wpdb->prefix . 'mypco_sermons';
-        $table_speakers = $wpdb->prefix . 'mypco_sermon_speakers';
-        $table_series = $wpdb->prefix . 'mypco_sermon_series';
-        $table_topics = $wpdb->prefix . 'mypco_sermon_topics';
+        $table_messages = $wpdb->prefix . 'mypco_messages';
+        $table_speakers = $wpdb->prefix . 'mypco_speakers';
+        $table_series = $wpdb->prefix . 'mypco_series';
+        $table_topics = $wpdb->prefix . 'mypco_topics';
 
-        $query = "SELECT s.*,
+        $query = "SELECT m.*,
                     sp.name AS speaker_name,
                     sp.title AS speaker_title,
                     sp.image_url AS speaker_image_url,
                     sr.title AS series_title,
                     sr.image_url AS series_image_url,
                     t.name AS topic_name
-                  FROM {$table_sermons} s
-                  LEFT JOIN {$table_speakers} sp ON s.speaker_id = sp.id
-                  LEFT JOIN {$table_series} sr ON s.series_id = sr.id
-                  LEFT JOIN {$table_topics} t ON s.topic_id = t.id
-                  WHERE s.id = %d";
+                  FROM {$table_messages} m
+                  LEFT JOIN {$table_speakers} sp ON m.speaker_id = sp.id
+                  LEFT JOIN {$table_series} sr ON m.series_id = sr.id
+                  LEFT JOIN {$table_topics} t ON m.topic_id = t.id
+                  WHERE m.id = %d";
 
-        return $wpdb->get_row($wpdb->prepare($query, $sermon_id));
+        return $wpdb->get_row($wpdb->prepare($query, $message_id));
     }
 
     /**
-     * Fetch sermons from the database.
+     * Fetch messages from the database.
      *
      * @param array $args Query arguments.
-     * @return array Array of sermon objects.
+     * @return array Array of message objects.
      */
-    private function fetch_sermons($args) {
+    private function fetch_messages($args) {
         global $wpdb;
 
-        $table_sermons = $wpdb->prefix . 'mypco_sermons';
-        $table_speakers = $wpdb->prefix . 'mypco_sermon_speakers';
-        $table_series = $wpdb->prefix . 'mypco_sermon_series';
-        $table_topics = $wpdb->prefix . 'mypco_sermon_topics';
+        $table_messages = $wpdb->prefix . 'mypco_messages';
+        $table_speakers = $wpdb->prefix . 'mypco_speakers';
+        $table_series = $wpdb->prefix . 'mypco_series';
+        $table_topics = $wpdb->prefix . 'mypco_topics';
 
         $where = '1=1';
         $params = [];
@@ -200,7 +200,7 @@ class MyPCO_Sermons_Public {
         // Filter by series (by ID or slug/title)
         if (!empty($args['series'])) {
             if (is_numeric($args['series'])) {
-                $where .= ' AND s.series_id = %d';
+                $where .= ' AND m.series_id = %d';
                 $params[] = absint($args['series']);
             } else {
                 $where .= ' AND sr.title LIKE %s';
@@ -211,7 +211,7 @@ class MyPCO_Sermons_Public {
         // Filter by speaker (by ID or name)
         if (!empty($args['speaker'])) {
             if (is_numeric($args['speaker'])) {
-                $where .= ' AND s.speaker_id = %d';
+                $where .= ' AND m.speaker_id = %d';
                 $params[] = absint($args['speaker']);
             } else {
                 $where .= ' AND sp.name LIKE %s';
@@ -222,7 +222,7 @@ class MyPCO_Sermons_Public {
         // Filter by topic (by ID or name)
         if (!empty($args['topic'])) {
             if (is_numeric($args['topic'])) {
-                $where .= ' AND s.topic_id = %d';
+                $where .= ' AND m.topic_id = %d';
                 $params[] = absint($args['topic']);
             } else {
                 $where .= ' AND t.name LIKE %s';
@@ -231,24 +231,24 @@ class MyPCO_Sermons_Public {
         }
 
         // Order
-        $order_col = 's.sermon_date';
+        $order_col = 'm.message_date';
         if ($args['orderby'] === 'title') {
-            $order_col = 's.title';
+            $order_col = 'm.title';
         }
 
         $order = $args['order'] === 'ASC' ? 'ASC' : 'DESC';
         $limit = min(absint($args['count']), 100);
 
-        $query = "SELECT s.*,
+        $query = "SELECT m.*,
                     sp.name AS speaker_name,
                     sp.image_url AS speaker_image_url,
                     sr.title AS series_title,
                     sr.image_url AS series_image_url,
                     t.name AS topic_name
-                  FROM {$table_sermons} s
-                  LEFT JOIN {$table_speakers} sp ON s.speaker_id = sp.id
-                  LEFT JOIN {$table_series} sr ON s.series_id = sr.id
-                  LEFT JOIN {$table_topics} t ON s.topic_id = t.id
+                  FROM {$table_messages} m
+                  LEFT JOIN {$table_speakers} sp ON m.speaker_id = sp.id
+                  LEFT JOIN {$table_series} sr ON m.series_id = sr.id
+                  LEFT JOIN {$table_topics} t ON m.topic_id = t.id
                   WHERE {$where}
                   ORDER BY {$order_col} {$order}
                   LIMIT %d";
@@ -266,7 +266,7 @@ class MyPCO_Sermons_Public {
 
         ob_start();
 
-        $template_path = MYPCO_PLUGIN_DIR . 'modules/sermons/public/templates/' . $template_name . '.php';
+        $template_path = MYPCO_PLUGIN_DIR . 'modules/series/public/templates/' . $template_name . '.php';
 
         if (file_exists($template_path)) {
             include $template_path;

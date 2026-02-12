@@ -1,5 +1,5 @@
 /**
- * Sermons Admin JavaScript
+ * Series Admin JavaScript
  */
 (function($) {
     'use strict';
