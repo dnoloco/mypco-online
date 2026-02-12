@@ -1,6 +1,6 @@
 <?php
 /**
- * Sermons Admin List Page Template
+ * Messages Admin List Page Template
  *
  * Available variables:
  * - $sermons (array)
@@ -18,8 +18,10 @@ $base_url = admin_url('admin.php?page=mypco-sermons');
 ?>
 
 <div class="wrap">
-    <h1 class="wp-heading-inline"><?php _e('Sermons', 'mypco-online'); ?></h1>
+    <h1 class="wp-heading-inline"><?php _e('Create and Edit Messages', 'mypco-online'); ?></h1>
     <a href="<?php echo esc_url($base_url . '&view=add'); ?>" class="page-title-action"><?php _e('Add New', 'mypco-online'); ?></a>
+
+    <p class="mypco-page-description"><?php _e('Manage your messages here. Add sermon titles, assign speakers, link to audio or video, and organise by series and topics.', 'mypco-online'); ?></p>
 
     <?php if ($success): ?>
         <div class="notice notice-success is-dismissible">
@@ -27,13 +29,13 @@ $base_url = admin_url('admin.php?page=mypco-sermons');
                 <?php
                 switch ($success) {
                     case 'sermon_added':
-                        _e('Sermon added successfully.', 'mypco-online');
+                        _e('Message added successfully.', 'mypco-online');
                         break;
                     case 'sermon_updated':
-                        _e('Sermon updated successfully.', 'mypco-online');
+                        _e('Message updated successfully.', 'mypco-online');
                         break;
                     case 'sermon_deleted':
-                        _e('Sermon deleted successfully.', 'mypco-online');
+                        _e('Message deleted successfully.', 'mypco-online');
                         break;
                     default:
                         _e('Operation completed.', 'mypco-online');
@@ -66,7 +68,7 @@ $base_url = admin_url('admin.php?page=mypco-sermons');
                 <?php endforeach; ?>
             </select>
 
-            <input type="search" name="s" value="<?php echo esc_attr($search); ?>" placeholder="<?php esc_attr_e('Search sermons...', 'mypco-online'); ?>">
+            <input type="search" name="s" value="<?php echo esc_attr($search); ?>" placeholder="<?php esc_attr_e('Search messages...', 'mypco-online'); ?>">
 
             <input type="submit" class="button" value="<?php esc_attr_e('Filter', 'mypco-online'); ?>">
 
@@ -76,24 +78,25 @@ $base_url = admin_url('admin.php?page=mypco-sermons');
         </form>
     </div>
 
-    <!-- Sermons Table -->
+    <!-- Messages Table -->
     <table class="wp-list-table widefat fixed striped table-view-list">
         <thead>
         <tr>
             <th scope="col" class="manage-column column-title column-primary"><?php _e('Title', 'mypco-online'); ?></th>
-            <th scope="col" class="manage-column column-date"><?php _e('Date', 'mypco-online'); ?></th>
             <th scope="col" class="manage-column column-speaker"><?php _e('Speaker', 'mypco-online'); ?></th>
+            <th scope="col" class="manage-column column-date"><?php _e('Date', 'mypco-online'); ?></th>
             <th scope="col" class="manage-column column-series"><?php _e('Series', 'mypco-online'); ?></th>
             <th scope="col" class="manage-column column-scripture"><?php _e('Scripture', 'mypco-online'); ?></th>
             <th scope="col" class="manage-column column-media"><?php _e('Media', 'mypco-online'); ?></th>
+            <th scope="col" class="manage-column column-delete" style="width:60px;"><?php _e('Delete', 'mypco-online'); ?></th>
         </tr>
         </thead>
         <tbody id="the-list">
         <?php if (empty($sermons)): ?>
             <tr class="no-items">
-                <td class="colspanchange" colspan="6">
-                    <?php _e('No sermons found.', 'mypco-online'); ?>
-                    <a href="<?php echo esc_url($base_url . '&view=add'); ?>"><?php _e('Add your first sermon', 'mypco-online'); ?></a>
+                <td class="colspanchange" colspan="7">
+                    <?php _e('No messages found.', 'mypco-online'); ?>
+                    <a href="<?php echo esc_url($base_url . '&view=add'); ?>"><?php _e('Add your first message', 'mypco-online'); ?></a>
                 </td>
             </tr>
         <?php else: ?>
@@ -114,14 +117,13 @@ $base_url = admin_url('admin.php?page=mypco-sermons');
                         <strong><a class="row-title" href="<?php echo $edit_url; ?>"><?php echo esc_html($sermon->title); ?></a></strong>
                         <div class="row-actions">
                             <span class="edit"><a href="<?php echo $edit_url; ?>"><?php _e('Edit', 'mypco-online'); ?></a></span>
-                            | <span class="trash"><a href="<?php echo esc_url($delete_url); ?>" class="submitdelete" onclick="return confirm('<?php esc_attr_e('Are you sure you want to delete this sermon?', 'mypco-online'); ?>')"><?php _e('Delete', 'mypco-online'); ?></a></span>
                         </div>
-                    </td>
-                    <td class="date column-date">
-                        <?php echo !empty($sermon->sermon_date) ? esc_html(date_i18n(get_option('date_format'), strtotime($sermon->sermon_date))) : '&mdash;'; ?>
                     </td>
                     <td class="speaker column-speaker">
                         <?php echo !empty($sermon->speaker_name) ? esc_html($sermon->speaker_name) : '<span class="mypco-no-description">&mdash;</span>'; ?>
+                    </td>
+                    <td class="date column-date">
+                        <?php echo !empty($sermon->sermon_date) ? esc_html(date_i18n(get_option('date_format'), strtotime($sermon->sermon_date))) : '&mdash;'; ?>
                     </td>
                     <td class="series column-series">
                         <?php echo !empty($sermon->series_title) ? esc_html($sermon->series_title) : '<span class="mypco-no-description">&mdash;</span>'; ?>
@@ -132,27 +134,14 @@ $base_url = admin_url('admin.php?page=mypco-sermons');
                     <td class="media column-media">
                         <?php echo !empty($media_icons) ? implode(' ', $media_icons) : '<span class="mypco-no-description">&mdash;</span>'; ?>
                     </td>
+                    <td class="delete column-delete">
+                        <a href="<?php echo esc_url($delete_url); ?>" class="submitdelete" onclick="return confirm('<?php esc_attr_e('Are you sure you want to delete this message?', 'mypco-online'); ?>')" title="<?php esc_attr_e('Delete', 'mypco-online'); ?>">
+                            <span class="dashicons dashicons-trash"></span>
+                        </a>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         <?php endif; ?>
         </tbody>
-        <tfoot>
-        <tr>
-            <th scope="col" class="manage-column column-title column-primary"><?php _e('Title', 'mypco-online'); ?></th>
-            <th scope="col" class="manage-column column-date"><?php _e('Date', 'mypco-online'); ?></th>
-            <th scope="col" class="manage-column column-speaker"><?php _e('Speaker', 'mypco-online'); ?></th>
-            <th scope="col" class="manage-column column-series"><?php _e('Series', 'mypco-online'); ?></th>
-            <th scope="col" class="manage-column column-scripture"><?php _e('Scripture', 'mypco-online'); ?></th>
-            <th scope="col" class="manage-column column-media"><?php _e('Media', 'mypco-online'); ?></th>
-        </tr>
-        </tfoot>
     </table>
-
-    <p class="description">
-        <?php printf(
-            __('Showing %d sermon(s). Use the shortcode %s to display sermons on your site.', 'mypco-online'),
-            count($sermons),
-            '<code>[mypco_sermons]</code>'
-        ); ?>
-    </p>
 </div>

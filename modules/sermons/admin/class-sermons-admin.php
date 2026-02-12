@@ -35,13 +35,13 @@ class MyPCO_Sermons_Admin {
     // =========================================================================
 
     /**
-     * Add top-level Sermons menu with submenus.
+     * Add top-level Messages menu with submenus.
      */
     public function add_admin_pages() {
         // Top-level menu
         add_menu_page(
-            __('Sermons', 'mypco-online'),
-            __('Sermons', 'mypco-online'),
+            __('Messages', 'mypco-online'),
+            __('Messages', 'mypco-online'),
             'edit_posts',
             'mypco-sermons',
             [$this, 'render_sermons_page'],
@@ -49,11 +49,11 @@ class MyPCO_Sermons_Admin {
             26
         );
 
-        // Submenu: All Sermons (replaces the auto-generated first item)
+        // Submenu: All Messages (replaces the auto-generated first item)
         add_submenu_page(
             'mypco-sermons',
-            __('All Sermons', 'mypco-online'),
-            __('All Sermons', 'mypco-online'),
+            __('All Messages', 'mypco-online'),
+            __('All Messages', 'mypco-online'),
             'edit_posts',
             'mypco-sermons',
             [$this, 'render_sermons_page']

@@ -11,8 +11,8 @@ require_once MYPCO_PLUGIN_DIR . 'includes/class-mypco-module-base.php';
 class MyPCO_Sermons_Module extends MyPCO_Module_Base {
 
     protected $module_key = 'sermons';
-    protected $module_name = 'Sermons';
-    protected $module_description = 'Manage and display sermon archives with series, speakers, topics, and media.';
+    protected $module_name = 'Messages';
+    protected $module_description = 'Manage and display message archives with series, speakers, topics, and media.';
 
     /**
      * Module tier: freemium (basic display free, customization premium)

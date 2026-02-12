@@ -170,10 +170,10 @@ class MyPCO_Shortcodes_Admin {
             ],
             'mypco_sermons_list' => [
                 'module'      => 'sermons',
-                'module_name' => 'Sermons',
-                'name'        => 'Sermon List',
-                'description' => 'Display a list of sermons with speaker, series, and media links.',
-                'tag'         => 'mypco_sermons',
+                'module_name' => 'Messages',
+                'name'        => 'Message List',
+                'description' => 'Display a list of messages with speaker, series, and media links.',
+                'tag'         => 'mypco_messages',
                 'defaults'    => [
                     'description'      => '',
                     'count'            => 10,
@@ -187,11 +187,11 @@ class MyPCO_Shortcodes_Admin {
                 'fields' => [
                     [
                         'key'         => 'count',
-                        'label'       => 'Number of Sermons',
+                        'label'       => 'Number of Messages',
                         'type'        => 'number',
                         'min'         => 1,
                         'max'         => 100,
-                        'description' => 'Maximum number of sermons to display.',
+                        'description' => 'Maximum number of messages to display.',
                     ],
                 ],
             ],

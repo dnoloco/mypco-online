@@ -13,12 +13,12 @@
 defined('ABSPATH') || exit;
 
 $base_url = admin_url('admin.php?page=mypco-sermons');
-$page_title = $is_edit ? __('Edit Sermon', 'mypco-online') : __('Add New Sermon', 'mypco-online');
+$page_title = $is_edit ? __('Edit Message', 'mypco-online') : __('Add New Message', 'mypco-online');
 ?>
 
 <div class="wrap">
     <h1 class="wp-heading-inline"><?php echo esc_html($page_title); ?></h1>
-    <a href="<?php echo esc_url($base_url); ?>" class="page-title-action"><?php _e('Back to Sermons', 'mypco-online'); ?></a>
+    <a href="<?php echo esc_url($base_url); ?>" class="page-title-action"><?php _e('Back to Messages', 'mypco-online'); ?></a>
 
     <form method="post" action="" class="mypco-sermon-form">
         <?php wp_nonce_field('mypco_save_sermon'); ?>
@@ -152,12 +152,12 @@ $page_title = $is_edit ? __('Edit Sermon', 'mypco-online') : __('Add New Sermon'
                                value="<?php echo esc_url($is_edit ? $sermon->image_url : ''); ?>">
                         <button type="button" class="button mypco-upload-btn"><?php _e('Upload Image', 'mypco-online'); ?></button>
                         <button type="button" class="button mypco-remove-btn" <?php echo ($is_edit && !empty($sermon->image_url)) ? '' : 'style="display:none;"'; ?>><?php _e('Remove', 'mypco-online'); ?></button>
-                        <p class="description"><?php _e('Featured image for this sermon. If empty, the series image will be used.', 'mypco-online'); ?></p>
+                        <p class="description"><?php _e('Featured image for this message. If empty, the series image will be used.', 'mypco-online'); ?></p>
                     </div>
                 </td>
             </tr>
         </table>
 
-        <?php submit_button($is_edit ? __('Update Sermon', 'mypco-online') : __('Add Sermon', 'mypco-online')); ?>
+        <?php submit_button($is_edit ? __('Update Message', 'mypco-online') : __('Add Message', 'mypco-online')); ?>
     </form>
 </div>

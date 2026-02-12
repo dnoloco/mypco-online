@@ -109,7 +109,29 @@
     height: auto;
 }
 
+/* Page description */
+.mypco-page-description {
+    color: #50575e;
+    font-size: 13px;
+    margin: 0 0 16px;
+}
+
 /* Filter bar */
 .tablenav .button {
     margin-left: 4px;
+}
+
+/* Delete column */
+.column-delete .submitdelete {
+    color: #b32d2e;
+}
+
+.column-delete .submitdelete:hover {
+    color: #a00;
+}
+
+.column-delete .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
 }
