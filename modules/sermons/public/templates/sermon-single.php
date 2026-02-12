@@ -85,7 +85,7 @@ $back_url = remove_query_arg('mypco_sermon');
 <div class="mypco-sermon-single">
 
     <!-- Back link -->
-    <a href="<?php echo esc_url($back_url); ?>" class="mypco-sermon-back">&larr; <?php _e('All Sermons', 'mypco-online'); ?></a>
+    <a href="<?php echo esc_url($back_url); ?>" class="mypco-sermon-back">&larr; <?php _e('All Messages', 'mypco-online'); ?></a>
 
     <!-- Sermon title -->
     <h2 class="mypco-sermon-single-title"><?php echo esc_html($sermon->title); ?></h2>

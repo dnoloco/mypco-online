@@ -159,8 +159,8 @@ class MyPCO_Module_Manager {
                 'class' => 'MyPCO_Messages_Module'
             ],
             'sermons' => [
-                'name' => 'Sermons',
-                'description' => 'Manage and display sermon archives with series, speakers, topics, and media.',
+                'name' => 'Messages',
+                'description' => 'Manage and display message archives with series, speakers, topics, and media.',
                 'tier' => 'freemium',
                 'requires_license' => false,
                 'min_license_tier' => 'starter',

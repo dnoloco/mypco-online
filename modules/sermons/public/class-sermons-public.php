@@ -24,7 +24,8 @@ class MyPCO_Sermons_Public {
      * Initialize public functionality.
      */
     public function init() {
-        add_shortcode('mypco_sermons', [$this, 'render_sermons_shortcode']);
+        add_shortcode('mypco_messages', [$this, 'render_sermons_shortcode']);
+        add_shortcode('mypco_sermons', [$this, 'render_sermons_shortcode']); // backward compat
         $this->loader->add_action('wp_enqueue_scripts', $this, 'enqueue_public_assets');
     }
 
@@ -38,7 +39,7 @@ class MyPCO_Sermons_Public {
             return;
         }
 
-        if (!has_shortcode($post->post_content, 'mypco_sermons')) {
+        if (!has_shortcode($post->post_content, 'mypco_messages') && !has_shortcode($post->post_content, 'mypco_sermons')) {
             return;
         }
 
@@ -84,7 +85,7 @@ class MyPCO_Sermons_Public {
             'view'    => 'gallery',
             'orderby' => 'date',
             'order'   => 'DESC',
-        ], $atts, 'mypco_sermons');
+        ], $atts, 'mypco_messages');
 
         // Load centralized shortcode settings when id is provided
         $id = absint($atts['id']);
@@ -117,7 +118,7 @@ class MyPCO_Sermons_Public {
         ]);
 
         if (empty($sermons)) {
-            return '<div class="mypco-sermons-empty"><p>' . esc_html__('No sermons found.', 'mypco-online') . '</p></div>';
+            return '<div class="mypco-sermons-empty"><p>' . esc_html__('No messages found.', 'mypco-online') . '</p></div>';
         }
 
         $template = ($view === 'list') ? 'sermons-list' : 'sermons-gallery';
@@ -140,7 +141,7 @@ class MyPCO_Sermons_Public {
         $sermon = $this->fetch_single_sermon($sermon_id);
 
         if (!$sermon) {
-            return '<div class="mypco-sermons-empty"><p>' . esc_html__('Sermon not found.', 'mypco-online') . '</p></div>';
+            return '<div class="mypco-sermons-empty"><p>' . esc_html__('Message not found.', 'mypco-online') . '</p></div>';
         }
 
         return $this->load_template('sermon-single', [
