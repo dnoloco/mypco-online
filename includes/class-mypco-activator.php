@@ -45,11 +45,11 @@ class MyPCO_Activator {
         add_option('mypco_module_groups_enabled', true);
 
         // Freemium modules
-        add_option('mypco_module_sermons_enabled', true);
+        add_option('mypco_module_series_enabled', true);
 
         // Premium modules disabled by default (enable after license validation)
         add_option('mypco_module_services_enabled', true);
-        add_option('mypco_module_messages_enabled', true);
+        add_option('mypco_module_contacts_enabled', true);
         add_option('mypco_module_signups_enabled', true);
 
         // Set plugin version
@@ -62,11 +62,11 @@ class MyPCO_Activator {
 
         // License options (placeholder for future licensing system)
         add_option('mypco_license_services', '');
-        add_option('mypco_license_messages', '');
+        add_option('mypco_license_series', '');
     }
 
     /**
-     * Create database tables for signups and messages.
+     * Create database tables for signups, series, and messages.
      */
     private static function create_tables() {
         global $wpdb;
@@ -139,9 +139,9 @@ class MyPCO_Activator {
             KEY status (status)
         ) $charset_collate;";
 
-        // Table for sermon speakers
-        $table_sermon_speakers = $wpdb->prefix . 'mypco_sermon_speakers';
-        $sql_sermon_speakers = "CREATE TABLE IF NOT EXISTS $table_sermon_speakers (
+        // Table for speakers
+        $table_speakers = $wpdb->prefix . 'mypco_speakers';
+        $sql_speakers = "CREATE TABLE IF NOT EXISTS $table_speakers (
             id mediumint(9) NOT NULL AUTO_INCREMENT,
             name varchar(200) NOT NULL,
             title varchar(200) DEFAULT NULL,
@@ -151,9 +151,9 @@ class MyPCO_Activator {
             KEY name (name)
         ) $charset_collate;";
 
-        // Table for sermon series
-        $table_sermon_series = $wpdb->prefix . 'mypco_sermon_series';
-        $sql_sermon_series = "CREATE TABLE IF NOT EXISTS $table_sermon_series (
+        // Table for series
+        $table_series = $wpdb->prefix . 'mypco_series';
+        $sql_series = "CREATE TABLE IF NOT EXISTS $table_series (
             id mediumint(9) NOT NULL AUTO_INCREMENT,
             title varchar(255) NOT NULL,
             description text DEFAULT NULL,
@@ -165,9 +165,9 @@ class MyPCO_Activator {
             KEY start_date (start_date)
         ) $charset_collate;";
 
-        // Table for sermon topics
-        $table_sermon_topics = $wpdb->prefix . 'mypco_sermon_topics';
-        $sql_sermon_topics = "CREATE TABLE IF NOT EXISTS $table_sermon_topics (
+        // Table for topics
+        $table_topics = $wpdb->prefix . 'mypco_topics';
+        $sql_topics = "CREATE TABLE IF NOT EXISTS $table_topics (
             id mediumint(9) NOT NULL AUTO_INCREMENT,
             name varchar(200) NOT NULL,
             description text DEFAULT NULL,
@@ -175,12 +175,12 @@ class MyPCO_Activator {
             KEY name (name)
         ) $charset_collate;";
 
-        // Table for sermons
-        $table_sermons = $wpdb->prefix . 'mypco_sermons';
-        $sql_sermons = "CREATE TABLE IF NOT EXISTS $table_sermons (
+        // Table for messages
+        $table_messages = $wpdb->prefix . 'mypco_messages';
+        $sql_messages = "CREATE TABLE IF NOT EXISTS $table_messages (
             id mediumint(9) NOT NULL AUTO_INCREMENT,
             title varchar(255) NOT NULL,
-            sermon_date date NOT NULL,
+            message_date date NOT NULL,
             speaker_id mediumint(9) DEFAULT 0,
             series_id mediumint(9) DEFAULT 0,
             topic_id mediumint(9) DEFAULT 0,
@@ -192,7 +192,7 @@ class MyPCO_Activator {
             created_at datetime DEFAULT CURRENT_TIMESTAMP,
             updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY  (id),
-            KEY sermon_date (sermon_date),
+            KEY message_date (message_date),
             KEY speaker_id (speaker_id),
             KEY series_id (series_id),
             KEY topic_id (topic_id)
@@ -202,10 +202,10 @@ class MyPCO_Activator {
         dbDelta($sql_signups);
         dbDelta($sql_registrations);
         dbDelta($sql_clearstream);
-        dbDelta($sql_sermon_speakers);
-        dbDelta($sql_sermon_series);
-        dbDelta($sql_sermon_topics);
-        dbDelta($sql_sermons);
+        dbDelta($sql_speakers);
+        dbDelta($sql_series);
+        dbDelta($sql_topics);
+        dbDelta($sql_messages);
     }
 
     /**

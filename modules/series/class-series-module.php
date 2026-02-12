@@ -1,17 +1,17 @@
 <?php
 /**
- * Sermons Module - Main Orchestrator
+ * Series Module - Main Orchestrator
  *
- * Coordinates the admin and public components of the Sermons module.
- * Provides sermon management with series, speakers, topics, and media links.
+ * Coordinates the admin and public components of the Series module.
+ * Provides message management with series, speakers, topics, and media links.
  */
 
 require_once MYPCO_PLUGIN_DIR . 'includes/class-mypco-module-base.php';
 
-class MyPCO_Sermons_Module extends MyPCO_Module_Base {
+class MyPCO_Series_Module extends MyPCO_Module_Base {
 
-    protected $module_key = 'sermons';
-    protected $module_name = 'Messages';
+    protected $module_key = 'series';
+    protected $module_name = 'Series';
     protected $module_description = 'Manage and display message archives with series, speakers, topics, and media.';
 
     /**
@@ -24,17 +24,17 @@ class MyPCO_Sermons_Module extends MyPCO_Module_Base {
     /**
      * Features available in this module
      *
-     * Free: Basic sermon management and default shortcode display
+     * Free: Basic message management and default shortcode display
      * Premium: Featured message widget, custom series display, advanced filtering
      */
     protected $features = [
         'free' => [
-            'manage_sermons',
+            'manage_messages',
             'manage_speakers',
             'manage_series',
             'manage_topics',
             'basic_shortcode',
-            'sermon_list_view'
+            'message_list_view'
         ],
         'premium' => [
             'featured_message',
@@ -56,7 +56,7 @@ class MyPCO_Sermons_Module extends MyPCO_Module_Base {
     private $public;
 
     /**
-     * Initialize the Sermons module.
+     * Initialize the Series module.
      */
     public function init() {
         // Load and initialize admin component
@@ -72,8 +72,8 @@ class MyPCO_Sermons_Module extends MyPCO_Module_Base {
      * Load the admin component.
      */
     private function load_admin_component() {
-        require_once $this->get_module_path('admin/class-sermons-admin.php');
-        $this->admin = new MyPCO_Sermons_Admin($this->loader, $this->api_model);
+        require_once $this->get_module_path('admin/class-series-admin.php');
+        $this->admin = new MyPCO_Series_Admin($this->loader, $this->api_model);
         $this->admin->init();
     }
 
@@ -81,8 +81,8 @@ class MyPCO_Sermons_Module extends MyPCO_Module_Base {
      * Load the public component.
      */
     private function load_public_component() {
-        require_once $this->get_module_path('public/class-sermons-public.php');
-        $this->public = new MyPCO_Sermons_Public($this->loader, $this->api_model);
+        require_once $this->get_module_path('public/class-series-public.php');
+        $this->public = new MyPCO_Series_Public($this->loader, $this->api_model);
         $this->public->init();
     }
 
@@ -90,6 +90,6 @@ class MyPCO_Sermons_Module extends MyPCO_Module_Base {
      * Get path within this module.
      */
     private function get_module_path($relative_path) {
-        return MYPCO_PLUGIN_DIR . 'modules/sermons/' . $relative_path;
+        return MYPCO_PLUGIN_DIR . 'modules/series/' . $relative_path;
     }
 }

@@ -9,7 +9,7 @@
 
 defined('ABSPATH') || exit;
 
-$base_url = admin_url('admin.php?page=mypco-sermon-topics');
+$base_url = admin_url('admin.php?page=mypco-series-topics');
 $page_title = $is_edit ? __('Edit Topic', 'mypco-online') : __('Add New Topic', 'mypco-online');
 ?>
 

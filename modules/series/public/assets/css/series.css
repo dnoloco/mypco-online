@@ -1,12 +1,12 @@
 /**
- * Sermons Public Styles
+ * Series Public Styles
  */
 
 /* =========================================================================
    Empty state
    ========================================================================= */
 
-.mypco-sermons-empty {
+.mypco-messages-empty {
     text-align: center;
     padding: 40px 20px;
     color: #666;
@@ -16,7 +16,7 @@
    Gallery View (card grid)
    ========================================================================= */
 
-.mypco-sermons-gallery {
+.mypco-messages-gallery {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 24px;
@@ -24,7 +24,7 @@
     margin: 0 auto;
 }
 
-.mypco-sermon-card {
+.mypco-message-card {
     display: block;
     text-decoration: none;
     color: inherit;
@@ -35,29 +35,29 @@
     transition: box-shadow 0.2s, transform 0.2s;
 }
 
-.mypco-sermon-card:hover {
+.mypco-message-card:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transform: translateY(-2px);
 }
 
-.mypco-sermon-card-image {
+.mypco-message-card-image {
     aspect-ratio: 16 / 9;
     overflow: hidden;
     background: #e5e7eb;
 }
 
-.mypco-sermon-card-image img {
+.mypco-message-card-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
 }
 
-.mypco-sermon-card-body {
+.mypco-message-card-body {
     padding: 12px 16px 16px;
 }
 
-.mypco-sermon-card-title {
+.mypco-message-card-title {
     margin: 0;
     font-size: 1em;
     line-height: 1.4;
@@ -65,16 +65,16 @@
 }
 
 /* =========================================================================
-   Single Sermon Detail
+   Single Message Detail
    ========================================================================= */
 
-.mypco-sermon-single {
+.mypco-message-single {
     max-width: 800px;
     margin: 0 auto;
 }
 
 /* Back link */
-.mypco-sermon-back {
+.mypco-message-back {
     display: inline-block;
     margin-bottom: 16px;
     font-size: 0.9em;
@@ -82,19 +82,19 @@
     text-decoration: none;
 }
 
-.mypco-sermon-back:hover {
+.mypco-message-back:hover {
     text-decoration: underline;
 }
 
 /* Title */
-.mypco-sermon-single-title {
+.mypco-message-single-title {
     margin: 0 0 20px 0;
     font-size: 1.6em;
     line-height: 1.3;
 }
 
 /* Video player (full-width) */
-.mypco-sermon-single-video {
+.mypco-message-single-video {
     width: 100%;
     border-radius: 8px;
     overflow: hidden;
@@ -102,14 +102,14 @@
     margin-bottom: 20px;
 }
 
-.mypco-sermon-single-video .mypco-sermon-video-thumb {
+.mypco-message-single-video .mypco-message-video-thumb {
     position: relative;
     width: 100%;
     padding-top: 56.25%; /* 16:9 */
     cursor: pointer;
 }
 
-.mypco-sermon-single-video .mypco-sermon-video-thumb img {
+.mypco-message-single-video .mypco-message-video-thumb img {
     position: absolute;
     top: 0;
     left: 0;
@@ -119,7 +119,7 @@
     display: block;
 }
 
-.mypco-sermon-video-placeholder {
+.mypco-message-video-placeholder {
     position: absolute;
     top: 0;
     left: 0;
@@ -128,20 +128,20 @@
     background: #1a1a1a;
 }
 
-.mypco-sermon-single-video iframe {
+.mypco-message-single-video iframe {
     width: 100%;
     aspect-ratio: 16 / 9;
     display: block;
     border: 0;
 }
 
-.mypco-sermon-single-video-element {
+.mypco-message-single-video-element {
     width: 100%;
     display: block;
 }
 
 /* Play button (shared between list and single) */
-.mypco-sermon-play-btn {
+.mypco-message-play-btn {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -154,43 +154,43 @@
     transition: opacity 0.2s;
 }
 
-.mypco-sermon-play-btn:hover {
+.mypco-message-play-btn:hover {
     opacity: 0.9;
 }
 
-.mypco-sermon-play-btn:hover .mypco-play-bg {
+.mypco-message-play-btn:hover .mypco-play-bg {
     fill: #cc0000;
     fill-opacity: 1;
 }
 
 /* Audio link area */
-.mypco-sermon-single-audio {
+.mypco-message-single-audio {
     margin-bottom: 24px;
 }
 
-/* Sermon info section */
-.mypco-sermon-single-info {
+/* Message info section */
+.mypco-message-single-info {
     margin-top: 4px;
 }
 
-.mypco-sermon-single-description {
+.mypco-message-single-description {
     font-size: 0.95em;
     line-height: 1.7;
     color: #374151;
     margin-bottom: 24px;
 }
 
-.mypco-sermon-single-description p:last-child {
+.mypco-message-single-description p:last-child {
     margin-bottom: 0;
 }
 
 /* Meta rows (label: value) */
-.mypco-sermon-single-meta {
+.mypco-message-single-meta {
     border-top: 1px solid #e5e7eb;
     padding-top: 16px;
 }
 
-.mypco-sermon-single-meta-row {
+.mypco-message-single-meta-row {
     display: flex;
     gap: 12px;
     padding: 8px 0;
@@ -198,18 +198,18 @@
     border-bottom: 1px solid #f3f4f6;
 }
 
-.mypco-sermon-single-meta-row:last-child {
+.mypco-message-single-meta-row:last-child {
     border-bottom: none;
 }
 
-.mypco-sermon-single-label {
+.mypco-message-single-label {
     flex-shrink: 0;
     width: 80px;
     font-weight: 600;
     color: #6b7280;
 }
 
-.mypco-sermon-single-value {
+.mypco-message-single-value {
     color: #374151;
 }
 
@@ -217,7 +217,7 @@
    Shared link styles (audio button)
    ========================================================================= */
 
-.mypco-sermon-link {
+.mypco-message-link {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -229,13 +229,13 @@
     transition: background-color 0.2s, color 0.2s;
 }
 
-.mypco-sermon-audio {
+.mypco-message-audio {
     background: #f0f7ff;
     color: #2563eb;
     border: 1px solid #bfdbfe;
 }
 
-.mypco-sermon-audio:hover {
+.mypco-message-audio:hover {
     background: #dbeafe;
     color: #1d4ed8;
 }
@@ -248,35 +248,35 @@
    List View (original layout, kept for view="list")
    ========================================================================= */
 
-.mypco-sermons-wrapper {
+.mypco-messages-wrapper {
     max-width: 900px;
     margin: 0 auto;
 }
 
-.mypco-sermon-item {
+.mypco-message-item {
     display: flex;
     gap: 20px;
     padding: 20px 0;
     border-bottom: 1px solid #e5e7eb;
 }
 
-.mypco-sermon-item:last-child {
+.mypco-message-item:last-child {
     border-bottom: none;
 }
 
-.mypco-sermon-image {
+.mypco-message-image {
     flex-shrink: 0;
     width: 160px;
 }
 
-.mypco-sermon-image img {
+.mypco-message-image img {
     width: 100%;
     height: auto;
     border-radius: 6px;
     display: block;
 }
 
-.mypco-sermon-video-player {
+.mypco-message-video-player {
     flex-shrink: 0;
     width: 320px;
     border-radius: 8px;
@@ -284,14 +284,14 @@
     background: #000;
 }
 
-.mypco-sermon-video-player .mypco-sermon-video-thumb {
+.mypco-message-video-player .mypco-message-video-thumb {
     position: relative;
     width: 100%;
     padding-top: 56.25%;
     cursor: pointer;
 }
 
-.mypco-sermon-video-player .mypco-sermon-video-thumb img {
+.mypco-message-video-player .mypco-message-video-thumb img {
     position: absolute;
     top: 0;
     left: 0;
@@ -301,31 +301,31 @@
     display: block;
 }
 
-.mypco-sermon-video-player iframe {
+.mypco-message-video-player iframe {
     width: 100%;
     aspect-ratio: 16 / 9;
     display: block;
     border: 0;
 }
 
-.mypco-sermon-video-element {
+.mypco-message-video-element {
     width: 100%;
     display: block;
     border-radius: 8px;
 }
 
-.mypco-sermon-content {
+.mypco-message-content {
     flex: 1;
     min-width: 0;
 }
 
-.mypco-sermon-title {
+.mypco-message-title {
     margin: 0 0 8px 0;
     font-size: 1.2em;
     line-height: 1.3;
 }
 
-.mypco-sermon-meta {
+.mypco-message-meta {
     display: flex;
     flex-wrap: wrap;
     gap: 4px 16px;
@@ -334,40 +334,40 @@
     color: #666;
 }
 
-.mypco-sermon-meta span::before {
+.mypco-message-meta span::before {
     margin-right: 4px;
 }
 
-.mypco-sermon-date::before {
+.mypco-message-date::before {
     content: "\1F4C5";
 }
 
-.mypco-sermon-speaker::before {
+.mypco-message-speaker::before {
     content: "\1F399\FE0F";
 }
 
-.mypco-sermon-series::before {
+.mypco-message-series::before {
     content: "\1F4DA";
 }
 
-.mypco-sermon-topic::before {
+.mypco-message-topic::before {
     content: "\1F3F7\FE0F";
 }
 
-.mypco-sermon-scripture {
+.mypco-message-scripture {
     font-size: 0.9em;
     margin-bottom: 8px;
     color: #555;
 }
 
-.mypco-sermon-description {
+.mypco-message-description {
     font-size: 0.9em;
     color: #555;
     margin-bottom: 12px;
     line-height: 1.5;
 }
 
-.mypco-sermon-links {
+.mypco-message-links {
     display: flex;
     gap: 12px;
 }
@@ -378,37 +378,37 @@
 
 @media (max-width: 768px) {
     /* Gallery: 1 column on small screens */
-    .mypco-sermons-gallery {
+    .mypco-messages-gallery {
         grid-template-columns: 1fr;
     }
 
     /* List view stacking */
-    .mypco-sermon-item {
+    .mypco-message-item {
         flex-direction: column;
     }
 
-    .mypco-sermon-video-player,
-    .mypco-sermon-image {
+    .mypco-message-video-player,
+    .mypco-message-image {
         order: -1;
         width: 100%;
     }
 
-    .mypco-sermon-meta {
+    .mypco-message-meta {
         flex-direction: column;
         gap: 4px;
     }
 
     /* Single view */
-    .mypco-sermon-single-title {
+    .mypco-message-single-title {
         font-size: 1.3em;
     }
 
-    .mypco-sermon-single-meta-row {
+    .mypco-message-single-meta-row {
         flex-direction: column;
         gap: 2px;
     }
 
-    .mypco-sermon-single-label {
+    .mypco-message-single-label {
         width: auto;
     }
 }

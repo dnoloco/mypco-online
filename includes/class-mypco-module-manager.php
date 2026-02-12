@@ -140,8 +140,8 @@ class MyPCO_Module_Manager {
                 'file' => 'signups/class-signups-module.php',
                 'class' => 'MyPCO_Signups_Module'
             ],
-            'messages' => [
-                'name' => 'Messages',
+            'contacts' => [
+                'name' => 'Contacts',
                 'description' => 'Send mass SMS via Clearstream integration.',
                 'tier' => 'premium',
                 'requires_license' => true,
@@ -155,23 +155,23 @@ class MyPCO_Module_Manager {
                         'message_history'
                     ]
                 ],
-                'file' => 'messages/class-messages-module.php',
-                'class' => 'MyPCO_Messages_Module'
+                'file' => 'contacts/class-contacts-module.php',
+                'class' => 'MyPCO_Contacts_Module'
             ],
-            'sermons' => [
-                'name' => 'Messages',
+            'series' => [
+                'name' => 'Series',
                 'description' => 'Manage and display message archives with series, speakers, topics, and media.',
                 'tier' => 'freemium',
                 'requires_license' => false,
                 'min_license_tier' => 'starter',
                 'features' => [
                     'free' => [
-                        'manage_sermons',
+                        'manage_messages',
                         'manage_speakers',
                         'manage_series',
                         'manage_topics',
                         'basic_shortcode',
-                        'sermon_list_view'
+                        'message_list_view'
                     ],
                     'premium' => [
                         'featured_message',
@@ -181,8 +181,8 @@ class MyPCO_Module_Manager {
                         'custom_css'
                     ]
                 ],
-                'file' => 'sermons/class-sermons-module.php',
-                'class' => 'MyPCO_Sermons_Module'
+                'file' => 'series/class-series-module.php',
+                'class' => 'MyPCO_Series_Module'
             ],
             'calendar_shortcodes' => [
                 'name' => 'Calendar Shortcodes',
