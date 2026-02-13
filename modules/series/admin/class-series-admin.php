@@ -843,8 +843,6 @@ class MyPCO_Series_Admin {
 
     /**
      * Register the "Speaker" meta box on the mypco_message post type.
-     *
-     * Placed in the side context so it appears in the editor sidebar.
      */
     public function add_speaker_meta_box() {
         add_meta_box(
@@ -852,13 +850,13 @@ class MyPCO_Series_Admin {
             __('Message Speaker', 'mypco-online'),
             [$this, 'render_speaker_meta_box'],
             'mypco_message',
-            'side',
-            'default'
+            'normal',
+            'high'
         );
     }
 
     /**
-     * Render the "Speaker" meta box with a dropdown and inline add.
+     * Render the "Speaker" meta box with a dropdown and toggle-able inline add.
      */
     public function render_speaker_meta_box($post) {
         wp_nonce_field('mypco_speaker_meta_save', 'mypco_speaker_meta_nonce');
@@ -885,10 +883,14 @@ class MyPCO_Series_Admin {
         }
         echo '</select>';
 
-        echo '<div style="margin-top:8px;">';
-        echo '<input type="text" id="mypco_new_speaker_name" placeholder="' . esc_attr__('New speaker name', 'mypco-online') . '" style="width:100%;margin-bottom:4px;" />';
-        echo '<button type="button" id="mypco_add_speaker_btn" class="button" style="width:100%;">' . esc_html__('Add New Speaker', 'mypco-online') . '</button>';
-        echo '<span id="mypco_add_speaker_status" style="display:none;font-style:italic;font-size:12px;margin-top:4px;display:block;"></span>';
+        // Toggle link + hidden add-new form (matches WP "Add New Category" pattern)
+        echo '<a href="#" id="mypco_toggle_add_speaker" style="display:inline-block;margin-top:6px;font-size:12px;">';
+        echo '+ ' . esc_html__('Add New Speaker', 'mypco-online');
+        echo '</a>';
+        echo '<div id="mypco_add_speaker_form" style="display:none;margin-top:6px;">';
+        echo '<input type="text" id="mypco_new_speaker_name" style="width:100%;margin-bottom:6px;" />';
+        echo '<input type="button" id="mypco_add_speaker_btn" class="button" value="' . esc_attr__('Add New Speaker', 'mypco-online') . '" />';
+        echo '<span id="mypco_add_speaker_status" style="display:none;font-style:italic;font-size:12px;margin-left:6px;"></span>';
         echo '</div>';
     }
 
