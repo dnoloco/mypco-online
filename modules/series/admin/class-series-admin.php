@@ -41,6 +41,14 @@ class MyPCO_Series_Admin {
         $this->loader->add_action('add_meta_boxes', $this, 'add_message_info_meta_box');
         $this->loader->add_action('save_post_mypco_message', $this, 'save_message_info_meta', 10, 2);
 
+        // Media meta box on Message post type (audio + video)
+        $this->loader->add_action('add_meta_boxes', $this, 'add_media_meta_box');
+        $this->loader->add_action('save_post_mypco_message', $this, 'save_media_meta', 10, 2);
+
+        // Scripture meta box on Message post type (multiple passages)
+        $this->loader->add_action('add_meta_boxes', $this, 'add_scripture_meta_box');
+        $this->loader->add_action('save_post_mypco_message', $this, 'save_scripture_meta', 10, 2);
+
         // AJAX: create speaker from Message editor meta box
         $this->loader->add_action('wp_ajax_mypco_add_speaker', $this, 'ajax_add_speaker');
 
@@ -131,10 +139,22 @@ class MyPCO_Series_Admin {
             true
         );
 
-        wp_localize_script('mypco-series-admin', 'mypcoSeriesAdmin', [
+        $localize_data = [
             'ajaxUrl'         => admin_url('admin-ajax.php'),
             'addSpeakerNonce' => wp_create_nonce('mypco_add_speaker'),
-        ]);
+        ];
+
+        // Include Bible data only on the message editor
+        if ($screen && $screen->post_type === 'mypco_message') {
+            $localize_data['bibleData'] = include MYPCO_PLUGIN_DIR . 'modules/series/admin/bible-data.php';
+            $localize_data['i18n'] = [
+                'selectBook' => __('Select Book', 'mypco-online'),
+                'chapter'    => __('Chapter', 'mypco-online'),
+                'verse'      => __('Verse', 'mypco-online'),
+            ];
+        }
+
+        wp_localize_script('mypco-series-admin', 'mypcoSeriesAdmin', $localize_data);
     }
 
     // =========================================================================
@@ -1044,6 +1064,208 @@ class MyPCO_Series_Admin {
 
         if (isset($_POST['mypco_message_image'])) {
             update_post_meta($post_id, '_mypco_message_image', esc_url_raw($_POST['mypco_message_image']));
+        }
+    }
+
+    // =========================================================================
+    // Message Post Type – Meta Box (Media)
+    // =========================================================================
+
+    /**
+     * Register the "Media" meta box on the mypco_message post type.
+     */
+    public function add_media_meta_box() {
+        add_meta_box(
+            'mypco_media_meta',
+            __('Media', 'mypco-online'),
+            [$this, 'render_media_meta_box'],
+            'mypco_message',
+            'normal',
+            'high'
+        );
+    }
+
+    /**
+     * Render the "Media" meta box fields (audio + video).
+     */
+    public function render_media_meta_box($post) {
+        wp_nonce_field('mypco_media_meta_save', 'mypco_media_meta_nonce');
+
+        $audio = get_post_meta($post->ID, '_mypco_message_audio', true);
+        $video = get_post_meta($post->ID, '_mypco_message_video', true);
+        ?>
+        <table class="form-table">
+            <tr>
+                <th><label for="mypco_message_audio"><?php esc_html_e('Audio', 'mypco-online'); ?></label></th>
+                <td>
+                    <input type="url" id="mypco_message_audio" name="mypco_message_audio"
+                           value="<?php echo esc_url($audio); ?>" class="large-text"
+                           placeholder="<?php esc_attr_e('Paste a URL or upload a file', 'mypco-online'); ?>" />
+                    <p>
+                        <button type="button" class="button mypco-upload-media-btn"
+                                data-target="#mypco_message_audio"
+                                data-media-type="audio"><?php esc_html_e('Upload Audio', 'mypco-online'); ?></button>
+                        <button type="button" class="button mypco-remove-media-btn"
+                                data-target="#mypco_message_audio"
+                                <?php echo $audio ? '' : 'style="display:none;"'; ?>><?php esc_html_e('Remove', 'mypco-online'); ?></button>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="mypco_message_video"><?php esc_html_e('Video', 'mypco-online'); ?></label></th>
+                <td>
+                    <input type="url" id="mypco_message_video" name="mypco_message_video"
+                           value="<?php echo esc_url($video); ?>" class="large-text"
+                           placeholder="<?php esc_attr_e('Paste a URL or upload a file', 'mypco-online'); ?>" />
+                    <p>
+                        <button type="button" class="button mypco-upload-media-btn"
+                                data-target="#mypco_message_video"
+                                data-media-type="video"><?php esc_html_e('Upload Video', 'mypco-online'); ?></button>
+                        <button type="button" class="button mypco-remove-media-btn"
+                                data-target="#mypco_message_video"
+                                <?php echo $video ? '' : 'style="display:none;"'; ?>><?php esc_html_e('Remove', 'mypco-online'); ?></button>
+                    </p>
+                </td>
+            </tr>
+        </table>
+        <?php
+    }
+
+    /**
+     * Save the "Media" meta box data.
+     */
+    public function save_media_meta($post_id, $post) {
+        if (!isset($_POST['mypco_media_meta_nonce']) ||
+            !wp_verify_nonce($_POST['mypco_media_meta_nonce'], 'mypco_media_meta_save')) {
+            return;
+        }
+
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+            return;
+        }
+
+        if (!current_user_can('edit_post', $post_id)) {
+            return;
+        }
+
+        if (isset($_POST['mypco_message_audio'])) {
+            $audio = esc_url_raw($_POST['mypco_message_audio']);
+            if ($audio) {
+                update_post_meta($post_id, '_mypco_message_audio', $audio);
+            } else {
+                delete_post_meta($post_id, '_mypco_message_audio');
+            }
+        }
+
+        if (isset($_POST['mypco_message_video'])) {
+            $video = esc_url_raw($_POST['mypco_message_video']);
+            if ($video) {
+                update_post_meta($post_id, '_mypco_message_video', $video);
+            } else {
+                delete_post_meta($post_id, '_mypco_message_video');
+            }
+        }
+    }
+
+    // =========================================================================
+    // Message Post Type – Meta Box (Scripture)
+    // =========================================================================
+
+    /**
+     * Register the "Scripture" meta box on the mypco_message post type.
+     */
+    public function add_scripture_meta_box() {
+        add_meta_box(
+            'mypco_scripture_meta',
+            __('Scripture', 'mypco-online'),
+            [$this, 'render_scripture_meta_box'],
+            'mypco_message',
+            'normal',
+            'high'
+        );
+    }
+
+    /**
+     * Render the "Scripture" meta box with repeatable passage rows.
+     *
+     * Each passage has three cascading dropdowns: Book, Chapter, Verse.
+     * JavaScript populates the options from localised Bible data.
+     */
+    public function render_scripture_meta_box($post) {
+        wp_nonce_field('mypco_scripture_meta_save', 'mypco_scripture_meta_nonce');
+
+        $scriptures = get_post_meta($post->ID, '_mypco_message_scriptures', true);
+        if (!is_array($scriptures) || empty($scriptures)) {
+            $scriptures = [['book' => '', 'chapter' => '', 'verse' => '']];
+        }
+        ?>
+        <div id="mypco-scripture-passages">
+            <?php foreach ($scriptures as $i => $scripture) : ?>
+            <div class="mypco-scripture-row" data-index="<?php echo (int) $i; ?>">
+                <select name="mypco_scriptures[<?php echo (int) $i; ?>][book]" class="mypco-scripture-book"
+                        data-value="<?php echo esc_attr($scripture['book'] ?? ''); ?>">
+                    <option value=""><?php esc_html_e('Select Book', 'mypco-online'); ?></option>
+                </select>
+                <select name="mypco_scriptures[<?php echo (int) $i; ?>][chapter]" class="mypco-scripture-chapter"
+                        data-value="<?php echo esc_attr($scripture['chapter'] ?? ''); ?>" disabled>
+                    <option value=""><?php esc_html_e('Chapter', 'mypco-online'); ?></option>
+                </select>
+                <select name="mypco_scriptures[<?php echo (int) $i; ?>][verse]" class="mypco-scripture-verse"
+                        data-value="<?php echo esc_attr($scripture['verse'] ?? ''); ?>" disabled>
+                    <option value=""><?php esc_html_e('Verse', 'mypco-online'); ?></option>
+                </select>
+                <button type="button" class="button mypco-remove-scripture"
+                        title="<?php esc_attr_e('Remove', 'mypco-online'); ?>">&times;</button>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <p>
+            <button type="button" class="button" id="mypco-add-scripture">
+                <?php esc_html_e('Add Passage', 'mypco-online'); ?>
+            </button>
+        </p>
+        <?php
+    }
+
+    /**
+     * Save the "Scripture" meta box data.
+     */
+    public function save_scripture_meta($post_id, $post) {
+        if (!isset($_POST['mypco_scripture_meta_nonce']) ||
+            !wp_verify_nonce($_POST['mypco_scripture_meta_nonce'], 'mypco_scripture_meta_save')) {
+            return;
+        }
+
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+            return;
+        }
+
+        if (!current_user_can('edit_post', $post_id)) {
+            return;
+        }
+
+        $scriptures = [];
+
+        if (isset($_POST['mypco_scriptures']) && is_array($_POST['mypco_scriptures'])) {
+            foreach ($_POST['mypco_scriptures'] as $entry) {
+                $book    = isset($entry['book']) ? sanitize_text_field($entry['book']) : '';
+                $chapter = isset($entry['chapter']) ? absint($entry['chapter']) : 0;
+                $verse   = isset($entry['verse']) ? absint($entry['verse']) : 0;
+
+                if (!empty($book)) {
+                    $scriptures[] = [
+                        'book'    => $book,
+                        'chapter' => $chapter,
+                        'verse'   => $verse,
+                    ];
+                }
+            }
+        }
+
+        if (!empty($scriptures)) {
+            update_post_meta($post_id, '_mypco_message_scriptures', $scriptures);
+        } else {
+            delete_post_meta($post_id, '_mypco_message_scriptures');
         }
     }
 
