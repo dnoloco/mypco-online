@@ -203,6 +203,14 @@ class MyPCO_Series_Module extends MyPCO_Module_Base {
             delete_transient('mypco_flush_rewrite_rules');
             flush_rewrite_rules();
         }
+
+        // Also flush when CPT/taxonomy registrations change. Bump the
+        // version string whenever slugs or post types are modified.
+        $rewrite_version = 'mypco_rewrite_v1';
+        if (get_option('mypco_rewrite_version') !== $rewrite_version) {
+            flush_rewrite_rules();
+            update_option('mypco_rewrite_version', $rewrite_version);
+        }
     }
 
     /**
