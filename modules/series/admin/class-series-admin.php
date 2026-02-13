@@ -100,7 +100,7 @@ class MyPCO_Series_Admin {
     public function enqueue_admin_assets($hook) {
         $screen = get_current_screen();
         $is_module_post_type = ($screen && in_array($screen->post_type, ['mypco_message', 'mypco_speaker'], true));
-        $is_module_taxonomy = ($screen && in_array($screen->taxonomy, ['mypco_series', 'mypco_service_type'], true));
+        $is_module_taxonomy = ($screen && in_array($screen->taxonomy, ['mypco_series', 'mypco_speaker_tax', 'mypco_service_type'], true));
 
         // Match our custom admin pages, post type editors, or taxonomy screens
         if (strpos($hook, 'mypco-series') === false && !$is_module_post_type && !$is_module_taxonomy) {
