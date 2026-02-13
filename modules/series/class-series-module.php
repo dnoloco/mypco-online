@@ -196,6 +196,13 @@ class MyPCO_Series_Module extends MyPCO_Module_Base {
             'show_in_rest'      => true,
             'rewrite'           => ['slug' => 'service-types'],
         ]);
+
+        // Flush rewrite rules once after activation so new CPT/taxonomy
+        // URLs are recognised (the activator sets this transient).
+        if (get_transient('mypco_flush_rewrite_rules')) {
+            delete_transient('mypco_flush_rewrite_rules');
+            flush_rewrite_rules();
+        }
     }
 
     /**
