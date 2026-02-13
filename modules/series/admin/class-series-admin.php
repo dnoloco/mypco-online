@@ -840,8 +840,8 @@ class MyPCO_Series_Admin {
      */
     public function add_speaker_meta_box() {
         add_meta_box(
-            'mypco_speaker_select',
-            __('Speaker', 'mypco-online'),
+            'mypco_speaker_meta',
+            __('Message Speaker', 'mypco-online'),
             [$this, 'render_speaker_meta_box'],
             'mypco_message',
             'side',
@@ -855,7 +855,7 @@ class MyPCO_Series_Admin {
     public function render_speaker_meta_box($post) {
         wp_nonce_field('mypco_speaker_meta_save', 'mypco_speaker_meta_nonce');
 
-        $selected_speaker = get_post_meta($post->ID, '_mypco_speaker_id', true);
+        $current_speaker = get_post_meta($post->ID, '_mypco_speaker_id', true);
 
         $speakers = get_posts([
             'post_type'      => 'mypco_speaker',
@@ -864,17 +864,18 @@ class MyPCO_Series_Admin {
             'order'          => 'ASC',
             'post_status'    => 'publish',
         ]);
-        ?>
-        <select id="mypco_speaker_id" name="mypco_speaker_id" style="width:100%;">
-            <option value=""><?php esc_html_e('— Select Speaker —', 'mypco-online'); ?></option>
-            <?php foreach ($speakers as $speaker) : ?>
-                <option value="<?php echo esc_attr($speaker->ID); ?>"
-                    <?php selected($selected_speaker, $speaker->ID); ?>>
-                    <?php echo esc_html($speaker->post_title); ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-        <?php
+
+        echo '<select name="mypco_speaker_id" style="width:100%;">';
+        echo '<option value="">' . esc_html__('Select a Speaker', 'mypco-online') . '</option>';
+        foreach ($speakers as $speaker) {
+            printf(
+                '<option value="%d" %s>%s</option>',
+                $speaker->ID,
+                selected($current_speaker, $speaker->ID, false),
+                esc_html($speaker->post_title)
+            );
+        }
+        echo '</select>';
     }
 
     /**
