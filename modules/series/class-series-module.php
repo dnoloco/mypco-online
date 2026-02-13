@@ -59,6 +59,9 @@ class MyPCO_Series_Module extends MyPCO_Module_Base {
      * Initialize the Series module.
      */
     public function init() {
+        // Register custom post type (must run on every request)
+        $this->loader->add_action('init', $this, 'register_series_post_type');
+
         // Load and initialize admin component
         if (is_admin()) {
             $this->load_admin_component();
@@ -66,6 +69,46 @@ class MyPCO_Series_Module extends MyPCO_Module_Base {
 
         // Load and initialize public component (always loaded for shortcodes)
         $this->load_public_component();
+    }
+
+    /**
+     * Register the Series custom post type.
+     */
+    public function register_series_post_type() {
+        $labels = [
+            'name'                  => __('Series', 'mypco-online'),
+            'singular_name'         => __('Series', 'mypco-online'),
+            'menu_name'             => __('Series', 'mypco-online'),
+            'name_admin_bar'        => __('Series', 'mypco-online'),
+            'add_new'               => __('Add New', 'mypco-online'),
+            'add_new_item'          => __('Add New Series', 'mypco-online'),
+            'new_item'              => __('New Series', 'mypco-online'),
+            'edit_item'             => __('Edit Series', 'mypco-online'),
+            'view_item'             => __('View Series', 'mypco-online'),
+            'all_items'             => __('All Series', 'mypco-online'),
+            'search_items'          => __('Search Series', 'mypco-online'),
+            'not_found'             => __('No series found.', 'mypco-online'),
+            'not_found_in_trash'    => __('No series found in Trash.', 'mypco-online'),
+        ];
+
+        $args = [
+            'labels'             => $labels,
+            'public'             => true,
+            'publicly_queryable' => true,
+            'show_ui'            => true,
+            'show_in_menu'       => true,
+            'query_var'          => true,
+            'rewrite'            => ['slug' => 'series'],
+            'capability_type'    => 'post',
+            'has_archive'        => true,
+            'hierarchical'       => false,
+            'menu_position'      => 26,
+            'menu_icon'          => 'dashicons-microphone',
+            'supports'           => ['title', 'editor', 'thumbnail'],
+            'show_in_rest'       => true,
+        ];
+
+        register_post_type('mypco_series', $args);
     }
 
     /**
