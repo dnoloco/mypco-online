@@ -152,13 +152,54 @@
 #mypco_series_info .handle-order-higher,
 #mypco_series_info .handle-order-lower,
 #mypco_message_info .handle-order-higher,
-#mypco_message_info .handle-order-lower {
+#mypco_message_info .handle-order-lower,
+#mypco_media_meta .handle-order-higher,
+#mypco_media_meta .handle-order-lower,
+#mypco_scripture_meta .handle-order-higher,
+#mypco_scripture_meta .handle-order-lower {
     display: none;
 }
 
 /* Remove drag cursor from our meta box title bars */
 #mypco_speaker_meta .hndle,
 #mypco_series_info .hndle,
-#mypco_message_info .hndle {
+#mypco_message_info .hndle,
+#mypco_media_meta .hndle,
+#mypco_scripture_meta .hndle {
     cursor: default;
+}
+
+/* =====================================================================
+   Message Editor – Media Meta Box
+   ===================================================================== */
+
+#mypco_media_meta .form-table td input[type="url"] {
+    margin-bottom: 6px;
+}
+
+/* =====================================================================
+   Message Editor – Scripture Meta Box
+   ===================================================================== */
+
+.mypco-scripture-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.mypco-scripture-row select {
+    min-width: 140px;
+}
+
+.mypco-scripture-row .mypco-scripture-book {
+    min-width: 180px;
+}
+
+.mypco-remove-scripture {
+    color: #b32d2e;
+    min-width: 30px;
+    padding: 0 8px;
+    line-height: 28px;
+    font-size: 16px;
 }

@@ -82,6 +82,198 @@
         });
 
         // =====================================================================
+        // Media Upload (Audio / Video) via WordPress Media Library
+        // =====================================================================
+
+        $(document).on('click', '.mypco-upload-media-btn', function(e) {
+            e.preventDefault();
+
+            var $btn       = $(this);
+            var $target    = $($btn.data('target'));
+            var mediaType  = $btn.data('media-type') || '';
+
+            var frameOpts = {
+                title: $btn.text(),
+                button: { text: 'Use this file' },
+                multiple: false
+            };
+
+            if (mediaType) {
+                frameOpts.library = { type: mediaType };
+            }
+
+            var frame = wp.media(frameOpts);
+
+            frame.on('select', function() {
+                var attachment = frame.state().get('selection').first().toJSON();
+                $target.val(attachment.url);
+                $btn.siblings('.mypco-remove-media-btn').show();
+            });
+
+            frame.open();
+        });
+
+        $(document).on('click', '.mypco-remove-media-btn', function(e) {
+            e.preventDefault();
+            var $target = $($(this).data('target'));
+            $target.val('');
+            $(this).hide();
+        });
+
+        // Show/hide remove button when the URL input changes
+        $(document).on('input', '#mypco_message_audio, #mypco_message_video', function() {
+            var $remove = $(this).closest('td').find('.mypco-remove-media-btn');
+            if ($(this).val()) {
+                $remove.show();
+            } else {
+                $remove.hide();
+            }
+        });
+
+        // =====================================================================
+        // Scripture Passages – Cascading Book → Chapter → Verse
+        // =====================================================================
+
+        var bibleData = (typeof mypcoSeriesAdmin !== 'undefined' && mypcoSeriesAdmin.bibleData)
+            ? mypcoSeriesAdmin.bibleData
+            : [];
+
+        var i18n = (typeof mypcoSeriesAdmin !== 'undefined' && mypcoSeriesAdmin.i18n)
+            ? mypcoSeriesAdmin.i18n
+            : { selectBook: 'Select Book', chapter: 'Chapter', verse: 'Verse' };
+
+        function getBookData(bookName) {
+            for (var i = 0; i < bibleData.length; i++) {
+                if (bibleData[i].name === bookName) {
+                    return bibleData[i];
+                }
+            }
+            return null;
+        }
+
+        function populateBookDropdown($select) {
+            var saved = $select.data('value') || '';
+            $select.empty().append('<option value="">' + i18n.selectBook + '</option>');
+            $.each(bibleData, function(idx, book) {
+                $select.append('<option value="' + book.name + '">' + book.name + '</option>');
+            });
+            if (saved) {
+                $select.val(saved);
+            }
+        }
+
+        function populateChapterDropdown($select, book) {
+            var saved = $select.data('value') || '';
+            $select.empty().append('<option value="">' + i18n.chapter + '</option>');
+            if (book) {
+                for (var c = 1; c <= book.chapters.length; c++) {
+                    $select.append('<option value="' + c + '">' + c + '</option>');
+                }
+                $select.prop('disabled', false);
+            } else {
+                $select.prop('disabled', true);
+            }
+            if (saved) {
+                $select.val(saved);
+            }
+        }
+
+        function populateVerseDropdown($select, book, chapter) {
+            var saved = $select.data('value') || '';
+            $select.empty().append('<option value="">' + i18n.verse + '</option>');
+            if (book && chapter > 0 && chapter <= book.chapters.length) {
+                var count = book.chapters[chapter - 1];
+                for (var v = 1; v <= count; v++) {
+                    $select.append('<option value="' + v + '">' + v + '</option>');
+                }
+                $select.prop('disabled', false);
+            } else {
+                $select.prop('disabled', true);
+            }
+            if (saved) {
+                $select.val(saved);
+            }
+        }
+
+        // Initialise existing scripture rows (populate selects + restore saved values)
+        $('#mypco-scripture-passages .mypco-scripture-row').each(function() {
+            var $row     = $(this);
+            var $book    = $row.find('.mypco-scripture-book');
+            var $chapter = $row.find('.mypco-scripture-chapter');
+            var $verse   = $row.find('.mypco-scripture-verse');
+
+            populateBookDropdown($book);
+
+            var bookData = getBookData($book.val());
+            populateChapterDropdown($chapter, bookData);
+
+            if (bookData && $chapter.val()) {
+                populateVerseDropdown($verse, bookData, parseInt($chapter.val(), 10));
+            }
+        });
+
+        // Book changed → populate chapters, reset verses
+        $(document).on('change', '.mypco-scripture-book', function() {
+            var $row     = $(this).closest('.mypco-scripture-row');
+            var $chapter = $row.find('.mypco-scripture-chapter');
+            var $verse   = $row.find('.mypco-scripture-verse');
+            var bookData = getBookData($(this).val());
+
+            $chapter.removeData('value');
+            $verse.removeData('value');
+            populateChapterDropdown($chapter, bookData);
+            populateVerseDropdown($verse, null, 0);
+        });
+
+        // Chapter changed → populate verses
+        $(document).on('change', '.mypco-scripture-chapter', function() {
+            var $row     = $(this).closest('.mypco-scripture-row');
+            var $book    = $row.find('.mypco-scripture-book');
+            var $verse   = $row.find('.mypco-scripture-verse');
+            var bookData = getBookData($book.val());
+
+            $verse.removeData('value');
+            populateVerseDropdown($verse, bookData, parseInt($(this).val(), 10) || 0);
+        });
+
+        // Add a new passage row
+        $(document).on('click', '#mypco-add-scripture', function() {
+            var $container = $('#mypco-scripture-passages');
+            var index      = $container.find('.mypco-scripture-row').length;
+
+            var $row = $(
+                '<div class="mypco-scripture-row" data-index="' + index + '">' +
+                    '<select name="mypco_scriptures[' + index + '][book]" class="mypco-scripture-book">' +
+                        '<option value="">' + i18n.selectBook + '</option>' +
+                    '</select>' +
+                    '<select name="mypco_scriptures[' + index + '][chapter]" class="mypco-scripture-chapter" disabled>' +
+                        '<option value="">' + i18n.chapter + '</option>' +
+                    '</select>' +
+                    '<select name="mypco_scriptures[' + index + '][verse]" class="mypco-scripture-verse" disabled>' +
+                        '<option value="">' + i18n.verse + '</option>' +
+                    '</select>' +
+                    '<button type="button" class="button mypco-remove-scripture" title="Remove">&times;</button>' +
+                '</div>'
+            );
+
+            $container.append($row);
+            populateBookDropdown($row.find('.mypco-scripture-book'));
+        });
+
+        // Remove a passage row (clear instead of removing the last one)
+        $(document).on('click', '.mypco-remove-scripture', function() {
+            var $container = $('#mypco-scripture-passages');
+            var $row       = $(this).closest('.mypco-scripture-row');
+
+            if ($container.find('.mypco-scripture-row').length <= 1) {
+                $row.find('.mypco-scripture-book').val('').trigger('change');
+                return;
+            }
+
+            $row.remove();
+        });
+
+        // =====================================================================
         // Image Upload via WordPress Media Library
         // =====================================================================
 
