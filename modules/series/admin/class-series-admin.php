@@ -885,7 +885,7 @@ class MyPCO_Series_Admin {
 
         // Toggle link + hidden add-new form (matches WP "Add New Category" pattern)
         echo '<a href="#" id="mypco_toggle_add_speaker" style="display:inline-block;margin-top:6px;font-size:12px;">';
-        echo '+ ' . esc_html__('Add New Speaker', 'mypco-online');
+        echo esc_html__('Add New Speaker', 'mypco-online');
         echo '</a>';
         echo '<div id="mypco_add_speaker_form" style="display:none;margin-top:6px;">';
         echo '<input type="text" id="mypco_new_speaker_name" style="width:100%;margin-bottom:6px;" />';

@@ -14,8 +14,12 @@
 
         // Lock our meta boxes in place on the Message editor –
         // disable sortable so they cannot be dragged between areas.
+        // Wrapped in try-catch because sortable may not be initialised
+        // yet when Gutenberg renders meta boxes asynchronously.
         if ($('body').hasClass('post-type-mypco_message')) {
-            $('.meta-box-sortables').sortable('disable');
+            try {
+                $('.meta-box-sortables').sortable('disable');
+            } catch (e) { /* sortable not ready yet */ }
         }
 
         // =====================================================================
