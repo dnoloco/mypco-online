@@ -20,9 +20,17 @@
 
         // =====================================================================
         // Inline "Add New Speaker" from the Message editor meta box
+        // Uses event delegation so it works with Gutenberg's async rendering.
         // =====================================================================
 
-        $('#mypco_add_speaker_btn').on('click', function() {
+        // Toggle the add-new form
+        $(document).on('click', '#mypco_toggle_add_speaker', function(e) {
+            e.preventDefault();
+            $('#mypco_add_speaker_form').slideToggle(150);
+        });
+
+        // Create the speaker via AJAX
+        $(document).on('click', '#mypco_add_speaker_btn', function() {
             var $btn    = $(this);
             var $input  = $('#mypco_new_speaker_name');
             var $select = $('#mypco_speaker_id');
@@ -45,13 +53,13 @@
                 $btn.prop('disabled', false);
 
                 if (response.success) {
-                    // Add the new speaker to the dropdown and select it
                     $select.append(
                         $('<option>', { value: response.data.id, text: response.data.name })
                     );
                     $select.val(response.data.id);
                     $input.val('');
                     $status.text('Added!').delay(2000).fadeOut();
+                    $('#mypco_add_speaker_form').slideUp(150);
                 } else {
                     $status.text(response.data.message || 'Error').show();
                 }
@@ -62,7 +70,7 @@
         });
 
         // Allow pressing Enter in the speaker name field to trigger the add
-        $('#mypco_new_speaker_name').on('keydown', function(e) {
+        $(document).on('keydown', '#mypco_new_speaker_name', function(e) {
             if (e.which === 13) {
                 e.preventDefault();
                 $('#mypco_add_speaker_btn').trigger('click');
