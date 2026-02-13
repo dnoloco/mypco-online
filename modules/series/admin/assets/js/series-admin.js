@@ -16,6 +16,7 @@
         // Image Upload via WordPress Media Library
         // =====================================================================
 
+        // Pattern 1: .mypco-image-upload wrapper (existing admin templates)
         $('.mypco-image-upload').each(function() {
             var $wrap      = $(this);
             var $input     = $wrap.find('input[type="hidden"]');
@@ -66,6 +67,58 @@
                 $preview.html('').removeClass('has-image');
                 $removeBtn.hide();
             });
+        });
+
+        // Pattern 2: data-target / data-preview buttons (meta box + taxonomy forms)
+        $(document).on('click', '.mypco-upload-image-btn', function(e) {
+            e.preventDefault();
+
+            var $btn     = $(this);
+            var $target  = $($btn.data('target'));
+            var $preview = $btn.data('preview') ? $($btn.data('preview')) : null;
+            var $remove  = $btn.siblings('.mypco-remove-image-btn');
+
+            var frame = wp.media({
+                title: $btn.text(),
+                button: { text: 'Use this image' },
+                multiple: false,
+                library: { type: 'image' }
+            });
+
+            frame.on('select', function() {
+                var attachment = frame.state().get('selection').first().toJSON();
+                var url = attachment.sizes && attachment.sizes.medium
+                    ? attachment.sizes.medium.url
+                    : attachment.url;
+
+                $target.val(url);
+
+                if ($preview && $preview.length) {
+                    $preview.html('<img src="' + url + '" style="max-width:200px;height:auto;" />');
+                }
+
+                if ($remove.length) {
+                    $remove.show();
+                }
+            });
+
+            frame.open();
+        });
+
+        $(document).on('click', '.mypco-remove-image-btn', function(e) {
+            e.preventDefault();
+
+            var $btn     = $(this);
+            var $target  = $($btn.data('target'));
+            var $preview = $btn.data('preview') ? $($btn.data('preview')) : null;
+
+            $target.val('');
+
+            if ($preview && $preview.length) {
+                $preview.html('');
+            }
+
+            $btn.hide();
         });
     });
 })(jQuery);
