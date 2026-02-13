@@ -12,6 +12,12 @@
             }
         });
 
+        // Lock our meta boxes in place on the Message editor –
+        // disable sortable so they cannot be dragged between areas.
+        if ($('body').hasClass('post-type-mypco_message')) {
+            $('.meta-box-sortables').sortable('disable');
+        }
+
         // =====================================================================
         // Image Upload via WordPress Media Library
         // =====================================================================

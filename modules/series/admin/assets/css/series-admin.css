@@ -135,3 +135,30 @@
     width: 18px;
     height: 18px;
 }
+
+/* =====================================================================
+   Message Editor – Meta Box Lockdown
+   ===================================================================== */
+
+/* Fix speaker dropdown overflow in sidebar */
+#mypco_speaker_meta select {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Hide move/sort handles on our meta boxes */
+#mypco_speaker_meta .handle-order-higher,
+#mypco_speaker_meta .handle-order-lower,
+#mypco_series_info .handle-order-higher,
+#mypco_series_info .handle-order-lower,
+#mypco_message_info .handle-order-higher,
+#mypco_message_info .handle-order-lower {
+    display: none;
+}
+
+/* Remove drag cursor from our meta box title bars */
+#mypco_speaker_meta .hndle,
+#mypco_series_info .hndle,
+#mypco_message_info .hndle {
+    cursor: default;
+}
