@@ -146,12 +146,13 @@ class MyPCO_Series_Module extends MyPCO_Module_Base {
     }
 
     /**
-     * Register the Series, Speaker, and Service Type taxonomies.
+     * Register the Series and Service Type taxonomies.
      *
-     * Registration order determines sidebar panel order in the editor.
+     * Speaker assignment uses a post-meta relationship to the mypco_speaker CPT
+     * rather than a taxonomy (see the Speaker meta box in class-series-admin.php).
      */
     public function register_taxonomies() {
-        // 1. Series taxonomy
+        // Series taxonomy
         $series_labels = [
             'name'                       => __('Series', 'mypco-online'),
             'singular_name'              => __('Series', 'mypco-online'),
@@ -175,32 +176,7 @@ class MyPCO_Series_Module extends MyPCO_Module_Base {
             'rewrite'           => ['slug' => 'series'],
         ]);
 
-        // 2. Speaker taxonomy (sidebar panel for tagging messages with speakers;
-        //    the mypco_speaker CPT is kept separately for full speaker profiles)
-        $speaker_tax_labels = [
-            'name'                       => __('Speakers', 'mypco-online'),
-            'singular_name'              => __('Speaker', 'mypco-online'),
-            'search_items'               => __('Search Speakers', 'mypco-online'),
-            'all_items'                  => __('All Speakers', 'mypco-online'),
-            'edit_item'                  => __('Edit Speaker', 'mypco-online'),
-            'update_item'                => __('Update Speaker', 'mypco-online'),
-            'add_new_item'               => __('Add New Speaker', 'mypco-online'),
-            'new_item_name'              => __('New Speaker Name', 'mypco-online'),
-            'menu_name'                  => __('Speakers', 'mypco-online'),
-            'not_found'                  => __('No speakers found.', 'mypco-online'),
-        ];
-
-        register_taxonomy('mypco_speaker_tax', ['mypco_message'], [
-            'labels'            => $speaker_tax_labels,
-            'hierarchical'      => true,
-            'public'            => true,
-            'show_ui'           => true,
-            'show_admin_column' => true,
-            'show_in_rest'      => true,
-            'rewrite'           => ['slug' => 'speaker'],
-        ]);
-
-        // 3. Service Type taxonomy
+        // Service Type taxonomy
         $service_type_labels = [
             'name'                       => __('Service Types', 'mypco-online'),
             'singular_name'              => __('Service Type', 'mypco-online'),
@@ -233,7 +209,7 @@ class MyPCO_Series_Module extends MyPCO_Module_Base {
 
         // Also flush when CPT/taxonomy registrations change. Bump the
         // version string whenever slugs or post types are modified.
-        $rewrite_version = 'mypco_rewrite_v3';
+        $rewrite_version = 'mypco_rewrite_v4';
         if (get_option('mypco_rewrite_version') !== $rewrite_version) {
             flush_rewrite_rules();
             update_option('mypco_rewrite_version', $rewrite_version);

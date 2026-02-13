@@ -33,6 +33,10 @@ class MyPCO_Series_Admin {
         $this->loader->add_action('add_meta_boxes', $this, 'add_series_info_meta_box');
         $this->loader->add_action('save_post_mypco_message', $this, 'save_series_info_meta', 10, 2);
 
+        // Speaker meta box on Message post type (relationship to mypco_speaker CPT)
+        $this->loader->add_action('add_meta_boxes', $this, 'add_speaker_meta_box');
+        $this->loader->add_action('save_post_mypco_message', $this, 'save_speaker_meta', 10, 2);
+
         // Message Info meta box on Message post type
         $this->loader->add_action('add_meta_boxes', $this, 'add_message_info_meta_box');
         $this->loader->add_action('save_post_mypco_message', $this, 'save_message_info_meta', 10, 2);
@@ -100,7 +104,7 @@ class MyPCO_Series_Admin {
     public function enqueue_admin_assets($hook) {
         $screen = get_current_screen();
         $is_module_post_type = ($screen && in_array($screen->post_type, ['mypco_message', 'mypco_speaker'], true));
-        $is_module_taxonomy = ($screen && in_array($screen->taxonomy, ['mypco_series', 'mypco_speaker_tax', 'mypco_service_type'], true));
+        $is_module_taxonomy = ($screen && in_array($screen->taxonomy, ['mypco_series', 'mypco_service_type'], true));
 
         // Match our custom admin pages, post type editors, or taxonomy screens
         if (strpos($hook, 'mypco-series') === false && !$is_module_post_type && !$is_module_taxonomy) {
@@ -822,6 +826,80 @@ class MyPCO_Series_Admin {
 
         if (isset($_POST['mypco_series_image'])) {
             update_term_meta($term_id, '_mypco_series_image', esc_url_raw($_POST['mypco_series_image']));
+        }
+    }
+
+    // =========================================================================
+    // Message Post Type – Meta Box (Speaker)
+    // =========================================================================
+
+    /**
+     * Register the "Speaker" meta box on the mypco_message post type.
+     *
+     * Placed in the side context so it appears in the editor sidebar.
+     */
+    public function add_speaker_meta_box() {
+        add_meta_box(
+            'mypco_speaker_select',
+            __('Speaker', 'mypco-online'),
+            [$this, 'render_speaker_meta_box'],
+            'mypco_message',
+            'side',
+            'default'
+        );
+    }
+
+    /**
+     * Render the "Speaker" meta box with a dropdown of mypco_speaker posts.
+     */
+    public function render_speaker_meta_box($post) {
+        wp_nonce_field('mypco_speaker_meta_save', 'mypco_speaker_meta_nonce');
+
+        $selected_speaker = get_post_meta($post->ID, '_mypco_speaker_id', true);
+
+        $speakers = get_posts([
+            'post_type'      => 'mypco_speaker',
+            'posts_per_page' => -1,
+            'orderby'        => 'title',
+            'order'          => 'ASC',
+            'post_status'    => 'publish',
+        ]);
+        ?>
+        <select id="mypco_speaker_id" name="mypco_speaker_id" style="width:100%;">
+            <option value=""><?php esc_html_e('— Select Speaker —', 'mypco-online'); ?></option>
+            <?php foreach ($speakers as $speaker) : ?>
+                <option value="<?php echo esc_attr($speaker->ID); ?>"
+                    <?php selected($selected_speaker, $speaker->ID); ?>>
+                    <?php echo esc_html($speaker->post_title); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <?php
+    }
+
+    /**
+     * Save the selected speaker ID as post meta.
+     */
+    public function save_speaker_meta($post_id, $post) {
+        if (!isset($_POST['mypco_speaker_meta_nonce']) ||
+            !wp_verify_nonce($_POST['mypco_speaker_meta_nonce'], 'mypco_speaker_meta_save')) {
+            return;
+        }
+
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+            return;
+        }
+
+        if (!current_user_can('edit_post', $post_id)) {
+            return;
+        }
+
+        $speaker_id = isset($_POST['mypco_speaker_id']) ? absint($_POST['mypco_speaker_id']) : 0;
+
+        if ($speaker_id > 0) {
+            update_post_meta($post_id, '_mypco_speaker_id', $speaker_id);
+        } else {
+            delete_post_meta($post_id, '_mypco_speaker_id');
         }
     }
 
