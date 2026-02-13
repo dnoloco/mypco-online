@@ -33,6 +33,10 @@ class MyPCO_Series_Admin {
         $this->loader->add_action('add_meta_boxes', $this, 'add_series_info_meta_box');
         $this->loader->add_action('save_post_mypco_message', $this, 'save_series_info_meta', 10, 2);
 
+        // Message Info meta box on Message post type
+        $this->loader->add_action('add_meta_boxes', $this, 'add_message_info_meta_box');
+        $this->loader->add_action('save_post_mypco_message', $this, 'save_message_info_meta', 10, 2);
+
         // Series taxonomy custom fields
         $this->loader->add_action('mypco_series_add_form_fields', $this, 'render_series_info_add_fields');
         $this->loader->add_action('mypco_series_edit_form_fields', $this, 'render_series_info_edit_fields');
@@ -818,6 +822,102 @@ class MyPCO_Series_Admin {
 
         if (isset($_POST['mypco_series_image'])) {
             update_term_meta($term_id, '_mypco_series_image', esc_url_raw($_POST['mypco_series_image']));
+        }
+    }
+
+    // =========================================================================
+    // Message Post Type – Meta Box (Message Info)
+    // =========================================================================
+
+    /**
+     * Register the "Message Info" meta box on the mypco_message post type.
+     */
+    public function add_message_info_meta_box() {
+        add_meta_box(
+            'mypco_message_info',
+            __('Message Info', 'mypco-online'),
+            [$this, 'render_message_info_meta_box'],
+            'mypco_message',
+            'normal',
+            'high'
+        );
+    }
+
+    /**
+     * Render the "Message Info" meta box fields.
+     */
+    public function render_message_info_meta_box($post) {
+        wp_nonce_field('mypco_message_info_meta_save', 'mypco_message_info_meta_nonce');
+
+        $description  = get_post_meta($post->ID, '_mypco_message_description', true);
+        $message_date = get_post_meta($post->ID, '_mypco_message_date', true);
+        $image        = get_post_meta($post->ID, '_mypco_message_image', true);
+        ?>
+        <table class="form-table">
+            <tr>
+                <th><label for="mypco_message_description"><?php esc_html_e('Description', 'mypco-online'); ?></label></th>
+                <td>
+                    <textarea id="mypco_message_description" name="mypco_message_description"
+                              rows="5" class="large-text"><?php echo esc_textarea($description); ?></textarea>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="mypco_message_date"><?php esc_html_e('Message Date', 'mypco-online'); ?></label></th>
+                <td>
+                    <input type="date" id="mypco_message_date" name="mypco_message_date"
+                           value="<?php echo esc_attr($message_date); ?>" />
+                </td>
+            </tr>
+            <tr>
+                <th><label for="mypco_message_image"><?php esc_html_e('Image', 'mypco-online'); ?></label></th>
+                <td>
+                    <input type="hidden" id="mypco_message_image" name="mypco_message_image"
+                           value="<?php echo esc_url($image); ?>" />
+                    <button type="button" class="button mypco-upload-image-btn"
+                            data-target="#mypco_message_image"
+                            data-preview="#mypco-message-image-preview"><?php esc_html_e('Select Image', 'mypco-online'); ?></button>
+                    <button type="button" class="button mypco-remove-image-btn"
+                            data-target="#mypco_message_image"
+                            data-preview="#mypco-message-image-preview"
+                            <?php echo $image ? '' : 'style="display:none;"'; ?>><?php esc_html_e('Remove Image', 'mypco-online'); ?></button>
+                    <div id="mypco-message-image-preview" style="margin-top:10px;">
+                        <?php if ($image) : ?>
+                            <img src="<?php echo esc_url($image); ?>" style="max-width:200px;height:auto;" />
+                        <?php endif; ?>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <?php
+    }
+
+    /**
+     * Save the "Message Info" meta box data.
+     */
+    public function save_message_info_meta($post_id, $post) {
+        if (!isset($_POST['mypco_message_info_meta_nonce']) ||
+            !wp_verify_nonce($_POST['mypco_message_info_meta_nonce'], 'mypco_message_info_meta_save')) {
+            return;
+        }
+
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+            return;
+        }
+
+        if (!current_user_can('edit_post', $post_id)) {
+            return;
+        }
+
+        if (isset($_POST['mypco_message_description'])) {
+            update_post_meta($post_id, '_mypco_message_description', sanitize_textarea_field($_POST['mypco_message_description']));
+        }
+
+        if (isset($_POST['mypco_message_date'])) {
+            update_post_meta($post_id, '_mypco_message_date', sanitize_text_field($_POST['mypco_message_date']));
+        }
+
+        if (isset($_POST['mypco_message_image'])) {
+            update_post_meta($post_id, '_mypco_message_image', esc_url_raw($_POST['mypco_message_image']));
         }
     }
 
