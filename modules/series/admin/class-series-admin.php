@@ -41,6 +41,9 @@ class MyPCO_Series_Admin {
         $this->loader->add_action('add_meta_boxes', $this, 'add_message_info_meta_box');
         $this->loader->add_action('save_post_mypco_message', $this, 'save_message_info_meta', 10, 2);
 
+        // AJAX: create speaker from Message editor meta box
+        $this->loader->add_action('wp_ajax_mypco_add_speaker', $this, 'ajax_add_speaker');
+
         // Series taxonomy custom fields
         $this->loader->add_action('mypco_series_add_form_fields', $this, 'render_series_info_add_fields');
         $this->loader->add_action('mypco_series_edit_form_fields', $this, 'render_series_info_edit_fields');
@@ -127,6 +130,11 @@ class MyPCO_Series_Admin {
             MYPCO_VERSION,
             true
         );
+
+        wp_localize_script('mypco-series-admin', 'mypcoSeriesAdmin', [
+            'ajaxUrl'         => admin_url('admin-ajax.php'),
+            'addSpeakerNonce' => wp_create_nonce('mypco_add_speaker'),
+        ]);
     }
 
     // =========================================================================
@@ -850,7 +858,7 @@ class MyPCO_Series_Admin {
     }
 
     /**
-     * Render the "Speaker" meta box with a dropdown of mypco_speaker posts.
+     * Render the "Speaker" meta box with a dropdown and inline add.
      */
     public function render_speaker_meta_box($post) {
         wp_nonce_field('mypco_speaker_meta_save', 'mypco_speaker_meta_nonce');
@@ -865,7 +873,7 @@ class MyPCO_Series_Admin {
             'post_status'    => 'publish',
         ]);
 
-        echo '<select name="mypco_speaker_id" style="width:100%;">';
+        echo '<select name="mypco_speaker_id" id="mypco_speaker_id" style="width:100%;">';
         echo '<option value="">' . esc_html__('Select a Speaker', 'mypco-online') . '</option>';
         foreach ($speakers as $speaker) {
             printf(
@@ -876,6 +884,12 @@ class MyPCO_Series_Admin {
             );
         }
         echo '</select>';
+
+        echo '<div style="margin-top:8px;">';
+        echo '<input type="text" id="mypco_new_speaker_name" placeholder="' . esc_attr__('New speaker name', 'mypco-online') . '" style="width:100%;margin-bottom:4px;" />';
+        echo '<button type="button" id="mypco_add_speaker_btn" class="button" style="width:100%;">' . esc_html__('Add New Speaker', 'mypco-online') . '</button>';
+        echo '<span id="mypco_add_speaker_status" style="display:none;font-style:italic;font-size:12px;margin-top:4px;display:block;"></span>';
+        echo '</div>';
     }
 
     /**
@@ -902,6 +916,37 @@ class MyPCO_Series_Admin {
         } else {
             delete_post_meta($post_id, '_mypco_speaker_id');
         }
+    }
+
+    /**
+     * AJAX: create a new mypco_speaker post from the Message editor meta box.
+     */
+    public function ajax_add_speaker() {
+        check_ajax_referer('mypco_add_speaker', 'nonce');
+
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(['message' => __('Permission denied.', 'mypco-online')]);
+        }
+
+        $name = isset($_POST['speaker_name']) ? sanitize_text_field($_POST['speaker_name']) : '';
+        if (empty($name)) {
+            wp_send_json_error(['message' => __('Speaker name is required.', 'mypco-online')]);
+        }
+
+        $post_id = wp_insert_post([
+            'post_type'   => 'mypco_speaker',
+            'post_title'  => $name,
+            'post_status' => 'publish',
+        ], true);
+
+        if (is_wp_error($post_id)) {
+            wp_send_json_error(['message' => $post_id->get_error_message()]);
+        }
+
+        wp_send_json_success([
+            'id'   => $post_id,
+            'name' => $name,
+        ]);
     }
 
     // =========================================================================

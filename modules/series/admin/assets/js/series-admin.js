@@ -19,6 +19,57 @@
         }
 
         // =====================================================================
+        // Inline "Add New Speaker" from the Message editor meta box
+        // =====================================================================
+
+        $('#mypco_add_speaker_btn').on('click', function() {
+            var $btn    = $(this);
+            var $input  = $('#mypco_new_speaker_name');
+            var $select = $('#mypco_speaker_id');
+            var $status = $('#mypco_add_speaker_status');
+            var name    = $.trim($input.val());
+
+            if (!name) {
+                $input.focus();
+                return;
+            }
+
+            $btn.prop('disabled', true);
+            $status.text('Adding…').show();
+
+            $.post(mypcoSeriesAdmin.ajaxUrl, {
+                action:       'mypco_add_speaker',
+                nonce:        mypcoSeriesAdmin.addSpeakerNonce,
+                speaker_name: name
+            }, function(response) {
+                $btn.prop('disabled', false);
+
+                if (response.success) {
+                    // Add the new speaker to the dropdown and select it
+                    $select.append(
+                        $('<option>', { value: response.data.id, text: response.data.name })
+                    );
+                    $select.val(response.data.id);
+                    $input.val('');
+                    $status.text('Added!').delay(2000).fadeOut();
+                } else {
+                    $status.text(response.data.message || 'Error').show();
+                }
+            }).fail(function() {
+                $btn.prop('disabled', false);
+                $status.text('Request failed.').show();
+            });
+        });
+
+        // Allow pressing Enter in the speaker name field to trigger the add
+        $('#mypco_new_speaker_name').on('keydown', function(e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                $('#mypco_add_speaker_btn').trigger('click');
+            }
+        });
+
+        // =====================================================================
         // Image Upload via WordPress Media Library
         // =====================================================================
 
