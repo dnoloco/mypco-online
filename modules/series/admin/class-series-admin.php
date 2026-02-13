@@ -715,55 +715,75 @@ class MyPCO_Series_Admin {
 
     /**
      * Render the "Series Info" meta box fields.
+     *
+     * Reads from the first assigned mypco_series taxonomy term so the data
+     * is shared with the term and not duplicated as post meta.
      */
     public function render_series_info_meta_box($post) {
         wp_nonce_field('mypco_series_info_meta_save', 'mypco_series_info_meta_nonce');
 
-        $description = get_post_meta($post->ID, '_mypco_series_description', true);
-        $start_date  = get_post_meta($post->ID, '_mypco_series_start_date', true);
-        $image_id    = get_post_meta($post->ID, '_mypco_series_image_id', true);
-        $image_url   = $image_id ? wp_get_attachment_image_url($image_id, 'medium') : '';
-        ?>
-        <table class="form-table">
-            <tr>
-                <th><label for="mypco_series_description"><?php esc_html_e('Description', 'mypco-online'); ?></label></th>
-                <td>
-                    <textarea id="mypco_series_description" name="mypco_series_description"
-                              rows="5" class="large-text"><?php echo esc_textarea($description); ?></textarea>
-                </td>
-            </tr>
-            <tr>
-                <th><label for="mypco_series_start_date"><?php esc_html_e('Start Date', 'mypco-online'); ?></label></th>
-                <td>
-                    <input type="date" id="mypco_series_start_date" name="mypco_series_start_date"
-                           value="<?php echo esc_attr($start_date); ?>" />
-                </td>
-            </tr>
-            <tr>
-                <th><label for="mypco_series_image_id"><?php esc_html_e('Image', 'mypco-online'); ?></label></th>
-                <td>
-                    <input type="hidden" id="mypco_series_image_id" name="mypco_series_image_id"
-                           value="<?php echo esc_attr($image_id); ?>" />
-                    <button type="button" class="button mypco-upload-image-btn"
-                            data-target="#mypco_series_image_id"
-                            data-preview="#mypco-series-image-preview"><?php esc_html_e('Select Image', 'mypco-online'); ?></button>
-                    <button type="button" class="button mypco-remove-image-btn"
-                            data-target="#mypco_series_image_id"
-                            data-preview="#mypco-series-image-preview"
-                            <?php echo $image_id ? '' : 'style="display:none;"'; ?>><?php esc_html_e('Remove Image', 'mypco-online'); ?></button>
-                    <div id="mypco-series-image-preview" style="margin-top:10px;">
-                        <?php if ($image_url) : ?>
-                            <img src="<?php echo esc_url($image_url); ?>" style="max-width:200px;height:auto;" />
-                        <?php endif; ?>
-                    </div>
-                </td>
-            </tr>
-        </table>
-        <?php
+        $description = '';
+        $start_date  = '';
+        $image       = '';
+        $term_name   = '';
+
+        $terms = wp_get_post_terms($post->ID, 'mypco_series');
+        if (!is_wp_error($terms) && !empty($terms)) {
+            $term        = $terms[0];
+            $term_name   = $term->name;
+            $description = $term->description;
+            $start_date  = get_term_meta($term->term_id, '_mypco_series_start_date', true);
+            $image       = get_term_meta($term->term_id, '_mypco_series_image', true);
+        }
+
+        if (empty($terms) || is_wp_error($terms)) : ?>
+            <p><em><?php esc_html_e('Select a Series from the Series panel to edit its info here.', 'mypco-online'); ?></em></p>
+        <?php else : ?>
+            <p><?php printf(
+                /* translators: %s: series term name */
+                esc_html__('Editing info for series: %s', 'mypco-online'),
+                '<strong>' . esc_html($term_name) . '</strong>'
+            ); ?></p>
+            <table class="form-table">
+                <tr>
+                    <th><label for="mypco_series_description"><?php esc_html_e('Description', 'mypco-online'); ?></label></th>
+                    <td>
+                        <textarea id="mypco_series_description" name="mypco_series_description"
+                                  rows="5" class="large-text"><?php echo esc_textarea($description); ?></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="mypco_series_start_date"><?php esc_html_e('Start Date', 'mypco-online'); ?></label></th>
+                    <td>
+                        <input type="date" id="mypco_series_start_date" name="mypco_series_start_date"
+                               value="<?php echo esc_attr($start_date); ?>" />
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="mypco_series_image"><?php esc_html_e('Image', 'mypco-online'); ?></label></th>
+                    <td>
+                        <input type="hidden" id="mypco_series_image" name="mypco_series_image"
+                               value="<?php echo esc_url($image); ?>" />
+                        <button type="button" class="button mypco-upload-image-btn"
+                                data-target="#mypco_series_image"
+                                data-preview="#mypco-series-image-preview"><?php esc_html_e('Select Image', 'mypco-online'); ?></button>
+                        <button type="button" class="button mypco-remove-image-btn"
+                                data-target="#mypco_series_image"
+                                data-preview="#mypco-series-image-preview"
+                                <?php echo $image ? '' : 'style="display:none;"'; ?>><?php esc_html_e('Remove Image', 'mypco-online'); ?></button>
+                        <div id="mypco-series-image-preview" style="margin-top:10px;">
+                            <?php if ($image) : ?>
+                                <img src="<?php echo esc_url($image); ?>" style="max-width:200px;height:auto;" />
+                            <?php endif; ?>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        <?php endif;
     }
 
     /**
-     * Save the "Series Info" meta box data on the mypco_message post type.
+     * Save the "Series Info" meta box data to the assigned Series taxonomy term.
      */
     public function save_series_info_meta($post_id, $post) {
         if (!isset($_POST['mypco_series_info_meta_nonce']) ||
@@ -779,16 +799,25 @@ class MyPCO_Series_Admin {
             return;
         }
 
+        $terms = wp_get_post_terms($post_id, 'mypco_series');
+        if (is_wp_error($terms) || empty($terms)) {
+            return;
+        }
+
+        $term_id = $terms[0]->term_id;
+
         if (isset($_POST['mypco_series_description'])) {
-            update_post_meta($post_id, '_mypco_series_description', sanitize_textarea_field($_POST['mypco_series_description']));
+            wp_update_term($term_id, 'mypco_series', [
+                'description' => sanitize_textarea_field($_POST['mypco_series_description']),
+            ]);
         }
 
         if (isset($_POST['mypco_series_start_date'])) {
-            update_post_meta($post_id, '_mypco_series_start_date', sanitize_text_field($_POST['mypco_series_start_date']));
+            update_term_meta($term_id, '_mypco_series_start_date', sanitize_text_field($_POST['mypco_series_start_date']));
         }
 
-        if (isset($_POST['mypco_series_image_id'])) {
-            update_post_meta($post_id, '_mypco_series_image_id', absint($_POST['mypco_series_image_id']));
+        if (isset($_POST['mypco_series_image'])) {
+            update_term_meta($term_id, '_mypco_series_image', esc_url_raw($_POST['mypco_series_image']));
         }
     }
 
