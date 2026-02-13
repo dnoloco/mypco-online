@@ -28,6 +28,10 @@ class MyPCO_Series_Admin {
         $this->loader->add_action('admin_enqueue_scripts', $this, 'enqueue_admin_assets');
         $this->loader->add_action('admin_init', $this, 'handle_form_submissions');
         $this->loader->add_filter('upload_dir', $this, 'custom_upload_dir');
+
+        // Series post type meta box
+        $this->loader->add_action('add_meta_boxes', $this, 'add_series_info_meta_box');
+        $this->loader->add_action('save_post_mypco_series', $this, 'save_series_info_meta', 10, 2);
     }
 
     // =========================================================================
@@ -84,8 +88,11 @@ class MyPCO_Series_Admin {
      * Enqueue admin-specific assets.
      */
     public function enqueue_admin_assets($hook) {
-        // Match any of our series admin pages
-        if (strpos($hook, 'mypco-series') === false) {
+        $screen = get_current_screen();
+        $is_series_post_type = ($screen && $screen->post_type === 'mypco_series');
+
+        // Match any of our series admin pages or the mypco_series post type editor
+        if (strpos($hook, 'mypco-series') === false && !$is_series_post_type) {
             return;
         }
 
@@ -679,6 +686,116 @@ class MyPCO_Series_Admin {
 
         wp_redirect(admin_url('admin.php?page=mypco-series-topics&success=topic_deleted'));
         exit;
+    }
+
+    // =========================================================================
+    // Series Post Type – Meta Box (Series Info)
+    // =========================================================================
+
+    /**
+     * Register the "Series Info" meta box for the mypco_series post type.
+     */
+    public function add_series_info_meta_box() {
+        add_meta_box(
+            'mypco_series_info',
+            __('Series Info', 'mypco-online'),
+            [$this, 'render_series_info_meta_box'],
+            'mypco_series',
+            'normal',
+            'high'
+        );
+    }
+
+    /**
+     * Render the "Series Info" meta box fields.
+     */
+    public function render_series_info_meta_box($post) {
+        wp_nonce_field('mypco_series_info_save', 'mypco_series_info_nonce');
+
+        $name        = get_post_meta($post->ID, '_mypco_series_name', true);
+        $description = get_post_meta($post->ID, '_mypco_series_description', true);
+        $start_date  = get_post_meta($post->ID, '_mypco_series_start_date', true);
+        $image       = get_post_meta($post->ID, '_mypco_series_image', true);
+        ?>
+        <table class="form-table">
+            <tr>
+                <th><label for="mypco_series_name"><?php esc_html_e('Name', 'mypco-online'); ?></label></th>
+                <td>
+                    <input type="text" id="mypco_series_name" name="mypco_series_name"
+                           value="<?php echo esc_attr($name); ?>" class="regular-text" />
+                </td>
+            </tr>
+            <tr>
+                <th><label for="mypco_series_description"><?php esc_html_e('Description', 'mypco-online'); ?></label></th>
+                <td>
+                    <textarea id="mypco_series_description" name="mypco_series_description"
+                              rows="5" class="large-text"><?php echo esc_textarea($description); ?></textarea>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="mypco_series_start_date"><?php esc_html_e('Start Date', 'mypco-online'); ?></label></th>
+                <td>
+                    <input type="date" id="mypco_series_start_date" name="mypco_series_start_date"
+                           value="<?php echo esc_attr($start_date); ?>" />
+                </td>
+            </tr>
+            <tr>
+                <th><label for="mypco_series_image"><?php esc_html_e('Image', 'mypco-online'); ?></label></th>
+                <td>
+                    <input type="url" id="mypco_series_image" name="mypco_series_image"
+                           value="<?php echo esc_url($image); ?>" class="regular-text" />
+                    <button type="button" class="button mypco-upload-image-btn"
+                            data-target="#mypco_series_image"><?php esc_html_e('Upload Image', 'mypco-online'); ?></button>
+                    <?php if ($image) : ?>
+                        <div style="margin-top:10px;">
+                            <img src="<?php echo esc_url($image); ?>" style="max-width:200px;height:auto;" />
+                        </div>
+                    <?php endif; ?>
+                </td>
+            </tr>
+        </table>
+        <?php
+    }
+
+    /**
+     * Save the "Series Info" meta box data.
+     */
+    public function save_series_info_meta($post_id, $post) {
+        if (!isset($_POST['mypco_series_info_nonce']) ||
+            !wp_verify_nonce($_POST['mypco_series_info_nonce'], 'mypco_series_info_save')) {
+            return;
+        }
+
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+            return;
+        }
+
+        if (!current_user_can('edit_post', $post_id)) {
+            return;
+        }
+
+        $fields = [
+            '_mypco_series_name'        => 'mypco_series_name',
+            '_mypco_series_description'  => 'mypco_series_description',
+            '_mypco_series_start_date'   => 'mypco_series_start_date',
+            '_mypco_series_image'        => 'mypco_series_image',
+        ];
+
+        foreach ($fields as $meta_key => $post_key) {
+            if (!isset($_POST[$post_key])) {
+                continue;
+            }
+
+            if ($meta_key === '_mypco_series_description') {
+                $value = sanitize_textarea_field($_POST[$post_key]);
+            } elseif ($meta_key === '_mypco_series_image') {
+                $value = esc_url_raw($_POST[$post_key]);
+            } else {
+                $value = sanitize_text_field($_POST[$post_key]);
+            }
+
+            update_post_meta($post_id, $meta_key, $value);
+        }
     }
 
     // =========================================================================
