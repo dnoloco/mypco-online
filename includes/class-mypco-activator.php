@@ -29,8 +29,9 @@ class MyPCO_Activator {
         // Check PHP requirements
         self::check_requirements();
 
-        // Flush rewrite rules
-        flush_rewrite_rules();
+        // Flag rewrite rules for flush on next page load, after CPTs/taxonomies
+        // have been registered on the 'init' hook.
+        set_transient('mypco_flush_rewrite_rules', true);
 
         // Log activation
         error_log('MyPCO Online: Plugin activated successfully');
