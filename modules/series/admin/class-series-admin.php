@@ -66,6 +66,10 @@ class MyPCO_Series_Admin {
 
         // Reorder Messages submenu
         $this->loader->add_action('admin_menu', $this, 'reorder_messages_submenu', 999);
+
+        // Settings page under Messages menu
+        $this->loader->add_action('admin_menu', $this, 'add_settings_page');
+        $this->loader->add_action('admin_init', $this, 'handle_settings_save');
     }
 
     // =========================================================================
@@ -128,9 +132,10 @@ class MyPCO_Series_Admin {
      * Register the "Series Info" meta box on the mypco_message post type.
      */
     public function add_series_info_meta_box() {
+        $names = MyPCO_Series_Module::get_custom_labels();
         add_meta_box(
             'mypco_series_info',
-            __('Series Info', 'mypco-online'),
+            sprintf(__('%s Info', 'mypco-online'), $names['series_singular']),
             [$this, 'render_series_info_meta_box'],
             'mypco_message',
             'normal',
@@ -254,9 +259,10 @@ class MyPCO_Series_Admin {
      * Register the "Speaker" meta box on the mypco_message post type.
      */
     public function add_speaker_meta_box() {
+        $names = MyPCO_Series_Module::get_custom_labels();
         add_meta_box(
             'mypco_speaker_meta',
-            __('Message Speaker', 'mypco-online'),
+            $names['message_singular'] . ' ' . $names['speaker_singular'],
             [$this, 'render_speaker_meta_box'],
             'mypco_message',
             'normal',
@@ -270,6 +276,9 @@ class MyPCO_Series_Admin {
     public function render_speaker_meta_box($post) {
         wp_nonce_field('mypco_speaker_meta_save', 'mypco_speaker_meta_nonce');
 
+        $names = MyPCO_Series_Module::get_custom_labels();
+        $speaker_s = $names['speaker_singular'];
+
         $current_speaker = get_post_meta($post->ID, '_mypco_speaker_id', true);
 
         $speakers = get_posts([
@@ -282,10 +291,10 @@ class MyPCO_Series_Admin {
         ?>
         <table class="form-table mypco-meta-table">
             <tr>
-                <th><label for="mypco_speaker_id"><?php esc_html_e('Speaker', 'mypco-online'); ?></label></th>
+                <th><label for="mypco_speaker_id"><?php echo esc_html($speaker_s); ?></label></th>
                 <td>
                     <select name="mypco_speaker_id" id="mypco_speaker_id">
-                        <option value=""><?php esc_html_e('Select a Speaker', 'mypco-online'); ?></option>
+                        <option value=""><?php echo esc_html(sprintf(__('Select a %s', 'mypco-online'), $speaker_s)); ?></option>
                         <?php foreach ($speakers as $speaker) : ?>
                             <option value="<?php echo (int) $speaker->ID; ?>" <?php selected($current_speaker, $speaker->ID); ?>>
                                 <?php echo esc_html($speaker->post_title); ?>
@@ -293,14 +302,14 @@ class MyPCO_Series_Admin {
                         <?php endforeach; ?>
                     </select>
                     <a href="#" id="mypco_toggle_add_speaker" style="display:inline-block;margin-left:8px;font-size:12px;">
-                        <?php esc_html_e('Add Speaker', 'mypco-online'); ?>
+                        <?php echo esc_html(sprintf(__('Add %s', 'mypco-online'), $speaker_s)); ?>
                     </a>
                     <div id="mypco_add_speaker_form" style="display:none;margin-top:8px;">
                         <div class="mypco-field-with-button">
                             <input type="text" id="mypco_new_speaker_name" class="regular-text"
-                                   placeholder="<?php esc_attr_e('Speaker name', 'mypco-online'); ?>" />
+                                   placeholder="<?php echo esc_attr(sprintf(__('%s name', 'mypco-online'), $speaker_s)); ?>" />
                             <input type="button" id="mypco_add_speaker_btn" class="button"
-                                   value="<?php esc_attr_e('Add Speaker', 'mypco-online'); ?>" />
+                                   value="<?php echo esc_attr(sprintf(__('Add %s', 'mypco-online'), $speaker_s)); ?>" />
                         </div>
                         <span id="mypco_add_speaker_status" style="display:none;font-style:italic;font-size:12px;margin-left:4px;"></span>
                     </div>
@@ -376,9 +385,10 @@ class MyPCO_Series_Admin {
      * Register the "Speaker Details" meta box on the mypco_speaker post type.
      */
     public function add_speaker_details_meta_box() {
+        $names = MyPCO_Series_Module::get_custom_labels();
         add_meta_box(
             'mypco_speaker_details',
-            __('Speaker Details', 'mypco-online'),
+            sprintf(__('%s Details', 'mypco-online'), $names['speaker_singular']),
             [$this, 'render_speaker_details_meta_box'],
             'mypco_speaker',
             'normal',
@@ -520,12 +530,13 @@ class MyPCO_Series_Admin {
      * Define custom columns for the mypco_speaker list table.
      */
     public function speaker_list_columns($columns) {
+        $names = MyPCO_Series_Module::get_custom_labels();
         $new_columns = [];
         foreach ($columns as $key => $label) {
             $new_columns[$key] = $label;
             if ($key === 'title') {
                 $new_columns['speaker_title'] = __('Title / Role', 'mypco-online');
-                $new_columns['message_count'] = __('Messages', 'mypco-online');
+                $new_columns['message_count'] = $names['message_plural'];
             }
         }
         return $new_columns;
@@ -563,9 +574,10 @@ class MyPCO_Series_Admin {
      * Register the "Message Info" meta box on the mypco_message post type.
      */
     public function add_message_info_meta_box() {
+        $names = MyPCO_Series_Module::get_custom_labels();
         add_meta_box(
             'mypco_message_info',
-            __('Message Info', 'mypco-online'),
+            sprintf(__('%s Info', 'mypco-online'), $names['message_singular']),
             [$this, 'render_message_info_meta_box'],
             'mypco_message',
             'normal',
@@ -663,9 +675,10 @@ class MyPCO_Series_Admin {
      * Register the "Media" meta box on the mypco_message post type.
      */
     public function add_media_meta_box() {
+        $names = MyPCO_Series_Module::get_custom_labels();
         add_meta_box(
             'mypco_media_meta',
-            __('Message Media', 'mypco-online'),
+            sprintf(__('%s Media', 'mypco-online'), $names['message_singular']),
             [$this, 'render_media_meta_box'],
             'mypco_message',
             'normal',
@@ -763,9 +776,10 @@ class MyPCO_Series_Admin {
      * Register the "Scripture" meta box on the mypco_message post type.
      */
     public function add_scripture_meta_box() {
+        $names = MyPCO_Series_Module::get_custom_labels();
         add_meta_box(
             'mypco_scripture_meta',
-            __('Message Scripture', 'mypco-online'),
+            sprintf(__('%s Scripture', 'mypco-online'), $names['message_singular']),
             [$this, 'render_scripture_meta_box'],
             'mypco_message',
             'normal',
@@ -954,6 +968,148 @@ class MyPCO_Series_Admin {
     }
 
     // =========================================================================
+    // Settings Page
+    // =========================================================================
+
+    /**
+     * Register the Settings submenu page under Messages.
+     */
+    public function add_settings_page() {
+        add_submenu_page(
+            'edit.php?post_type=mypco_message',
+            __('Messages Settings', 'mypco-online'),
+            __('Settings', 'mypco-online'),
+            'manage_options',
+            'mypco-series-settings',
+            [$this, 'render_settings_page']
+        );
+    }
+
+    /**
+     * Render the Settings page form.
+     */
+    public function render_settings_page() {
+        $saved = get_option('mypco_series_labels', []);
+        if (!is_array($saved)) {
+            $saved = [];
+        }
+
+        $sections = [
+            'message' => [
+                'heading'  => __('Messages', 'mypco-online'),
+                'singular' => 'Message',
+                'plural'   => 'Messages',
+            ],
+            'speaker' => [
+                'heading'  => __('Speakers', 'mypco-online'),
+                'singular' => 'Speaker',
+                'plural'   => 'Speakers',
+            ],
+            'series' => [
+                'heading'  => __('Series', 'mypco-online'),
+                'singular' => 'Series',
+                'plural'   => 'Series',
+            ],
+            'service_type' => [
+                'heading'  => __('Service Types', 'mypco-online'),
+                'singular' => 'Service Type',
+                'plural'   => 'Service Types',
+            ],
+        ];
+        ?>
+        <div class="wrap">
+            <h1><?php esc_html_e('Messages Settings', 'mypco-online'); ?></h1>
+
+            <?php if (isset($_GET['settings-updated'])) : ?>
+                <div class="notice notice-success is-dismissible">
+                    <p><?php esc_html_e('Settings saved.', 'mypco-online'); ?></p>
+                </div>
+            <?php endif; ?>
+
+            <div class="mypco-settings-content" style="background:#fff;border:1px solid #ccd0d4;padding:20px;margin-top:15px;">
+                <p class="description" style="margin-bottom:15px;">
+                    <?php esc_html_e('Customize the display names used throughout the admin area. Leave a field empty to use the default.', 'mypco-online'); ?>
+                </p>
+
+                <form method="post">
+                    <?php wp_nonce_field('mypco_series_labels_save', 'mypco_series_labels_nonce'); ?>
+
+                    <table class="form-table">
+                        <?php foreach ($sections as $key => $section) :
+                            $s_key = $key . '_singular';
+                            $p_key = $key . '_plural';
+                            $s_val = isset($saved[$s_key]) ? $saved[$s_key] : '';
+                            $p_val = isset($saved[$p_key]) ? $saved[$p_key] : '';
+                        ?>
+                        <tr>
+                            <th scope="row"><?php echo esc_html($section['heading']); ?></th>
+                            <td>
+                                <label style="display:inline-block;margin-right:20px;">
+                                    <span class="description"><?php esc_html_e('Singular', 'mypco-online'); ?></span><br>
+                                    <input type="text"
+                                           name="mypco_series_labels[<?php echo esc_attr($s_key); ?>]"
+                                           value="<?php echo esc_attr($s_val); ?>"
+                                           placeholder="<?php echo esc_attr($section['singular']); ?>"
+                                           class="regular-text" />
+                                </label>
+                                <label style="display:inline-block;">
+                                    <span class="description"><?php esc_html_e('Plural', 'mypco-online'); ?></span><br>
+                                    <input type="text"
+                                           name="mypco_series_labels[<?php echo esc_attr($p_key); ?>]"
+                                           value="<?php echo esc_attr($p_val); ?>"
+                                           placeholder="<?php echo esc_attr($section['plural']); ?>"
+                                           class="regular-text" />
+                                </label>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </table>
+
+                    <?php submit_button(__('Save Settings', 'mypco-online')); ?>
+                </form>
+            </div>
+        </div>
+        <?php
+    }
+
+    /**
+     * Handle the Settings page form submission.
+     */
+    public function handle_settings_save() {
+        if (!isset($_POST['mypco_series_labels_nonce']) ||
+            !wp_verify_nonce($_POST['mypco_series_labels_nonce'], 'mypco_series_labels_save')) {
+            return;
+        }
+
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
+        $raw = isset($_POST['mypco_series_labels']) && is_array($_POST['mypco_series_labels'])
+            ? $_POST['mypco_series_labels']
+            : [];
+
+        $allowed_keys = [
+            'message_singular', 'message_plural',
+            'speaker_singular', 'speaker_plural',
+            'series_singular',  'series_plural',
+            'service_type_singular', 'service_type_plural',
+        ];
+
+        $clean = [];
+        foreach ($allowed_keys as $key) {
+            if (isset($raw[$key]) && '' !== trim($raw[$key])) {
+                $clean[$key] = sanitize_text_field($raw[$key]);
+            }
+        }
+
+        update_option('mypco_series_labels', $clean);
+
+        wp_redirect(add_query_arg('settings-updated', 'true', wp_get_referer()));
+        exit;
+    }
+
+    // =========================================================================
     // Helper Methods
     // =========================================================================
 
@@ -978,6 +1134,7 @@ class MyPCO_Series_Admin {
             'edit.php?post_type=mypco_speaker',
             'edit-tags.php?taxonomy=mypco_series&post_type=mypco_message',
             'edit-tags.php?taxonomy=mypco_service_type&post_type=mypco_message',
+            'mypco-series-settings',
         ];
 
         $ordered  = [];

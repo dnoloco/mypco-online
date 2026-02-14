@@ -56,6 +56,37 @@ class MyPCO_Series_Module extends MyPCO_Module_Base {
     private $public;
 
     /**
+     * Return customisable display names with defaults.
+     *
+     * Stored in the `mypco_series_labels` option. Empty values fall back to
+     * the built-in defaults so users only need to fill in what they change.
+     */
+    public static function get_custom_labels() {
+        $defaults = [
+            'message_singular'      => 'Message',
+            'message_plural'        => 'Messages',
+            'speaker_singular'      => 'Speaker',
+            'speaker_plural'        => 'Speakers',
+            'series_singular'       => 'Series',
+            'series_plural'         => 'Series',
+            'service_type_singular' => 'Service Type',
+            'service_type_plural'   => 'Service Types',
+        ];
+
+        $saved = get_option('mypco_series_labels', []);
+        if (!is_array($saved)) {
+            $saved = [];
+        }
+
+        $labels = [];
+        foreach ($defaults as $key => $default) {
+            $labels[$key] = (!empty($saved[$key])) ? $saved[$key] : $default;
+        }
+
+        return $labels;
+    }
+
+    /**
      * Initialize the Series module.
      */
     public function init() {
@@ -76,25 +107,28 @@ class MyPCO_Series_Module extends MyPCO_Module_Base {
      * Register the Message and Speaker custom post types.
      */
     public function register_post_types() {
+        $names = self::get_custom_labels();
+
         // Message CPT
-        $message_labels = [
-            'name'                  => __('Messages', 'mypco-online'),
-            'singular_name'         => __('Message', 'mypco-online'),
-            'menu_name'             => __('Messages', 'mypco-online'),
-            'name_admin_bar'        => __('Message', 'mypco-online'),
-            'add_new'               => __('Add Message', 'mypco-online'),
-            'add_new_item'          => __('Add Message', 'mypco-online'),
-            'new_item'              => __('Message', 'mypco-online'),
-            'edit_item'             => __('Edit Message', 'mypco-online'),
-            'view_item'             => __('View Message', 'mypco-online'),
-            'all_items'             => __('All Messages', 'mypco-online'),
-            'search_items'          => __('Search Messages', 'mypco-online'),
-            'not_found'             => __('No messages found.', 'mypco-online'),
-            'not_found_in_trash'    => __('No messages found in Trash.', 'mypco-online'),
-        ];
+        $ms = $names['message_singular'];
+        $mp = $names['message_plural'];
 
         register_post_type('mypco_message', [
-            'labels'             => $message_labels,
+            'labels' => [
+                'name'               => $mp,
+                'singular_name'      => $ms,
+                'menu_name'          => $mp,
+                'name_admin_bar'     => $ms,
+                'add_new'            => sprintf(__('Add %s', 'mypco-online'), $ms),
+                'add_new_item'       => sprintf(__('Add %s', 'mypco-online'), $ms),
+                'new_item'           => $ms,
+                'edit_item'          => sprintf(__('Edit %s', 'mypco-online'), $ms),
+                'view_item'          => sprintf(__('View %s', 'mypco-online'), $ms),
+                'all_items'          => sprintf(__('All %s', 'mypco-online'), $mp),
+                'search_items'       => sprintf(__('Search %s', 'mypco-online'), $mp),
+                'not_found'          => sprintf(__('No %s found.', 'mypco-online'), strtolower($mp)),
+                'not_found_in_trash' => sprintf(__('No %s found in Trash.', 'mypco-online'), strtolower($mp)),
+            ],
             'public'             => true,
             'publicly_queryable' => true,
             'show_ui'            => true,
@@ -111,24 +145,25 @@ class MyPCO_Series_Module extends MyPCO_Module_Base {
         ]);
 
         // Speaker CPT
-        $speaker_labels = [
-            'name'                  => __('Speakers', 'mypco-online'),
-            'singular_name'         => __('Speaker', 'mypco-online'),
-            'menu_name'             => __('Speakers', 'mypco-online'),
-            'name_admin_bar'        => __('Speaker', 'mypco-online'),
-            'add_new'               => __('Add Speaker', 'mypco-online'),
-            'add_new_item'          => __('Add Speaker', 'mypco-online'),
-            'new_item'              => __('Speaker', 'mypco-online'),
-            'edit_item'             => __('Edit Speaker', 'mypco-online'),
-            'view_item'             => __('View Speaker', 'mypco-online'),
-            'all_items'             => __('Speakers', 'mypco-online'),
-            'search_items'          => __('Search Speakers', 'mypco-online'),
-            'not_found'             => __('No speakers found.', 'mypco-online'),
-            'not_found_in_trash'    => __('No speakers found in Trash.', 'mypco-online'),
-        ];
+        $ss = $names['speaker_singular'];
+        $sp = $names['speaker_plural'];
 
         register_post_type('mypco_speaker', [
-            'labels'             => $speaker_labels,
+            'labels' => [
+                'name'               => $sp,
+                'singular_name'      => $ss,
+                'menu_name'          => $sp,
+                'name_admin_bar'     => $ss,
+                'add_new'            => sprintf(__('Add %s', 'mypco-online'), $ss),
+                'add_new_item'       => sprintf(__('Add %s', 'mypco-online'), $ss),
+                'new_item'           => $ss,
+                'edit_item'          => sprintf(__('Edit %s', 'mypco-online'), $ss),
+                'view_item'          => sprintf(__('View %s', 'mypco-online'), $ss),
+                'all_items'          => $sp,
+                'search_items'       => sprintf(__('Search %s', 'mypco-online'), $sp),
+                'not_found'          => sprintf(__('No %s found.', 'mypco-online'), strtolower($sp)),
+                'not_found_in_trash' => sprintf(__('No %s found in Trash.', 'mypco-online'), strtolower($sp)),
+            ],
             'public'             => true,
             'publicly_queryable' => true,
             'show_ui'            => true,
@@ -150,22 +185,25 @@ class MyPCO_Series_Module extends MyPCO_Module_Base {
      * rather than a taxonomy (see the Speaker meta box in class-series-admin.php).
      */
     public function register_taxonomies() {
+        $names = self::get_custom_labels();
+
         // Series taxonomy
-        $series_labels = [
-            'name'                       => __('Series', 'mypco-online'),
-            'singular_name'              => __('Series', 'mypco-online'),
-            'search_items'               => __('Search Series', 'mypco-online'),
-            'all_items'                  => __('All Series', 'mypco-online'),
-            'edit_item'                  => __('Edit Series', 'mypco-online'),
-            'update_item'                => __('Update Series', 'mypco-online'),
-            'add_new_item'               => __('Add Series', 'mypco-online'),
-            'new_item_name'              => __('Series Name', 'mypco-online'),
-            'menu_name'                  => __('Series', 'mypco-online'),
-            'not_found'                  => __('No series found.', 'mypco-online'),
-        ];
+        $srs = $names['series_singular'];
+        $srp = $names['series_plural'];
 
         register_taxonomy('mypco_series', ['mypco_message'], [
-            'labels'            => $series_labels,
+            'labels' => [
+                'name'          => $srp,
+                'singular_name' => $srs,
+                'search_items'  => sprintf(__('Search %s', 'mypco-online'), $srp),
+                'all_items'     => sprintf(__('All %s', 'mypco-online'), $srp),
+                'edit_item'     => sprintf(__('Edit %s', 'mypco-online'), $srs),
+                'update_item'   => sprintf(__('Update %s', 'mypco-online'), $srs),
+                'add_new_item'  => sprintf(__('Add %s', 'mypco-online'), $srs),
+                'new_item_name' => sprintf(__('%s Name', 'mypco-online'), $srs),
+                'menu_name'     => $srp,
+                'not_found'     => sprintf(__('No %s found.', 'mypco-online'), strtolower($srp)),
+            ],
             'hierarchical'      => true,
             'public'            => true,
             'show_ui'           => true,
@@ -175,21 +213,22 @@ class MyPCO_Series_Module extends MyPCO_Module_Base {
         ]);
 
         // Service Type taxonomy
-        $service_type_labels = [
-            'name'                       => __('Service Types', 'mypco-online'),
-            'singular_name'              => __('Service Type', 'mypco-online'),
-            'search_items'               => __('Search Service Types', 'mypco-online'),
-            'all_items'                  => __('All Service Types', 'mypco-online'),
-            'edit_item'                  => __('Edit Service Type', 'mypco-online'),
-            'update_item'                => __('Update Service Type', 'mypco-online'),
-            'add_new_item'               => __('Add Service Type', 'mypco-online'),
-            'new_item_name'              => __('Service Type Name', 'mypco-online'),
-            'menu_name'                  => __('Service Types', 'mypco-online'),
-            'not_found'                  => __('No service types found.', 'mypco-online'),
-        ];
+        $sts = $names['service_type_singular'];
+        $stp = $names['service_type_plural'];
 
         register_taxonomy('mypco_service_type', ['mypco_message'], [
-            'labels'            => $service_type_labels,
+            'labels' => [
+                'name'          => $stp,
+                'singular_name' => $sts,
+                'search_items'  => sprintf(__('Search %s', 'mypco-online'), $stp),
+                'all_items'     => sprintf(__('All %s', 'mypco-online'), $stp),
+                'edit_item'     => sprintf(__('Edit %s', 'mypco-online'), $sts),
+                'update_item'   => sprintf(__('Update %s', 'mypco-online'), $sts),
+                'add_new_item'  => sprintf(__('Add %s', 'mypco-online'), $sts),
+                'new_item_name' => sprintf(__('%s Name', 'mypco-online'), $sts),
+                'menu_name'     => $stp,
+                'not_found'     => sprintf(__('No %s found.', 'mypco-online'), strtolower($stp)),
+            ],
             'hierarchical'      => true,
             'public'            => true,
             'show_ui'           => true,
