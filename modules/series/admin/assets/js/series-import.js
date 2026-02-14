@@ -67,10 +67,12 @@
                     newCount++;
                 }
 
-                var mediaText = [];
-                if (ep.has_video) mediaText.push(i18n.video);
-                if (ep.has_audio) mediaText.push(i18n.audio);
-                if (!mediaText.length) mediaText.push(i18n.none);
+                var mediaHtml = [];
+                if (ep.has_video) mediaHtml.push('<span class="mypco-import-media-tag mypco-media-video">' + i18n.video + '</span>');
+                if (ep.has_audio) mediaHtml.push('<span class="mypco-import-media-tag mypco-media-audio">' + i18n.audio + '</span>');
+                if (ep.has_sermon_audio) mediaHtml.push('<span class="mypco-import-media-tag mypco-media-sermon-audio">' + i18n.sermonAudio + '</span>');
+                if (ep.has_art) mediaHtml.push('<span class="mypco-import-media-tag mypco-media-art">' + i18n.art + '</span>');
+                if (!mediaHtml.length) mediaHtml.push('<span class="mypco-import-media-tag mypco-media-none">' + i18n.none + '</span>');
 
                 var statusHtml = ep.already_imported
                     ? '<span class="mypco-import-badge mypco-import-badge-skip">' + i18n.alreadyExists + '</span>'
@@ -86,7 +88,7 @@
                         '<td><strong>' + escHtml(ep.title) + '</strong></td>' +
                         '<td>' + escHtml(ep.series_name || '—') + '</td>' +
                         '<td>' + escHtml(ep.published_date || '—') + '</td>' +
-                        '<td>' + mediaText.join(', ') + '</td>' +
+                        '<td>' + mediaHtml.join(' ') + '</td>' +
                         '<td class="mypco-import-row-status">' + statusHtml + '</td>' +
                     '</tr>'
                 );
