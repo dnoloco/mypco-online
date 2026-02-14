@@ -161,7 +161,7 @@ class MyPCO_Series_Admin {
                     'video'          => __('Video', 'mypco-online'),
                     'audio'          => __('Audio', 'mypco-online'),
                     'sermonAudio'    => __('Sermon Audio', 'mypco-online'),
-                    'art'            => __('Art', 'mypco-online'),
+                    'art'            => __('Image', 'mypco-online'),
                     'none'           => __('None', 'mypco-online'),
                 ],
             ]);
