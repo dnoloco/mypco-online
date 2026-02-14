@@ -1132,8 +1132,8 @@ class MyPCO_Series_Admin {
             'edit.php?post_type=mypco_message',
             'post-new.php?post_type=mypco_message',
             'edit.php?post_type=mypco_speaker',
-            'edit-tags.php?taxonomy=mypco_series&post_type=mypco_message',
-            'edit-tags.php?taxonomy=mypco_service_type&post_type=mypco_message',
+            'edit-tags.php?taxonomy=mypco_series&amp;post_type=mypco_message',
+            'edit-tags.php?taxonomy=mypco_service_type&amp;post_type=mypco_message',
             'mypco-series-settings',
         ];
 
