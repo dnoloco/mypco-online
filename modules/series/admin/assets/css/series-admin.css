@@ -137,13 +137,26 @@
 }
 
 /* =====================================================================
-   Message Editor – Meta Box Lockdown
+   Message Editor – Meta Box Styling
    ===================================================================== */
 
-/* Fix speaker dropdown overflow in sidebar */
-#mypco_speaker_meta select {
-    max-width: 100%;
-    box-sizing: border-box;
+/* Spacing between meta boxes */
+#mypco_message_info,
+#mypco_scripture_meta,
+#mypco_media_meta,
+#mypco_speaker_meta,
+#mypco_series_info {
+    margin-bottom: 24px;
+}
+
+/* Shaded header bar */
+#mypco_message_info .postbox-header,
+#mypco_scripture_meta .postbox-header,
+#mypco_media_meta .postbox-header,
+#mypco_speaker_meta .postbox-header,
+#mypco_series_info .postbox-header {
+    background: #f0f0f1;
+    border-bottom: 1px solid #c3c4c7;
 }
 
 /* Hide move/sort handles on our meta boxes */
@@ -169,12 +182,33 @@
     cursor: default;
 }
 
+/* Fix speaker dropdown overflow */
+#mypco_speaker_meta select {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
 /* =====================================================================
-   Message Editor – Media Meta Box
+   Message Editor – Shared Meta Table Layout
    ===================================================================== */
 
-#mypco_media_meta .form-table td input[type="url"] {
-    margin-bottom: 6px;
+/* Consistent label width across all meta boxes */
+.mypco-meta-table th {
+    width: 140px;
+    vertical-align: top;
+    padding-top: 14px;
+}
+
+/* Field + button inline layout */
+.mypco-field-with-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.mypco-field-with-button input.regular-text {
+    flex: 0 1 auto;
 }
 
 /* =====================================================================
@@ -189,11 +223,17 @@
 }
 
 .mypco-scripture-row select {
-    min-width: 140px;
+    min-width: 110px;
 }
 
 .mypco-scripture-row .mypco-scripture-book {
     min-width: 180px;
+}
+
+.mypco-scripture-dash {
+    color: #50575e;
+    font-size: 14px;
+    line-height: 28px;
 }
 
 .mypco-remove-scripture {
