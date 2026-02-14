@@ -148,12 +148,14 @@ class MyPCO_Series_Import {
                     <tbody>
                         <tr><td><?php esc_html_e('Episode Title', 'mypco-online'); ?></td><td><?php echo esc_html($names['message_singular']); ?> Title</td></tr>
                         <tr><td><?php esc_html_e('Episode Description', 'mypco-online'); ?></td><td><?php echo esc_html($names['message_singular']); ?> Description + Content</td></tr>
-                        <tr><td><?php esc_html_e('Published Date', 'mypco-online'); ?></td><td><?php echo esc_html($names['message_singular']); ?> Date</td></tr>
+                        <tr><td><code>published_to_library_at</code></td><td><?php echo esc_html($names['message_singular']); ?> Date</td></tr>
                         <tr><td><?php esc_html_e('Series', 'mypco-online'); ?></td><td><?php echo esc_html($names['series_singular']); ?> Taxonomy</td></tr>
                         <tr><td><?php esc_html_e('Series Artwork', 'mypco-online'); ?></td><td><?php echo esc_html($names['series_singular']); ?> Image</td></tr>
-                        <tr><td><?php esc_html_e('Episode Artwork', 'mypco-online'); ?></td><td><?php echo esc_html($names['message_singular']); ?> Image</td></tr>
-                        <tr><td><?php esc_html_e('Video Resource', 'mypco-online'); ?></td><td><?php echo esc_html($names['message_singular']); ?> Video URL</td></tr>
-                        <tr><td><?php esc_html_e('Audio Resource', 'mypco-online'); ?></td><td><?php echo esc_html($names['message_singular']); ?> Audio URL</td></tr>
+                        <tr><td><code>art</code> / <code>library_video_thumbnail_url</code></td><td><?php echo esc_html($names['message_singular']); ?> Image</td></tr>
+                        <tr><td><code>library_video_url</code></td><td><?php echo esc_html($names['message_singular']); ?> Video URL</td></tr>
+                        <tr><td><code>library_video_embed_code</code></td><td><?php echo esc_html($names['message_singular']); ?> Video Embed</td></tr>
+                        <tr><td><code>library_audio_url</code> / <code>sermon_audio</code></td><td><?php echo esc_html($names['message_singular']); ?> Audio URL</td></tr>
+                        <tr><td><code>library_video_thumbnail_url</code></td><td><?php echo esc_html($names['message_singular']); ?> Video Thumbnail</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -220,21 +222,28 @@ class MyPCO_Series_Import {
             }
 
             // Determine media availability
-            $has_video = false;
-            $has_audio = false;
-            if (!empty($attrs['video_url'])) {
-                $has_video = true;
-            }
-            if (!empty($attrs['audio_url'])) {
-                $has_audio = true;
+            $has_video = !empty($attrs['library_video_url']) || !empty($attrs['library_video_embed_code']);
+            $has_audio = !empty($attrs['library_audio_url']);
+
+            // Check sermon_audio object
+            if (!$has_audio && !empty($attrs['sermon_audio']) && is_array($attrs['sermon_audio'])) {
+                $has_audio = !empty($attrs['sermon_audio']['url']);
             }
 
             // Parse the published date
             $published_date = '';
-            if (!empty($attrs['published_at'])) {
-                $published_date = date('Y-m-d', strtotime($attrs['published_at']));
-            } elseif (!empty($attrs['air_date'])) {
-                $published_date = date('Y-m-d', strtotime($attrs['air_date']));
+            if (!empty($attrs['published_to_library_at'])) {
+                $published_date = date('Y-m-d', strtotime($attrs['published_to_library_at']));
+            } elseif (!empty($attrs['published_live_at'])) {
+                $published_date = date('Y-m-d', strtotime($attrs['published_live_at']));
+            }
+
+            // Resolve artwork from the art object or thumbnail
+            $artwork_url = '';
+            if (!empty($attrs['art']['attributes']['url'])) {
+                $artwork_url = $attrs['art']['attributes']['url'];
+            } elseif (!empty($attrs['library_video_thumbnail_url'])) {
+                $artwork_url = $attrs['library_video_thumbnail_url'];
             }
 
             $episodes[] = [
@@ -246,7 +255,7 @@ class MyPCO_Series_Import {
                 'series_name'    => $series_name,
                 'has_video'      => $has_video,
                 'has_audio'      => $has_audio,
-                'artwork_url'    => $attrs['artwork_url'] ?? ($attrs['image_url'] ?? ''),
+                'artwork_url'    => $artwork_url,
                 'already_imported' => in_array($ep_id, $imported_ids, true),
             ];
         }
@@ -375,8 +384,15 @@ class MyPCO_Series_Import {
         // --- Episode fields ---
         $title       = $attrs['title'] ?? '';
         $description = $attrs['description'] ?? '';
-        $published   = $attrs['published_at'] ?? ($attrs['air_date'] ?? '');
-        $artwork_url = $attrs['artwork_url'] ?? ($attrs['image_url'] ?? '');
+        $published   = $attrs['published_to_library_at'] ?? ($attrs['published_live_at'] ?? '');
+
+        // Resolve artwork from the art object or video thumbnail
+        $artwork_url = '';
+        if (!empty($attrs['art']['attributes']['url'])) {
+            $artwork_url = $attrs['art']['attributes']['url'];
+        } elseif (!empty($attrs['library_video_thumbnail_url'])) {
+            $artwork_url = $attrs['library_video_thumbnail_url'];
+        }
 
         $message_date = '';
         if ($published) {
@@ -429,16 +445,27 @@ class MyPCO_Series_Import {
     private function map_episode_resources($post_id, $ep_id, $included_map, $attrs) {
         $video_url = '';
         $audio_url = '';
+        $video_embed = '';
 
-        // Check direct attributes first (some episodes have these directly)
-        if (!empty($attrs['video_url'])) {
-            $video_url = $attrs['video_url'];
+        // Check episode attributes for media
+        if (!empty($attrs['library_video_url'])) {
+            $video_url = $attrs['library_video_url'];
         }
-        if (!empty($attrs['audio_url'])) {
-            $audio_url = $attrs['audio_url'];
+        if (!empty($attrs['library_video_embed_code'])) {
+            $video_embed = $attrs['library_video_embed_code'];
+        }
+        if (!empty($attrs['library_audio_url'])) {
+            $audio_url = $attrs['library_audio_url'];
         }
 
-        // Check included EpisodeResource items
+        // Check sermon_audio object
+        if (!$audio_url && !empty($attrs['sermon_audio']) && is_array($attrs['sermon_audio'])) {
+            if (!empty($attrs['sermon_audio']['url'])) {
+                $audio_url = $attrs['sermon_audio']['url'];
+            }
+        }
+
+        // Fall back to included EpisodeResource items
         if (isset($included_map['EpisodeResource'])) {
             foreach ($included_map['EpisodeResource'] as $resource) {
                 $res_attrs = $resource['attributes'];
@@ -460,8 +487,16 @@ class MyPCO_Series_Import {
         if ($video_url) {
             update_post_meta($post_id, '_mypco_message_video', esc_url_raw($video_url));
         }
+        if ($video_embed) {
+            update_post_meta($post_id, '_mypco_message_video_embed', wp_kses_post($video_embed));
+        }
         if ($audio_url) {
             update_post_meta($post_id, '_mypco_message_audio', esc_url_raw($audio_url));
+        }
+
+        // Store video thumbnail if available
+        if (!empty($attrs['library_video_thumbnail_url'])) {
+            update_post_meta($post_id, '_mypco_message_video_thumbnail', esc_url_raw($attrs['library_video_thumbnail_url']));
         }
     }
 
