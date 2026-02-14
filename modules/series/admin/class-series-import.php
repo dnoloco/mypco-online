@@ -222,13 +222,10 @@ class MyPCO_Series_Import {
             }
 
             // Determine media availability
-            $has_video = !empty($attrs['library_video_url']) || !empty($attrs['library_video_embed_code']);
-            $has_audio = !empty($attrs['library_audio_url']);
-
-            // Check sermon_audio object
-            if (!$has_audio && !empty($attrs['sermon_audio']) && is_array($attrs['sermon_audio'])) {
-                $has_audio = !empty($attrs['sermon_audio']['url']);
-            }
+            $has_video       = !empty($attrs['library_video_url']) || !empty($attrs['library_video_embed_code']);
+            $has_audio       = !empty($attrs['library_audio_url']);
+            $has_sermon_audio = !empty($attrs['sermon_audio']['id']);
+            $has_art         = !empty($attrs['art']['id']);
 
             // Parse the published date
             $published_date = '';
@@ -238,24 +235,17 @@ class MyPCO_Series_Import {
                 $published_date = date('Y-m-d', strtotime($attrs['published_live_at']));
             }
 
-            // Resolve artwork from the art object or thumbnail
-            $artwork_url = '';
-            if (!empty($attrs['art']['attributes']['url'])) {
-                $artwork_url = $attrs['art']['attributes']['url'];
-            } elseif (!empty($attrs['library_video_thumbnail_url'])) {
-                $artwork_url = $attrs['library_video_thumbnail_url'];
-            }
-
             $episodes[] = [
-                'id'             => $ep_id,
-                'title'          => $attrs['title'] ?? '',
-                'description'    => $attrs['description'] ?? '',
-                'published_date' => $published_date,
-                'series_id'      => $series_id,
-                'series_name'    => $series_name,
-                'has_video'      => $has_video,
-                'has_audio'      => $has_audio,
-                'artwork_url'    => $artwork_url,
+                'id'               => $ep_id,
+                'title'            => $attrs['title'] ?? '',
+                'description'      => $attrs['description'] ?? '',
+                'published_date'   => $published_date,
+                'series_id'        => $series_id,
+                'series_name'      => $series_name,
+                'has_video'        => $has_video,
+                'has_audio'        => $has_audio,
+                'has_sermon_audio' => $has_sermon_audio,
+                'has_art'          => $has_art,
                 'already_imported' => in_array($ep_id, $imported_ids, true),
             ];
         }
@@ -386,11 +376,24 @@ class MyPCO_Series_Import {
         $description = $attrs['description'] ?? '';
         $published   = $attrs['published_to_library_at'] ?? ($attrs['published_live_at'] ?? '');
 
-        // Resolve artwork from the art object or video thumbnail
+        // Resolve artwork from the art File object
         $artwork_url = '';
-        if (!empty($attrs['art']['attributes']['url'])) {
-            $artwork_url = $attrs['art']['attributes']['url'];
-        } elseif (!empty($attrs['library_video_thumbnail_url'])) {
+        if (!empty($attrs['art']['id'])) {
+            $art_attrs = $attrs['art']['attributes'] ?? [];
+            // PCO File objects: check for variants (sized URLs) first, then direct URL
+            if (!empty($art_attrs['variants'])) {
+                // variants is typically an array or object with size keys → URLs
+                $variants = $art_attrs['variants'];
+                if (is_array($variants)) {
+                    // Prefer original or largest variant
+                    $artwork_url = $variants['original'] ?? ($variants['large'] ?? reset($variants));
+                }
+            }
+            if (!$artwork_url && !empty($art_attrs['url'])) {
+                $artwork_url = $art_attrs['url'];
+            }
+        }
+        if (!$artwork_url && !empty($attrs['library_video_thumbnail_url'])) {
             $artwork_url = $attrs['library_video_thumbnail_url'];
         }
 
@@ -458,11 +461,32 @@ class MyPCO_Series_Import {
             $audio_url = $attrs['library_audio_url'];
         }
 
-        // Check sermon_audio object
-        if (!$audio_url && !empty($attrs['sermon_audio']) && is_array($attrs['sermon_audio'])) {
-            if (!empty($attrs['sermon_audio']['url'])) {
-                $audio_url = $attrs['sermon_audio']['url'];
+        // Check sermon_audio File object (has type, id, attributes with name/signed_identifier/source)
+        if (!empty($attrs['sermon_audio']['id'])) {
+            $sa_attrs = $attrs['sermon_audio']['attributes'] ?? [];
+
+            // Check for variants (sized/formatted URLs)
+            if (!$audio_url && !empty($sa_attrs['variants'])) {
+                $variants = $sa_attrs['variants'];
+                if (is_array($variants)) {
+                    $audio_url = $variants['original'] ?? reset($variants);
+                }
             }
+            // Check for direct url attribute
+            if (!$audio_url && !empty($sa_attrs['url'])) {
+                $audio_url = $sa_attrs['url'];
+            }
+
+            // Store sermon audio metadata for reference even if no direct URL
+            $sa_name = $sa_attrs['name'] ?? '';
+            $sa_source = $sa_attrs['source'] ?? '';
+            if ($sa_name) {
+                update_post_meta($post_id, '_mypco_sermon_audio_name', sanitize_text_field($sa_name));
+            }
+            if ($sa_source) {
+                update_post_meta($post_id, '_mypco_sermon_audio_source', sanitize_text_field($sa_source));
+            }
+            update_post_meta($post_id, '_mypco_sermon_audio_pco_id', sanitize_text_field($attrs['sermon_audio']['id']));
         }
 
         // Fall back to included EpisodeResource items

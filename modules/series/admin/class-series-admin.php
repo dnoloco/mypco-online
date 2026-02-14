@@ -160,6 +160,8 @@ class MyPCO_Series_Admin {
                     'alreadyImported' => __('already imported.', 'mypco-online'),
                     'video'          => __('Video', 'mypco-online'),
                     'audio'          => __('Audio', 'mypco-online'),
+                    'sermonAudio'    => __('Sermon Audio', 'mypco-online'),
+                    'art'            => __('Art', 'mypco-online'),
                     'none'           => __('None', 'mypco-online'),
                 ],
             ]);
