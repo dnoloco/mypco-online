@@ -63,6 +63,9 @@ class MyPCO_Series_Admin {
         $this->loader->add_action('mypco_series_edit_form_fields', $this, 'render_series_info_edit_fields');
         $this->loader->add_action('created_mypco_series', $this, 'save_series_info_term_meta');
         $this->loader->add_action('edited_mypco_series', $this, 'save_series_info_term_meta');
+
+        // Reorder Messages submenu
+        $this->loader->add_action('admin_menu', $this, 'reorder_messages_submenu', 999);
     }
 
     // =========================================================================
@@ -290,14 +293,14 @@ class MyPCO_Series_Admin {
                         <?php endforeach; ?>
                     </select>
                     <a href="#" id="mypco_toggle_add_speaker" style="display:inline-block;margin-left:8px;font-size:12px;">
-                        <?php esc_html_e('Add New Speaker', 'mypco-online'); ?>
+                        <?php esc_html_e('Add Speaker', 'mypco-online'); ?>
                     </a>
                     <div id="mypco_add_speaker_form" style="display:none;margin-top:8px;">
                         <div class="mypco-field-with-button">
                             <input type="text" id="mypco_new_speaker_name" class="regular-text"
                                    placeholder="<?php esc_attr_e('Speaker name', 'mypco-online'); ?>" />
                             <input type="button" id="mypco_add_speaker_btn" class="button"
-                                   value="<?php esc_attr_e('Add New Speaker', 'mypco-online'); ?>" />
+                                   value="<?php esc_attr_e('Add Speaker', 'mypco-online'); ?>" />
                         </div>
                         <span id="mypco_add_speaker_status" style="display:none;font-style:italic;font-size:12px;margin-left:4px;"></span>
                     </div>
@@ -953,6 +956,53 @@ class MyPCO_Series_Admin {
     // =========================================================================
     // Helper Methods
     // =========================================================================
+
+    /**
+     * Reorder the Messages admin submenu.
+     *
+     * Ensures the submenu appears as:
+     * All Messages, Add Message, Speakers, Series, Service Types.
+     */
+    public function reorder_messages_submenu() {
+        global $submenu;
+
+        $menu_slug = 'edit.php?post_type=mypco_message';
+
+        if (!isset($submenu[$menu_slug])) {
+            return;
+        }
+
+        $desired_order = [
+            'edit.php?post_type=mypco_message',
+            'post-new.php?post_type=mypco_message',
+            'edit.php?post_type=mypco_speaker',
+            'edit-tags.php?taxonomy=mypco_series&post_type=mypco_message',
+            'edit-tags.php?taxonomy=mypco_service_type&post_type=mypco_message',
+        ];
+
+        $ordered  = [];
+        $position = 0;
+
+        foreach ($desired_order as $slug) {
+            foreach ($submenu[$menu_slug] as $item) {
+                if ($item[2] === $slug) {
+                    $ordered[$position] = $item;
+                    $position++;
+                    break;
+                }
+            }
+        }
+
+        // Append any remaining items not in our desired order.
+        foreach ($submenu[$menu_slug] as $item) {
+            if (!in_array($item[2], $desired_order, true)) {
+                $ordered[$position] = $item;
+                $position++;
+            }
+        }
+
+        $submenu[$menu_slug] = $ordered;
+    }
 
     /**
      * Force meta box display order on the mypco_message editor.
