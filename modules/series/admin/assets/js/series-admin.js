@@ -283,6 +283,39 @@
         });
 
         // =====================================================================
+        // Speaker Links – Repeatable rows
+        // =====================================================================
+
+        $(document).on('click', '#mypco-add-speaker-link', function() {
+            var $container = $('#mypco-speaker-links');
+            var index = $container.find('.mypco-speaker-link-row').length;
+
+            var $row = $(
+                '<div class="mypco-speaker-link-row" data-index="' + index + '">' +
+                    '<input type="text" name="speaker_links[' + index + '][label]" ' +
+                        'class="regular-text mypco-link-label" placeholder="Label (e.g. Facebook)" />' +
+                    '<input type="url" name="speaker_links[' + index + '][url]" ' +
+                        'class="regular-text mypco-link-url" placeholder="https://..." />' +
+                    '<button type="button" class="button mypco-remove-speaker-link" title="Remove">&times;</button>' +
+                '</div>'
+            );
+
+            $container.append($row);
+        });
+
+        $(document).on('click', '.mypco-remove-speaker-link', function() {
+            var $container = $('#mypco-speaker-links');
+            var $row = $(this).closest('.mypco-speaker-link-row');
+
+            if ($container.find('.mypco-speaker-link-row').length <= 1) {
+                $row.find('input').val('');
+                return;
+            }
+
+            $row.remove();
+        });
+
+        // =====================================================================
         // Image Upload via WordPress Media Library
         // =====================================================================
 

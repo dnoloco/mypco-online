@@ -523,14 +523,26 @@ class MyPCO_Series_Admin {
 
         $id = isset($_POST['speaker_id']) ? absint($_POST['speaker_id']) : 0;
 
+        $links = [];
+        if (isset($_POST['speaker_links']) && is_array($_POST['speaker_links'])) {
+            foreach ($_POST['speaker_links'] as $entry) {
+                $label = isset($entry['label']) ? sanitize_text_field($entry['label']) : '';
+                $url   = isset($entry['url']) ? esc_url_raw($entry['url']) : '';
+                if (!empty($url)) {
+                    $links[] = ['label' => $label, 'url' => $url];
+                }
+            }
+        }
+
         $data = [
             'name'      => sanitize_text_field($_POST['speaker_name'] ?? ''),
             'title'     => sanitize_text_field($_POST['speaker_title'] ?? ''),
             'bio'       => sanitize_textarea_field($_POST['speaker_bio'] ?? ''),
             'image_url' => esc_url_raw($_POST['speaker_image_url'] ?? ''),
+            'links'     => !empty($links) ? wp_json_encode($links) : null,
         ];
 
-        $format = ['%s', '%s', '%s', '%s'];
+        $format = ['%s', '%s', '%s', '%s', '%s'];
 
         if ($id > 0) {
             $wpdb->update($table, $data, ['id' => $id], $format, ['%d']);
