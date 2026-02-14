@@ -290,11 +290,22 @@
             var $container = $('#mypco-speaker-links');
             var index = $container.find('.mypco-speaker-link-row').length;
 
+            // Detect field name prefix from existing rows (supports both
+            // the custom admin page and the WP post editor meta box).
+            var namePrefix = 'speaker_links';
+            var $existing = $container.find('.mypco-link-label').first();
+            if ($existing.length) {
+                var match = $existing.attr('name').match(/^(.+?)\[/);
+                if (match) {
+                    namePrefix = match[1];
+                }
+            }
+
             var $row = $(
                 '<div class="mypco-speaker-link-row" data-index="' + index + '">' +
-                    '<input type="text" name="speaker_links[' + index + '][label]" ' +
+                    '<input type="text" name="' + namePrefix + '[' + index + '][label]" ' +
                         'class="regular-text mypco-link-label" placeholder="Label (e.g. Facebook)" />' +
-                    '<input type="url" name="speaker_links[' + index + '][url]" ' +
+                    '<input type="url" name="' + namePrefix + '[' + index + '][url]" ' +
                         'class="regular-text mypco-link-url" placeholder="https://..." />' +
                     '<button type="button" class="button mypco-remove-speaker-link" title="Remove">&times;</button>' +
                 '</div>'

@@ -145,7 +145,8 @@
 #mypco_scripture_meta,
 #mypco_media_meta,
 #mypco_speaker_meta,
-#mypco_series_info {
+#mypco_series_info,
+#mypco_speaker_details {
     margin-bottom: 24px;
 }
 
@@ -160,7 +161,8 @@
 #mypco_scripture_meta .postbox-header,
 #mypco_media_meta .postbox-header,
 #mypco_speaker_meta .postbox-header,
-#mypco_series_info .postbox-header {
+#mypco_series_info .postbox-header,
+#mypco_speaker_details .postbox-header {
     background: #f0f0f1;
     border-bottom: 1px solid #c3c4c7;
 }
@@ -175,7 +177,9 @@
 #mypco_media_meta .handle-order-higher,
 #mypco_media_meta .handle-order-lower,
 #mypco_scripture_meta .handle-order-higher,
-#mypco_scripture_meta .handle-order-lower {
+#mypco_scripture_meta .handle-order-lower,
+#mypco_speaker_details .handle-order-higher,
+#mypco_speaker_details .handle-order-lower {
     display: none;
 }
 
@@ -184,7 +188,8 @@
 #mypco_series_info .hndle,
 #mypco_message_info .hndle,
 #mypco_media_meta .hndle,
-#mypco_scripture_meta .hndle {
+#mypco_scripture_meta .hndle,
+#mypco_speaker_details .hndle {
     cursor: default;
 }
 

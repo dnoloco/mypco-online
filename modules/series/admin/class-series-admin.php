@@ -48,6 +48,10 @@ class MyPCO_Series_Admin {
         // Force meta box display order (overrides any saved user preference)
         $this->loader->add_filter('get_user_option_meta-box-order_mypco_message', $this, 'force_meta_box_order');
 
+        // Meta boxes on Speaker post type
+        $this->loader->add_action('add_meta_boxes', $this, 'add_speaker_details_meta_box');
+        $this->loader->add_action('save_post_mypco_speaker', $this, 'save_speaker_details_meta', 10, 2);
+
         // AJAX: create speaker from Message editor meta box
         $this->loader->add_action('wp_ajax_mypco_add_speaker', $this, 'ajax_add_speaker');
 
@@ -989,6 +993,150 @@ class MyPCO_Series_Admin {
             'id'   => $post_id,
             'name' => $name,
         ]);
+    }
+
+    // =========================================================================
+    // Speaker Post Type – Meta Box (Speaker Details)
+    // =========================================================================
+
+    /**
+     * Register the "Speaker Details" meta box on the mypco_speaker post type.
+     */
+    public function add_speaker_details_meta_box() {
+        add_meta_box(
+            'mypco_speaker_details',
+            __('Speaker Details', 'mypco-online'),
+            [$this, 'render_speaker_details_meta_box'],
+            'mypco_speaker',
+            'normal',
+            'high'
+        );
+    }
+
+    /**
+     * Render the "Speaker Details" meta box fields.
+     */
+    public function render_speaker_details_meta_box($post) {
+        wp_nonce_field('mypco_speaker_details_meta_save', 'mypco_speaker_details_meta_nonce');
+
+        $title_role = get_post_meta($post->ID, '_mypco_speaker_title', true);
+        $image      = get_post_meta($post->ID, '_mypco_speaker_image', true);
+        $links      = get_post_meta($post->ID, '_mypco_speaker_links', true);
+
+        if (!is_array($links) || empty($links)) {
+            $links = [['label' => '', 'url' => '']];
+        }
+        ?>
+        <table class="form-table mypco-meta-table">
+            <tr>
+                <th><label for="mypco_speaker_title"><?php esc_html_e('Title / Role', 'mypco-online'); ?></label></th>
+                <td>
+                    <input type="text" id="mypco_speaker_title" name="mypco_speaker_title"
+                           value="<?php echo esc_attr($title_role); ?>" class="regular-text"
+                           placeholder="<?php esc_attr_e('e.g. Senior Pastor', 'mypco-online'); ?>" />
+                </td>
+            </tr>
+            <tr>
+                <th><label for="mypco_speaker_image"><?php esc_html_e('Photo', 'mypco-online'); ?></label></th>
+                <td>
+                    <input type="hidden" id="mypco_speaker_image" name="mypco_speaker_image"
+                           value="<?php echo esc_url($image); ?>" />
+                    <div class="mypco-field-with-button">
+                        <button type="button" class="button mypco-upload-image-btn"
+                                data-target="#mypco_speaker_image"
+                                data-preview="#mypco-speaker-image-preview"><?php esc_html_e('Select Image', 'mypco-online'); ?></button>
+                        <button type="button" class="button mypco-remove-image-btn"
+                                data-target="#mypco_speaker_image"
+                                data-preview="#mypco-speaker-image-preview"
+                                <?php echo $image ? '' : 'style="display:none;"'; ?>><?php esc_html_e('Remove Image', 'mypco-online'); ?></button>
+                    </div>
+                    <div id="mypco-speaker-image-preview" style="margin-top:10px;">
+                        <?php if ($image) : ?>
+                            <img src="<?php echo esc_url($image); ?>" style="max-width:200px;height:auto;" />
+                        <?php endif; ?>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th><?php esc_html_e('Links', 'mypco-online'); ?></th>
+                <td>
+                    <div id="mypco-speaker-links">
+                        <?php foreach ($links as $i => $link) : ?>
+                            <div class="mypco-speaker-link-row" data-index="<?php echo (int) $i; ?>">
+                                <input type="text" name="mypco_speaker_links[<?php echo (int) $i; ?>][label]"
+                                       class="regular-text mypco-link-label"
+                                       value="<?php echo esc_attr($link['label'] ?? ''); ?>"
+                                       placeholder="<?php esc_attr_e('Label (e.g. Facebook)', 'mypco-online'); ?>" />
+                                <input type="url" name="mypco_speaker_links[<?php echo (int) $i; ?>][url]"
+                                       class="regular-text mypco-link-url"
+                                       value="<?php echo esc_url($link['url'] ?? ''); ?>"
+                                       placeholder="<?php esc_attr_e('https://...', 'mypco-online'); ?>" />
+                                <button type="button" class="button mypco-remove-speaker-link"
+                                        title="<?php esc_attr_e('Remove', 'mypco-online'); ?>">&times;</button>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <p style="margin-top:8px;">
+                        <button type="button" class="button" id="mypco-add-speaker-link">
+                            <?php esc_html_e('Add Link', 'mypco-online'); ?>
+                        </button>
+                    </p>
+                    <p class="description"><?php esc_html_e('Add links to social profiles, websites, or other resources.', 'mypco-online'); ?></p>
+                </td>
+            </tr>
+        </table>
+        <?php
+    }
+
+    /**
+     * Save the "Speaker Details" meta box data.
+     */
+    public function save_speaker_details_meta($post_id, $post) {
+        if (!isset($_POST['mypco_speaker_details_meta_nonce']) ||
+            !wp_verify_nonce($_POST['mypco_speaker_details_meta_nonce'], 'mypco_speaker_details_meta_save')) {
+            return;
+        }
+
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+            return;
+        }
+
+        if (!current_user_can('edit_post', $post_id)) {
+            return;
+        }
+
+        // Title / Role
+        if (isset($_POST['mypco_speaker_title'])) {
+            update_post_meta($post_id, '_mypco_speaker_title', sanitize_text_field($_POST['mypco_speaker_title']));
+        }
+
+        // Photo
+        if (isset($_POST['mypco_speaker_image'])) {
+            $image = esc_url_raw($_POST['mypco_speaker_image']);
+            if ($image) {
+                update_post_meta($post_id, '_mypco_speaker_image', $image);
+            } else {
+                delete_post_meta($post_id, '_mypco_speaker_image');
+            }
+        }
+
+        // Links
+        $links = [];
+        if (isset($_POST['mypco_speaker_links']) && is_array($_POST['mypco_speaker_links'])) {
+            foreach ($_POST['mypco_speaker_links'] as $entry) {
+                $label = isset($entry['label']) ? sanitize_text_field($entry['label']) : '';
+                $url   = isset($entry['url']) ? esc_url_raw($entry['url']) : '';
+                if (!empty($url)) {
+                    $links[] = ['label' => $label, 'url' => $url];
+                }
+            }
+        }
+
+        if (!empty($links)) {
+            update_post_meta($post_id, '_mypco_speaker_links', $links);
+        } else {
+            delete_post_meta($post_id, '_mypco_speaker_links');
+        }
     }
 
     // =========================================================================
