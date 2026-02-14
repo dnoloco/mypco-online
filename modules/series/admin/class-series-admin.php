@@ -45,6 +45,9 @@ class MyPCO_Series_Admin {
         $this->loader->add_action('add_meta_boxes', $this, 'add_series_info_meta_box');
         $this->loader->add_action('save_post_mypco_message', $this, 'save_series_info_meta', 10, 2);
 
+        // Force meta box display order (overrides any saved user preference)
+        $this->loader->add_filter('get_user_option_meta-box-order_mypco_message', $this, 'force_meta_box_order');
+
         // AJAX: create speaker from Message editor meta box
         $this->loader->add_action('wp_ajax_mypco_add_speaker', $this, 'ajax_add_speaker');
 
@@ -1377,6 +1380,20 @@ class MyPCO_Series_Admin {
     // =========================================================================
     // Helper Methods
     // =========================================================================
+
+    /**
+     * Force meta box display order on the mypco_message editor.
+     *
+     * WordPress saves meta box positions per-user. This filter overrides
+     * that saved preference so our boxes always appear in a fixed order.
+     */
+    public function force_meta_box_order($order) {
+        return [
+            'normal'   => 'mypco_message_info,mypco_scripture_meta,mypco_media_meta,mypco_speaker_meta,mypco_series_info',
+            'side'     => '',
+            'advanced' => '',
+        ];
+    }
 
     /**
      * Customize the upload directory for series module uploads.
