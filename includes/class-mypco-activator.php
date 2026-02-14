@@ -140,74 +140,10 @@ class MyPCO_Activator {
             KEY status (status)
         ) $charset_collate;";
 
-        // Table for speakers
-        $table_speakers = $wpdb->prefix . 'mypco_speakers';
-        $sql_speakers = "CREATE TABLE IF NOT EXISTS $table_speakers (
-            id mediumint(9) NOT NULL AUTO_INCREMENT,
-            name varchar(200) NOT NULL,
-            title varchar(200) DEFAULT NULL,
-            bio text DEFAULT NULL,
-            image_url text DEFAULT NULL,
-            links text DEFAULT NULL,
-            PRIMARY KEY  (id),
-            KEY name (name)
-        ) $charset_collate;";
-
-        // Table for series
-        $table_series = $wpdb->prefix . 'mypco_series';
-        $sql_series = "CREATE TABLE IF NOT EXISTS $table_series (
-            id mediumint(9) NOT NULL AUTO_INCREMENT,
-            title varchar(255) NOT NULL,
-            description text DEFAULT NULL,
-            image_url text DEFAULT NULL,
-            start_date date DEFAULT NULL,
-            end_date date DEFAULT NULL,
-            PRIMARY KEY  (id),
-            KEY title (title),
-            KEY start_date (start_date)
-        ) $charset_collate;";
-
-        // Table for topics
-        $table_topics = $wpdb->prefix . 'mypco_topics';
-        $sql_topics = "CREATE TABLE IF NOT EXISTS $table_topics (
-            id mediumint(9) NOT NULL AUTO_INCREMENT,
-            name varchar(200) NOT NULL,
-            description text DEFAULT NULL,
-            PRIMARY KEY  (id),
-            KEY name (name)
-        ) $charset_collate;";
-
-        // Table for messages
-        $table_messages = $wpdb->prefix . 'mypco_messages';
-        $sql_messages = "CREATE TABLE IF NOT EXISTS $table_messages (
-            id mediumint(9) NOT NULL AUTO_INCREMENT,
-            title varchar(255) NOT NULL,
-            message_date date NOT NULL,
-            speaker_id mediumint(9) DEFAULT 0,
-            series_id mediumint(9) DEFAULT 0,
-            topic_id mediumint(9) DEFAULT 0,
-            scripture varchar(255) DEFAULT NULL,
-            description text DEFAULT NULL,
-            audio_url text DEFAULT NULL,
-            video_url text DEFAULT NULL,
-            image_url text DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY  (id),
-            KEY message_date (message_date),
-            KEY speaker_id (speaker_id),
-            KEY series_id (series_id),
-            KEY topic_id (topic_id)
-        ) $charset_collate;";
-
         // Execute table creation
         dbDelta($sql_signups);
         dbDelta($sql_registrations);
         dbDelta($sql_clearstream);
-        dbDelta($sql_speakers);
-        dbDelta($sql_series);
-        dbDelta($sql_topics);
-        dbDelta($sql_messages);
     }
 
     /**
