@@ -199,6 +199,12 @@
     padding-top: 14px;
 }
 
+/* Constrain textarea width to match regular-text inputs */
+.mypco-meta-table textarea {
+    max-width: 25em;
+    width: 100%;
+}
+
 /* Field + button inline layout */
 .mypco-field-with-button {
     display: flex;
