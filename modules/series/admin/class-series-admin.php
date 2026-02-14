@@ -29,25 +29,21 @@ class MyPCO_Series_Admin {
         $this->loader->add_action('admin_init', $this, 'handle_form_submissions');
         $this->loader->add_filter('upload_dir', $this, 'custom_upload_dir');
 
-        // Series Info meta box on Message post type
-        $this->loader->add_action('add_meta_boxes', $this, 'add_series_info_meta_box');
-        $this->loader->add_action('save_post_mypco_message', $this, 'save_series_info_meta', 10, 2);
-
-        // Speaker meta box on Message post type (relationship to mypco_speaker CPT)
-        $this->loader->add_action('add_meta_boxes', $this, 'add_speaker_meta_box');
-        $this->loader->add_action('save_post_mypco_message', $this, 'save_speaker_meta', 10, 2);
-
-        // Message Info meta box on Message post type
+        // Meta boxes on Message post type (order determines display order)
         $this->loader->add_action('add_meta_boxes', $this, 'add_message_info_meta_box');
         $this->loader->add_action('save_post_mypco_message', $this, 'save_message_info_meta', 10, 2);
 
-        // Media meta box on Message post type (audio + video)
+        $this->loader->add_action('add_meta_boxes', $this, 'add_scripture_meta_box');
+        $this->loader->add_action('save_post_mypco_message', $this, 'save_scripture_meta', 10, 2);
+
         $this->loader->add_action('add_meta_boxes', $this, 'add_media_meta_box');
         $this->loader->add_action('save_post_mypco_message', $this, 'save_media_meta', 10, 2);
 
-        // Scripture meta box on Message post type (multiple passages)
-        $this->loader->add_action('add_meta_boxes', $this, 'add_scripture_meta_box');
-        $this->loader->add_action('save_post_mypco_message', $this, 'save_scripture_meta', 10, 2);
+        $this->loader->add_action('add_meta_boxes', $this, 'add_speaker_meta_box');
+        $this->loader->add_action('save_post_mypco_message', $this, 'save_speaker_meta', 10, 2);
+
+        $this->loader->add_action('add_meta_boxes', $this, 'add_series_info_meta_box');
+        $this->loader->add_action('save_post_mypco_message', $this, 'save_series_info_meta', 10, 2);
 
         // AJAX: create speaker from Message editor meta box
         $this->loader->add_action('wp_ajax_mypco_add_speaker', $this, 'ajax_add_speaker');
@@ -150,7 +146,8 @@ class MyPCO_Series_Admin {
             $localize_data['i18n'] = [
                 'selectBook' => __('Select Book', 'mypco-online'),
                 'chapter'    => __('Chapter', 'mypco-online'),
-                'verse'      => __('Verse', 'mypco-online'),
+                'verseStart' => __('Start Verse', 'mypco-online'),
+                'verseEnd'   => __('End Verse', 'mypco-online'),
             ];
         }
 
@@ -780,7 +777,7 @@ class MyPCO_Series_Admin {
                 esc_html__('Editing info for series: %s', 'mypco-online'),
                 '<strong>' . esc_html($term_name) . '</strong>'
             ); ?></p>
-            <table class="form-table">
+            <table class="form-table mypco-meta-table">
                 <tr>
                     <th><label for="mypco_series_description"><?php esc_html_e('Description', 'mypco-online'); ?></label></th>
                     <td>
@@ -890,28 +887,36 @@ class MyPCO_Series_Admin {
             'order'          => 'ASC',
             'post_status'    => 'publish',
         ]);
-
-        echo '<select name="mypco_speaker_id" id="mypco_speaker_id" style="width:100%;">';
-        echo '<option value="">' . esc_html__('Select a Speaker', 'mypco-online') . '</option>';
-        foreach ($speakers as $speaker) {
-            printf(
-                '<option value="%d" %s>%s</option>',
-                $speaker->ID,
-                selected($current_speaker, $speaker->ID, false),
-                esc_html($speaker->post_title)
-            );
-        }
-        echo '</select>';
-
-        // Toggle link + hidden add-new form (matches WP "Add New Category" pattern)
-        echo '<a href="#" id="mypco_toggle_add_speaker" style="display:inline-block;margin-top:6px;font-size:12px;">';
-        echo esc_html__('Add New Speaker', 'mypco-online');
-        echo '</a>';
-        echo '<div id="mypco_add_speaker_form" style="display:none;margin-top:6px;">';
-        echo '<input type="text" id="mypco_new_speaker_name" style="width:100%;margin-bottom:6px;" />';
-        echo '<input type="button" id="mypco_add_speaker_btn" class="button" value="' . esc_attr__('Add New Speaker', 'mypco-online') . '" />';
-        echo '<span id="mypco_add_speaker_status" style="display:none;font-style:italic;font-size:12px;margin-left:6px;"></span>';
-        echo '</div>';
+        ?>
+        <table class="form-table mypco-meta-table">
+            <tr>
+                <th><label for="mypco_speaker_id"><?php esc_html_e('Speaker', 'mypco-online'); ?></label></th>
+                <td>
+                    <select name="mypco_speaker_id" id="mypco_speaker_id">
+                        <option value=""><?php esc_html_e('Select a Speaker', 'mypco-online'); ?></option>
+                        <?php foreach ($speakers as $speaker) : ?>
+                            <option value="<?php echo (int) $speaker->ID; ?>" <?php selected($current_speaker, $speaker->ID); ?>>
+                                <?php echo esc_html($speaker->post_title); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <a href="#" id="mypco_toggle_add_speaker" style="display:inline-block;margin-left:8px;font-size:12px;">
+                        <?php esc_html_e('Add New Speaker', 'mypco-online'); ?>
+                    </a>
+                    <div id="mypco_add_speaker_form" style="display:none;margin-top:8px;">
+                        <div class="mypco-field-with-button">
+                            <input type="text" id="mypco_new_speaker_name" class="regular-text"
+                                   placeholder="<?php esc_attr_e('Speaker name', 'mypco-online'); ?>" />
+                            <input type="button" id="mypco_add_speaker_btn" class="button"
+                                   value="<?php esc_attr_e('Add New Speaker', 'mypco-online'); ?>" />
+                        </div>
+                        <span id="mypco_add_speaker_status" style="display:none;font-style:italic;font-size:12px;margin-left:4px;"></span>
+                    </div>
+                    <p class="description"><?php esc_html_e('Choose the speaker for this message.', 'mypco-online'); ?></p>
+                </td>
+            </tr>
+        </table>
+        <?php
     }
 
     /**
@@ -999,19 +1004,21 @@ class MyPCO_Series_Admin {
         $message_date = get_post_meta($post->ID, '_mypco_message_date', true);
         $image        = get_post_meta($post->ID, '_mypco_message_image', true);
         ?>
-        <table class="form-table">
+        <table class="form-table mypco-meta-table">
             <tr>
                 <th><label for="mypco_message_description"><?php esc_html_e('Description', 'mypco-online'); ?></label></th>
                 <td>
                     <textarea id="mypco_message_description" name="mypco_message_description"
-                              rows="5" class="large-text"><?php echo esc_textarea($description); ?></textarea>
+                              rows="4" class="large-text"><?php echo esc_textarea($description); ?></textarea>
+                    <p class="description"><?php esc_html_e('A short summary of the message.', 'mypco-online'); ?></p>
                 </td>
             </tr>
             <tr>
-                <th><label for="mypco_message_date"><?php esc_html_e('Message Date', 'mypco-online'); ?></label></th>
+                <th><label for="mypco_message_date"><?php esc_html_e('Date', 'mypco-online'); ?></label></th>
                 <td>
                     <input type="date" id="mypco_message_date" name="mypco_message_date"
                            value="<?php echo esc_attr($message_date); ?>" />
+                    <p class="description"><?php esc_html_e('The date this message was delivered.', 'mypco-online'); ?></p>
                 </td>
             </tr>
             <tr>
@@ -1019,13 +1026,15 @@ class MyPCO_Series_Admin {
                 <td>
                     <input type="hidden" id="mypco_message_image" name="mypco_message_image"
                            value="<?php echo esc_url($image); ?>" />
-                    <button type="button" class="button mypco-upload-image-btn"
-                            data-target="#mypco_message_image"
-                            data-preview="#mypco-message-image-preview"><?php esc_html_e('Select Image', 'mypco-online'); ?></button>
-                    <button type="button" class="button mypco-remove-image-btn"
-                            data-target="#mypco_message_image"
-                            data-preview="#mypco-message-image-preview"
-                            <?php echo $image ? '' : 'style="display:none;"'; ?>><?php esc_html_e('Remove Image', 'mypco-online'); ?></button>
+                    <div class="mypco-field-with-button">
+                        <button type="button" class="button mypco-upload-image-btn"
+                                data-target="#mypco_message_image"
+                                data-preview="#mypco-message-image-preview"><?php esc_html_e('Select Image', 'mypco-online'); ?></button>
+                        <button type="button" class="button mypco-remove-image-btn"
+                                data-target="#mypco_message_image"
+                                data-preview="#mypco-message-image-preview"
+                                <?php echo $image ? '' : 'style="display:none;"'; ?>><?php esc_html_e('Remove Image', 'mypco-online'); ?></button>
+                    </div>
                     <div id="mypco-message-image-preview" style="margin-top:10px;">
                         <?php if ($image) : ?>
                             <img src="<?php echo esc_url($image); ?>" style="max-width:200px;height:auto;" />
@@ -1077,7 +1086,7 @@ class MyPCO_Series_Admin {
     public function add_media_meta_box() {
         add_meta_box(
             'mypco_media_meta',
-            __('Media', 'mypco-online'),
+            __('Message Media', 'mypco-online'),
             [$this, 'render_media_meta_box'],
             'mypco_message',
             'normal',
@@ -1086,7 +1095,7 @@ class MyPCO_Series_Admin {
     }
 
     /**
-     * Render the "Media" meta box fields (audio + video).
+     * Render the "Message Media" meta box fields (audio + video).
      */
     public function render_media_meta_box($post) {
         wp_nonce_field('mypco_media_meta_save', 'mypco_media_meta_nonce');
@@ -1094,37 +1103,37 @@ class MyPCO_Series_Admin {
         $audio = get_post_meta($post->ID, '_mypco_message_audio', true);
         $video = get_post_meta($post->ID, '_mypco_message_video', true);
         ?>
-        <table class="form-table">
+        <table class="form-table mypco-meta-table">
             <tr>
                 <th><label for="mypco_message_audio"><?php esc_html_e('Audio', 'mypco-online'); ?></label></th>
                 <td>
-                    <input type="url" id="mypco_message_audio" name="mypco_message_audio"
-                           value="<?php echo esc_url($audio); ?>" class="large-text"
-                           placeholder="<?php esc_attr_e('Paste a URL or upload a file', 'mypco-online'); ?>" />
-                    <p>
+                    <div class="mypco-field-with-button">
+                        <input type="url" id="mypco_message_audio" name="mypco_message_audio"
+                               value="<?php echo esc_url($audio); ?>" class="regular-text" />
                         <button type="button" class="button mypco-upload-media-btn"
                                 data-target="#mypco_message_audio"
-                                data-media-type="audio"><?php esc_html_e('Upload Audio', 'mypco-online'); ?></button>
+                                data-media-type="audio"><?php esc_html_e('Add or Upload File', 'mypco-online'); ?></button>
                         <button type="button" class="button mypco-remove-media-btn"
                                 data-target="#mypco_message_audio"
                                 <?php echo $audio ? '' : 'style="display:none;"'; ?>><?php esc_html_e('Remove', 'mypco-online'); ?></button>
-                    </p>
+                    </div>
+                    <p class="description"><?php esc_html_e('Enter a URL or upload an audio file.', 'mypco-online'); ?></p>
                 </td>
             </tr>
             <tr>
                 <th><label for="mypco_message_video"><?php esc_html_e('Video', 'mypco-online'); ?></label></th>
                 <td>
-                    <input type="url" id="mypco_message_video" name="mypco_message_video"
-                           value="<?php echo esc_url($video); ?>" class="large-text"
-                           placeholder="<?php esc_attr_e('Paste a URL or upload a file', 'mypco-online'); ?>" />
-                    <p>
+                    <div class="mypco-field-with-button">
+                        <input type="url" id="mypco_message_video" name="mypco_message_video"
+                               value="<?php echo esc_url($video); ?>" class="regular-text" />
                         <button type="button" class="button mypco-upload-media-btn"
                                 data-target="#mypco_message_video"
-                                data-media-type="video"><?php esc_html_e('Upload Video', 'mypco-online'); ?></button>
+                                data-media-type="video"><?php esc_html_e('Add or Upload File', 'mypco-online'); ?></button>
                         <button type="button" class="button mypco-remove-media-btn"
                                 data-target="#mypco_message_video"
                                 <?php echo $video ? '' : 'style="display:none;"'; ?>><?php esc_html_e('Remove', 'mypco-online'); ?></button>
-                    </p>
+                    </div>
+                    <p class="description"><?php esc_html_e('Enter a URL or upload a video file.', 'mypco-online'); ?></p>
                 </td>
             </tr>
         </table>
@@ -1177,7 +1186,7 @@ class MyPCO_Series_Admin {
     public function add_scripture_meta_box() {
         add_meta_box(
             'mypco_scripture_meta',
-            __('Scripture', 'mypco-online'),
+            __('Message Scripture', 'mypco-online'),
             [$this, 'render_scripture_meta_box'],
             'mypco_message',
             'normal',
@@ -1186,9 +1195,9 @@ class MyPCO_Series_Admin {
     }
 
     /**
-     * Render the "Scripture" meta box with repeatable passage rows.
+     * Render the "Message Scripture" meta box with repeatable passage rows.
      *
-     * Each passage has three cascading dropdowns: Book, Chapter, Verse.
+     * Each passage has cascading dropdowns: Book, Chapter, Start Verse, End Verse.
      * JavaScript populates the options from localised Bible data.
      */
     public function render_scripture_meta_box($post) {
@@ -1196,34 +1205,47 @@ class MyPCO_Series_Admin {
 
         $scriptures = get_post_meta($post->ID, '_mypco_message_scriptures', true);
         if (!is_array($scriptures) || empty($scriptures)) {
-            $scriptures = [['book' => '', 'chapter' => '', 'verse' => '']];
+            $scriptures = [['book' => '', 'chapter' => '', 'verse_start' => '', 'verse_end' => '']];
         }
         ?>
-        <div id="mypco-scripture-passages">
-            <?php foreach ($scriptures as $i => $scripture) : ?>
-            <div class="mypco-scripture-row" data-index="<?php echo (int) $i; ?>">
-                <select name="mypco_scriptures[<?php echo (int) $i; ?>][book]" class="mypco-scripture-book"
-                        data-value="<?php echo esc_attr($scripture['book'] ?? ''); ?>">
-                    <option value=""><?php esc_html_e('Select Book', 'mypco-online'); ?></option>
-                </select>
-                <select name="mypco_scriptures[<?php echo (int) $i; ?>][chapter]" class="mypco-scripture-chapter"
-                        data-value="<?php echo esc_attr($scripture['chapter'] ?? ''); ?>" disabled>
-                    <option value=""><?php esc_html_e('Chapter', 'mypco-online'); ?></option>
-                </select>
-                <select name="mypco_scriptures[<?php echo (int) $i; ?>][verse]" class="mypco-scripture-verse"
-                        data-value="<?php echo esc_attr($scripture['verse'] ?? ''); ?>" disabled>
-                    <option value=""><?php esc_html_e('Verse', 'mypco-online'); ?></option>
-                </select>
-                <button type="button" class="button mypco-remove-scripture"
-                        title="<?php esc_attr_e('Remove', 'mypco-online'); ?>">&times;</button>
-            </div>
-            <?php endforeach; ?>
-        </div>
-        <p>
-            <button type="button" class="button" id="mypco-add-scripture">
-                <?php esc_html_e('Add Passage', 'mypco-online'); ?>
-            </button>
-        </p>
+        <table class="form-table mypco-meta-table">
+            <tr>
+                <th><?php esc_html_e('Passages', 'mypco-online'); ?></th>
+                <td>
+                    <div id="mypco-scripture-passages">
+                        <?php foreach ($scriptures as $i => $scripture) : ?>
+                        <div class="mypco-scripture-row" data-index="<?php echo (int) $i; ?>">
+                            <select name="mypco_scriptures[<?php echo (int) $i; ?>][book]" class="mypco-scripture-book"
+                                    data-value="<?php echo esc_attr($scripture['book'] ?? ''); ?>">
+                                <option value=""><?php esc_html_e('Select Book', 'mypco-online'); ?></option>
+                            </select>
+                            <select name="mypco_scriptures[<?php echo (int) $i; ?>][chapter]" class="mypco-scripture-chapter"
+                                    data-value="<?php echo esc_attr($scripture['chapter'] ?? ''); ?>" disabled>
+                                <option value=""><?php esc_html_e('Chapter', 'mypco-online'); ?></option>
+                            </select>
+                            <select name="mypco_scriptures[<?php echo (int) $i; ?>][verse_start]" class="mypco-scripture-verse-start"
+                                    data-value="<?php echo esc_attr($scripture['verse_start'] ?? $scripture['verse'] ?? ''); ?>" disabled>
+                                <option value=""><?php esc_html_e('Start Verse', 'mypco-online'); ?></option>
+                            </select>
+                            <span class="mypco-scripture-dash">&ndash;</span>
+                            <select name="mypco_scriptures[<?php echo (int) $i; ?>][verse_end]" class="mypco-scripture-verse-end"
+                                    data-value="<?php echo esc_attr($scripture['verse_end'] ?? ''); ?>" disabled>
+                                <option value=""><?php esc_html_e('End Verse', 'mypco-online'); ?></option>
+                            </select>
+                            <button type="button" class="button mypco-remove-scripture"
+                                    title="<?php esc_attr_e('Remove', 'mypco-online'); ?>">&times;</button>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <p style="margin-top:8px;">
+                        <button type="button" class="button" id="mypco-add-scripture">
+                            <?php esc_html_e('Add Passage', 'mypco-online'); ?>
+                        </button>
+                    </p>
+                    <p class="description"><?php esc_html_e('Select a book, chapter, and optional verse range for each passage.', 'mypco-online'); ?></p>
+                </td>
+            </tr>
+        </table>
         <?php
     }
 
@@ -1248,15 +1270,17 @@ class MyPCO_Series_Admin {
 
         if (isset($_POST['mypco_scriptures']) && is_array($_POST['mypco_scriptures'])) {
             foreach ($_POST['mypco_scriptures'] as $entry) {
-                $book    = isset($entry['book']) ? sanitize_text_field($entry['book']) : '';
-                $chapter = isset($entry['chapter']) ? absint($entry['chapter']) : 0;
-                $verse   = isset($entry['verse']) ? absint($entry['verse']) : 0;
+                $book        = isset($entry['book']) ? sanitize_text_field($entry['book']) : '';
+                $chapter     = isset($entry['chapter']) ? absint($entry['chapter']) : 0;
+                $verse_start = isset($entry['verse_start']) ? absint($entry['verse_start']) : 0;
+                $verse_end   = isset($entry['verse_end']) ? absint($entry['verse_end']) : 0;
 
                 if (!empty($book)) {
                     $scriptures[] = [
-                        'book'    => $book,
-                        'chapter' => $chapter,
-                        'verse'   => $verse,
+                        'book'        => $book,
+                        'chapter'     => $chapter,
+                        'verse_start' => $verse_start,
+                        'verse_end'   => $verse_end,
                     ];
                 }
             }

@@ -140,7 +140,7 @@
 
         var i18n = (typeof mypcoSeriesAdmin !== 'undefined' && mypcoSeriesAdmin.i18n)
             ? mypcoSeriesAdmin.i18n
-            : { selectBook: 'Select Book', chapter: 'Chapter', verse: 'Verse' };
+            : { selectBook: 'Select Book', chapter: 'Chapter', verseStart: 'Start Verse', verseEnd: 'End Verse' };
 
         function getBookData(bookName) {
             for (var i = 0; i < bibleData.length; i++) {
@@ -178,9 +178,9 @@
             }
         }
 
-        function populateVerseDropdown($select, book, chapter) {
+        function populateVerseDropdown($select, book, chapter, label) {
             var saved = $select.data('value') || '';
-            $select.empty().append('<option value="">' + i18n.verse + '</option>');
+            $select.empty().append('<option value="">' + label + '</option>');
             if (book && chapter > 0 && chapter <= book.chapters.length) {
                 var count = book.chapters[chapter - 1];
                 for (var v = 1; v <= count; v++) {
@@ -195,12 +195,18 @@
             }
         }
 
+        function populateVerses($row, book, chapter) {
+            var $start = $row.find('.mypco-scripture-verse-start');
+            var $end   = $row.find('.mypco-scripture-verse-end');
+            populateVerseDropdown($start, book, chapter, i18n.verseStart);
+            populateVerseDropdown($end, book, chapter, i18n.verseEnd);
+        }
+
         // Initialise existing scripture rows (populate selects + restore saved values)
         $('#mypco-scripture-passages .mypco-scripture-row').each(function() {
             var $row     = $(this);
             var $book    = $row.find('.mypco-scripture-book');
             var $chapter = $row.find('.mypco-scripture-chapter');
-            var $verse   = $row.find('.mypco-scripture-verse');
 
             populateBookDropdown($book);
 
@@ -208,7 +214,7 @@
             populateChapterDropdown($chapter, bookData);
 
             if (bookData && $chapter.val()) {
-                populateVerseDropdown($verse, bookData, parseInt($chapter.val(), 10));
+                populateVerses($row, bookData, parseInt($chapter.val(), 10));
             }
         });
 
@@ -216,24 +222,23 @@
         $(document).on('change', '.mypco-scripture-book', function() {
             var $row     = $(this).closest('.mypco-scripture-row');
             var $chapter = $row.find('.mypco-scripture-chapter');
-            var $verse   = $row.find('.mypco-scripture-verse');
             var bookData = getBookData($(this).val());
 
             $chapter.removeData('value');
-            $verse.removeData('value');
+            $row.find('.mypco-scripture-verse-start').removeData('value');
+            $row.find('.mypco-scripture-verse-end').removeData('value');
             populateChapterDropdown($chapter, bookData);
-            populateVerseDropdown($verse, null, 0);
+            populateVerses($row, null, 0);
         });
 
         // Chapter changed → populate verses
         $(document).on('change', '.mypco-scripture-chapter', function() {
             var $row     = $(this).closest('.mypco-scripture-row');
-            var $book    = $row.find('.mypco-scripture-book');
-            var $verse   = $row.find('.mypco-scripture-verse');
-            var bookData = getBookData($book.val());
+            var bookData = getBookData($row.find('.mypco-scripture-book').val());
 
-            $verse.removeData('value');
-            populateVerseDropdown($verse, bookData, parseInt($(this).val(), 10) || 0);
+            $row.find('.mypco-scripture-verse-start').removeData('value');
+            $row.find('.mypco-scripture-verse-end').removeData('value');
+            populateVerses($row, bookData, parseInt($(this).val(), 10) || 0);
         });
 
         // Add a new passage row
@@ -249,8 +254,12 @@
                     '<select name="mypco_scriptures[' + index + '][chapter]" class="mypco-scripture-chapter" disabled>' +
                         '<option value="">' + i18n.chapter + '</option>' +
                     '</select>' +
-                    '<select name="mypco_scriptures[' + index + '][verse]" class="mypco-scripture-verse" disabled>' +
-                        '<option value="">' + i18n.verse + '</option>' +
+                    '<select name="mypco_scriptures[' + index + '][verse_start]" class="mypco-scripture-verse-start" disabled>' +
+                        '<option value="">' + i18n.verseStart + '</option>' +
+                    '</select>' +
+                    '<span class="mypco-scripture-dash">&ndash;</span>' +
+                    '<select name="mypco_scriptures[' + index + '][verse_end]" class="mypco-scripture-verse-end" disabled>' +
+                        '<option value="">' + i18n.verseEnd + '</option>' +
                     '</select>' +
                     '<button type="button" class="button mypco-remove-scripture" title="Remove">&times;</button>' +
                 '</div>'
@@ -260,7 +269,7 @@
             populateBookDropdown($row.find('.mypco-scripture-book'));
         });
 
-        // Remove a passage row (clear instead of removing the last one)
+        // Remove a passage row (clear the last row instead of removing it)
         $(document).on('click', '.mypco-remove-scripture', function() {
             var $container = $('#mypco-scripture-passages');
             var $row       = $(this).closest('.mypco-scripture-row');
