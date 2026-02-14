@@ -163,6 +163,8 @@ class MyPCO_Series_Admin {
                     'sermonAudio'    => __('Sermon Audio', 'mypco-online'),
                     'art'            => __('Image', 'mypco-online'),
                     'none'           => __('None', 'mypco-online'),
+                    'requestTimeout' => __('Request timed out. Try importing fewer episodes at a time.', 'mypco-online'),
+                    'cacheExpired'   => __('Episode data expired. Please fetch again.', 'mypco-online'),
                 ],
             ]);
         }

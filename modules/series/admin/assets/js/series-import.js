@@ -170,11 +170,11 @@
                             badgeText  = i18n.skipped;
                         } else {
                             badgeClass = 'mypco-import-badge-error';
-                            badgeText  = i18n.error;
+                            badgeText  = result.message || i18n.error;
                         }
 
                         $row.find('.mypco-import-row-status').html(
-                            '<span class="mypco-import-badge ' + badgeClass + '">' + badgeText + '</span>'
+                            '<span class="mypco-import-badge ' + badgeClass + '" title="' + escHtml(result.message || '') + '">' + escHtml(badgeText) + '</span>'
                         );
                     });
                 }
@@ -199,9 +199,25 @@
                 $('#mypco-import-results').html(resultsHtml);
                 $('#mypco-import-step-results').slideDown(200);
 
-            }).fail(function() {
+            }).fail(function(jqXHR) {
                 $btn.prop('disabled', false).text($btn.data('original-text') || 'Import Selected');
-                $status.html('<span class="mypco-import-error">' + i18n.error + '</span>');
+                var msg = i18n.error;
+                if (jqXHR.responseJSON && jqXHR.responseJSON.data && jqXHR.responseJSON.data.message) {
+                    msg = jqXHR.responseJSON.data.message;
+                } else if (jqXHR.status === 0) {
+                    msg = i18n.requestTimeout;
+                } else if (jqXHR.statusText) {
+                    msg = i18n.error + ': ' + jqXHR.statusText;
+                }
+                $status.html('<span class="mypco-import-error">' + escHtml(msg) + '</span>');
+
+                // Reset row badges back from "Importing..." to "New"
+                $.each(selectedIds, function(idx, id) {
+                    var $row = $('#mypco-import-tbody tr[data-episode-id="' + id + '"]');
+                    $row.find('.mypco-import-row-status').html(
+                        '<span class="mypco-import-badge mypco-import-badge-new">New</span>'
+                    );
+                });
             });
         });
 
