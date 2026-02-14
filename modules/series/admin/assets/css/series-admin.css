@@ -288,3 +288,113 @@
     line-height: 28px;
     font-size: 16px;
 }
+
+/* =====================================================================
+   Import Page
+   ===================================================================== */
+
+.mypco-import-wrap h2 {
+    margin-top: 0;
+}
+
+.mypco-import-step {
+    margin-bottom: 25px;
+}
+
+.mypco-import-step h3 {
+    margin-top: 20px;
+    margin-bottom: 5px;
+}
+
+/* Status messages */
+.mypco-import-status {
+    display: inline-block;
+    margin-left: 10px;
+    font-style: italic;
+    line-height: 30px;
+    vertical-align: middle;
+}
+
+.mypco-import-error {
+    color: #d63638;
+    font-style: normal;
+    font-weight: 600;
+}
+
+/* Import table */
+#mypco-import-table {
+    margin-top: 10px;
+}
+
+#mypco-import-table th.check-column,
+#mypco-import-table td.check-column {
+    width: 2.2em;
+    padding: 8px 0 8px 10px;
+}
+
+/* Dim already-imported rows */
+.mypco-import-row-existing td {
+    opacity: 0.6;
+}
+
+/* Status badges */
+.mypco-import-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.5;
+    white-space: nowrap;
+}
+
+.mypco-import-badge-new {
+    background: #dff0d8;
+    color: #3c763d;
+}
+
+.mypco-import-badge-success {
+    background: #dff0d8;
+    color: #3c763d;
+}
+
+.mypco-import-badge-skip {
+    background: #f0f0f1;
+    color: #50575e;
+}
+
+.mypco-import-badge-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.mypco-import-badge-error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Field mapping reference table */
+.mypco-import-mapping {
+    border-top: 1px solid #ccd0d4;
+    padding-top: 20px;
+}
+
+.mypco-import-mapping table {
+    background: #f9f9f9;
+}
+
+.mypco-import-mapping th,
+.mypco-import-mapping td {
+    padding: 8px 12px;
+}
+
+/* Last import info bar */
+.mypco-import-last-run {
+    font-size: 13px;
+}
+
+/* Summary line */
+#mypco-import-summary {
+    font-size: 13px;
+    padding: 8px 0;
+}

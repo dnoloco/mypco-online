@@ -26,7 +26,11 @@ class MyPCO_API_Model {
     /**
      * Core function to fetch data from a specific PCO endpoint, handling caching.
      */
-    public function get_data_with_caching($app_domain, $endpoint_path, $params, $transient_key) {
+    public function get_data_with_caching($app_domain, $endpoint_path, $params, $transient_key, $cache_duration = null) {
+        if ($cache_duration === null) {
+            $cache_duration = self::CACHE_DURATION;
+        }
+
         $output = get_transient($transient_key);
 
         if (false === $output) {
@@ -51,7 +55,7 @@ class MyPCO_API_Model {
                 return ['error' => $error];
             } else {
                 // Save successful result to cache
-                set_transient($transient_key, $output, self::CACHE_DURATION);
+                set_transient($transient_key, $output, $cache_duration);
             }
         }
 
@@ -234,5 +238,109 @@ class MyPCO_API_Model {
         return $this->get_data_with_caching('services', $endpoint, $params, $key, 1 * HOUR_IN_SECONDS);
     }
 
-    // ... end of mypco_api_model class
+    // =========================================================================
+    // Publishing API – Episodes, Series, Resources
+    // =========================================================================
+
+    /**
+     * Fetches episodes from the Publishing API with pagination support.
+     *
+     * @param int    $per_page Number of episodes per page (max 100).
+     * @param int    $offset   Offset for pagination.
+     * @param string $order    Sort order: 'desc' or 'asc'.
+     * @return array|false API response or false on error.
+     */
+    public function get_publishing_episodes($per_page = 25, $offset = 0, $order = 'desc') {
+        $endpoint = '/v2/episodes';
+        $params = [
+            'per_page' => min($per_page, 100),
+            'offset'   => $offset,
+            'order'    => $order === 'asc' ? 'published_at' : '-published_at',
+            'include'  => 'series',
+        ];
+        $key = 'mypco_pub_episodes_' . md5($per_page . $offset . $order);
+        return $this->get_data_with_caching('publishing', $endpoint, $params, $key, 5 * MINUTE_IN_SECONDS);
+    }
+
+    /**
+     * Fetches a single episode with its resources (media attachments).
+     *
+     * @param string $episode_id The PCO episode ID.
+     * @return array|false API response or false on error.
+     */
+    public function get_publishing_episode($episode_id) {
+        $endpoint = "/v2/episodes/{$episode_id}";
+        $params = [
+            'include' => 'series,episode_resources',
+        ];
+        $key = 'mypco_pub_episode_' . $episode_id;
+        return $this->get_data_with_caching('publishing', $endpoint, $params, $key, 5 * MINUTE_IN_SECONDS);
+    }
+
+    /**
+     * Fetches resources (video, audio, notes) for a specific episode.
+     *
+     * @param string $episode_id The PCO episode ID.
+     * @return array|false API response or false on error.
+     */
+    public function get_publishing_episode_resources($episode_id) {
+        $endpoint = "/v2/episodes/{$episode_id}/episode_resources";
+        $key = 'mypco_pub_ep_res_' . $episode_id;
+        return $this->get_data_with_caching('publishing', $endpoint, [], $key, 5 * MINUTE_IN_SECONDS);
+    }
+
+    /**
+     * Fetches all series from the Publishing API.
+     *
+     * @param int $per_page Number of series per page.
+     * @param int $offset   Offset for pagination.
+     * @return array|false API response or false on error.
+     */
+    public function get_publishing_series($per_page = 100, $offset = 0) {
+        $endpoint = '/v2/series';
+        $params = [
+            'per_page' => min($per_page, 100),
+            'offset'   => $offset,
+        ];
+        $key = 'mypco_pub_series_' . md5($per_page . $offset);
+        return $this->get_data_with_caching('publishing', $endpoint, $params, $key, 15 * MINUTE_IN_SECONDS);
+    }
+
+    /**
+     * Fetches all episodes from Publishing, handling pagination automatically.
+     *
+     * @return array All episode data items, or an error array.
+     */
+    public function get_all_publishing_episodes() {
+        $all_episodes = [];
+        $all_included = [];
+        $offset = 0;
+        $per_page = 100;
+
+        do {
+            $response = $this->get_publishing_episodes($per_page, $offset);
+
+            if (!$response || isset($response['error'])) {
+                return $response ?: ['error' => 'Failed to fetch episodes.'];
+            }
+
+            if (isset($response['data'])) {
+                $all_episodes = array_merge($all_episodes, $response['data']);
+            }
+
+            if (isset($response['included'])) {
+                $all_included = array_merge($all_included, $response['included']);
+            }
+
+            $total = isset($response['meta']['total_count']) ? (int) $response['meta']['total_count'] : 0;
+            $offset += $per_page;
+
+        } while ($offset < $total && !empty($response['data']));
+
+        return [
+            'data'     => $all_episodes,
+            'included' => $all_included,
+            'meta'     => ['total_count' => count($all_episodes)],
+        ];
+    }
 }

@@ -15,10 +15,15 @@ class MyPCO_Series_Admin {
 
     private $loader;
     private $api_model;
+    private $import;
 
     public function __construct($loader, $api_model) {
         $this->loader = $loader;
         $this->api_model = $api_model;
+
+        // Initialize the import component
+        require_once __DIR__ . '/class-series-import.php';
+        $this->import = new MyPCO_Series_Import($loader, $api_model);
     }
 
     /**
@@ -70,6 +75,9 @@ class MyPCO_Series_Admin {
         // Settings page under Messages menu
         $this->loader->add_action('admin_menu', $this, 'add_settings_page');
         $this->loader->add_action('admin_init', $this, 'handle_settings_save');
+
+        // Import functionality
+        $this->import->init();
     }
 
     // =========================================================================
@@ -83,8 +91,9 @@ class MyPCO_Series_Admin {
         $screen = get_current_screen();
         $is_module_post_type = ($screen && in_array($screen->post_type, ['mypco_message', 'mypco_speaker'], true));
         $is_module_taxonomy = ($screen && in_array($screen->taxonomy, ['mypco_series', 'mypco_service_type'], true));
+        $is_settings_page = ($hook === 'mypco_message_page_mypco-series-settings');
 
-        if (!$is_module_post_type && !$is_module_taxonomy) {
+        if (!$is_module_post_type && !$is_module_taxonomy && !$is_settings_page) {
             return;
         }
 
@@ -111,7 +120,7 @@ class MyPCO_Series_Admin {
         ];
 
         // Include Bible data only on the message editor
-        if ($screen && $screen->post_type === 'mypco_message') {
+        if ($screen && $screen->post_type === 'mypco_message' && $screen->base === 'post') {
             $localize_data['bibleData'] = include MYPCO_PLUGIN_DIR . 'modules/series/admin/bible-data.php';
             $localize_data['i18n'] = [
                 'selectBook' => __('Select Book', 'mypco-online'),
@@ -122,6 +131,39 @@ class MyPCO_Series_Admin {
         }
 
         wp_localize_script('mypco-series-admin', 'mypcoSeriesAdmin', $localize_data);
+
+        // Enqueue import script on the settings/import page
+        if ($is_settings_page && isset($_GET['tab']) && $_GET['tab'] === 'import') {
+            wp_enqueue_script(
+                'mypco-series-import',
+                MYPCO_PLUGIN_URL . 'modules/series/admin/assets/js/series-import.js',
+                ['jquery'],
+                MYPCO_VERSION,
+                true
+            );
+
+            wp_localize_script('mypco-series-import', 'mypcoImport', [
+                'ajaxUrl' => admin_url('admin-ajax.php'),
+                'nonce'   => wp_create_nonce('mypco_import_nonce'),
+                'i18n'    => [
+                    'fetching'       => __('Fetching episodes...', 'mypco-online'),
+                    'importing'      => __('Importing...', 'mypco-online'),
+                    'imported'       => __('Imported', 'mypco-online'),
+                    'skipped'        => __('Skipped', 'mypco-online'),
+                    'error'          => __('Error', 'mypco-online'),
+                    'alreadyExists'  => __('Already imported', 'mypco-online'),
+                    'noEpisodes'     => __('No episodes selected.', 'mypco-online'),
+                    'fetchError'     => __('Failed to fetch episodes.', 'mypco-online'),
+                    'importComplete' => __('Import complete!', 'mypco-online'),
+                    'episodesFound'  => __('episodes found.', 'mypco-online'),
+                    'newEpisodes'    => __('new,', 'mypco-online'),
+                    'alreadyImported' => __('already imported.', 'mypco-online'),
+                    'video'          => __('Video', 'mypco-online'),
+                    'audio'          => __('Audio', 'mypco-online'),
+                    'none'           => __('None', 'mypco-online'),
+                ],
+            ]);
+        }
     }
 
     // =========================================================================
@@ -986,9 +1028,58 @@ class MyPCO_Series_Admin {
     }
 
     /**
-     * Render the Settings page form.
+     * Render the Settings page form with tabbed navigation.
      */
     public function render_settings_page() {
+        $active_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'settings';
+        $names = MyPCO_Series_Module::get_custom_labels();
+        ?>
+        <div class="wrap">
+            <h1><?php echo esc_html($names['message_plural']); ?> <?php esc_html_e('Settings', 'mypco-online'); ?></h1>
+
+            <?php if (isset($_GET['settings-updated'])) : ?>
+                <div class="notice notice-success is-dismissible">
+                    <p><?php esc_html_e('Settings saved.', 'mypco-online'); ?></p>
+                </div>
+            <?php endif; ?>
+
+            <h2 class="nav-tab-wrapper">
+                <a href="?post_type=mypco_message&page=mypco-series-settings&tab=settings"
+                   class="nav-tab <?php echo $active_tab === 'settings' ? 'nav-tab-active' : ''; ?>">
+                    <?php esc_html_e('Settings', 'mypco-online'); ?>
+                </a>
+                <a href="?post_type=mypco_message&page=mypco-series-settings&tab=import"
+                   class="nav-tab <?php echo $active_tab === 'import' ? 'nav-tab-active' : ''; ?>">
+                    <?php esc_html_e('Import', 'mypco-online'); ?>
+                </a>
+            </h2>
+
+            <div class="mypco-settings-content" style="background:#fff;border:1px solid #ccd0d4;border-top:none;padding:20px;">
+                <?php if ($active_tab === 'import') : ?>
+                    <?php $this->render_import_tab(); ?>
+                <?php else : ?>
+                    <?php $this->render_labels_settings(); ?>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php
+    }
+
+    /**
+     * Render the Import tab content.
+     */
+    private function render_import_tab() {
+        if ($this->import) {
+            $this->import->render_import_tab();
+        } else {
+            echo '<p>' . esc_html__('Import functionality requires the API model to be initialized.', 'mypco-online') . '</p>';
+        }
+    }
+
+    /**
+     * Render the Labels/Settings tab content.
+     */
+    private function render_labels_settings() {
         $saved = get_option('mypco_series_labels', []);
         if (!is_array($saved)) {
             $saved = [];
@@ -1017,58 +1108,46 @@ class MyPCO_Series_Admin {
             ],
         ];
         ?>
-        <div class="wrap">
-            <h1><?php esc_html_e('Messages Settings', 'mypco-online'); ?></h1>
+        <p class="description" style="margin-bottom:15px;">
+            <?php esc_html_e('Customize the display names used throughout the admin area. Leave a field empty to use the default.', 'mypco-online'); ?>
+        </p>
 
-            <?php if (isset($_GET['settings-updated'])) : ?>
-                <div class="notice notice-success is-dismissible">
-                    <p><?php esc_html_e('Settings saved.', 'mypco-online'); ?></p>
-                </div>
-            <?php endif; ?>
+        <form method="post">
+            <?php wp_nonce_field('mypco_series_labels_save', 'mypco_series_labels_nonce'); ?>
 
-            <div class="mypco-settings-content" style="background:#fff;border:1px solid #ccd0d4;padding:20px;margin-top:15px;">
-                <p class="description" style="margin-bottom:15px;">
-                    <?php esc_html_e('Customize the display names used throughout the admin area. Leave a field empty to use the default.', 'mypco-online'); ?>
-                </p>
+            <table class="form-table">
+                <?php foreach ($sections as $key => $section) :
+                    $s_key = $key . '_singular';
+                    $p_key = $key . '_plural';
+                    $s_val = isset($saved[$s_key]) ? $saved[$s_key] : '';
+                    $p_val = isset($saved[$p_key]) ? $saved[$p_key] : '';
+                ?>
+                <tr>
+                    <th scope="row"><?php echo esc_html($section['heading']); ?></th>
+                    <td>
+                        <label style="display:inline-block;margin-right:20px;">
+                            <span class="description"><?php esc_html_e('Singular', 'mypco-online'); ?></span><br>
+                            <input type="text"
+                                   name="mypco_series_labels[<?php echo esc_attr($s_key); ?>]"
+                                   value="<?php echo esc_attr($s_val); ?>"
+                                   placeholder="<?php echo esc_attr($section['singular']); ?>"
+                                   class="regular-text" />
+                        </label>
+                        <label style="display:inline-block;">
+                            <span class="description"><?php esc_html_e('Plural', 'mypco-online'); ?></span><br>
+                            <input type="text"
+                                   name="mypco_series_labels[<?php echo esc_attr($p_key); ?>]"
+                                   value="<?php echo esc_attr($p_val); ?>"
+                                   placeholder="<?php echo esc_attr($section['plural']); ?>"
+                                   class="regular-text" />
+                        </label>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
 
-                <form method="post">
-                    <?php wp_nonce_field('mypco_series_labels_save', 'mypco_series_labels_nonce'); ?>
-
-                    <table class="form-table">
-                        <?php foreach ($sections as $key => $section) :
-                            $s_key = $key . '_singular';
-                            $p_key = $key . '_plural';
-                            $s_val = isset($saved[$s_key]) ? $saved[$s_key] : '';
-                            $p_val = isset($saved[$p_key]) ? $saved[$p_key] : '';
-                        ?>
-                        <tr>
-                            <th scope="row"><?php echo esc_html($section['heading']); ?></th>
-                            <td>
-                                <label style="display:inline-block;margin-right:20px;">
-                                    <span class="description"><?php esc_html_e('Singular', 'mypco-online'); ?></span><br>
-                                    <input type="text"
-                                           name="mypco_series_labels[<?php echo esc_attr($s_key); ?>]"
-                                           value="<?php echo esc_attr($s_val); ?>"
-                                           placeholder="<?php echo esc_attr($section['singular']); ?>"
-                                           class="regular-text" />
-                                </label>
-                                <label style="display:inline-block;">
-                                    <span class="description"><?php esc_html_e('Plural', 'mypco-online'); ?></span><br>
-                                    <input type="text"
-                                           name="mypco_series_labels[<?php echo esc_attr($p_key); ?>]"
-                                           value="<?php echo esc_attr($p_val); ?>"
-                                           placeholder="<?php echo esc_attr($section['plural']); ?>"
-                                           class="regular-text" />
-                                </label>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </table>
-
-                    <?php submit_button(__('Save Settings', 'mypco-online')); ?>
-                </form>
-            </div>
-        </div>
+            <?php submit_button(__('Save Settings', 'mypco-online')); ?>
+        </form>
         <?php
     }
 
