@@ -51,6 +51,10 @@ class MyPCO_Series_Admin {
         $this->loader->add_action('add_meta_boxes', $this, 'add_speaker_details_meta_box');
         $this->loader->add_action('save_post_mypco_speaker', $this, 'save_speaker_details_meta', 10, 2);
 
+        // Speaker list table columns
+        $this->loader->add_filter('manage_mypco_speaker_posts_columns', $this, 'speaker_list_columns');
+        $this->loader->add_action('manage_mypco_speaker_posts_custom_column', $this, 'speaker_list_column_content', 10, 2);
+
         // AJAX: create speaker from Message editor meta box
         $this->loader->add_action('wp_ajax_mypco_add_speaker', $this, 'ajax_add_speaker');
 
@@ -502,6 +506,49 @@ class MyPCO_Series_Admin {
             update_post_meta($post_id, '_mypco_speaker_links', $links);
         } else {
             delete_post_meta($post_id, '_mypco_speaker_links');
+        }
+    }
+
+    // =========================================================================
+    // Speaker Post Type – List Table Columns
+    // =========================================================================
+
+    /**
+     * Define custom columns for the mypco_speaker list table.
+     */
+    public function speaker_list_columns($columns) {
+        $new_columns = [];
+        foreach ($columns as $key => $label) {
+            $new_columns[$key] = $label;
+            if ($key === 'title') {
+                $new_columns['speaker_title'] = __('Title / Role', 'mypco-online');
+                $new_columns['message_count'] = __('Messages', 'mypco-online');
+            }
+        }
+        return $new_columns;
+    }
+
+    /**
+     * Render content for custom speaker list table columns.
+     */
+    public function speaker_list_column_content($column, $post_id) {
+        if ($column === 'speaker_title') {
+            $title = get_post_meta($post_id, '_mypco_speaker_title', true);
+            echo esc_html($title ?: '—');
+        }
+
+        if ($column === 'message_count') {
+            global $wpdb;
+            $count = (int) $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM {$wpdb->postmeta} pm
+                 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+                 WHERE pm.meta_key = '_mypco_speaker_id'
+                 AND pm.meta_value = %s
+                 AND p.post_type = 'mypco_message'
+                 AND p.post_status != 'trash'",
+                (string) $post_id
+            ));
+            echo (int) $count;
         }
     }
 
