@@ -22,6 +22,7 @@ class MyPCO_Series_Import {
     const PCO_EPISODE_META_KEY  = '_mypco_pco_episode_id';
     const PCO_SERIES_META_KEY   = '_mypco_pco_series_id';
     const IMPORT_LOG_OPTION     = 'mypco_import_log';
+    const IMPORT_CACHE_KEY      = 'mypco_import_episode_cache';
 
     public function __construct($loader, $api_model) {
         $this->loader    = $loader;
@@ -250,6 +251,24 @@ class MyPCO_Series_Import {
             ];
         }
 
+        // Cache the raw API response so the import step can reuse it
+        // without making additional API calls (avoids timeouts).
+        $cache = [];
+        foreach ($response['data'] as $episode) {
+            $cache[$episode['id']] = $episode;
+        }
+        // Also cache the included series data keyed by ID
+        $included_cache = [];
+        if (!empty($response['included'])) {
+            foreach ($response['included'] as $inc) {
+                $included_cache[$inc['type']][$inc['id']] = $inc;
+            }
+        }
+        set_transient(self::IMPORT_CACHE_KEY, [
+            'episodes' => $cache,
+            'included' => $included_cache,
+        ], 15 * MINUTE_IN_SECONDS);
+
         wp_send_json_success([
             'episodes'    => $episodes,
             'series'      => $series_map,
@@ -271,15 +290,20 @@ class MyPCO_Series_Import {
             wp_send_json_error(['message' => __('Permission denied.', 'mypco-online')]);
         }
 
-        if (!$this->api_model) {
-            wp_send_json_error(['message' => __('API credentials not configured.', 'mypco-online')]);
-        }
-
         $episode_ids = isset($_POST['episode_ids']) ? array_map('sanitize_text_field', (array) $_POST['episode_ids']) : [];
 
         if (empty($episode_ids)) {
             wp_send_json_error(['message' => __('No episodes selected for import.', 'mypco-online')]);
         }
+
+        // Load the cached episode data from the fetch step
+        $cache = get_transient(self::IMPORT_CACHE_KEY);
+        if (empty($cache) || empty($cache['episodes'])) {
+            wp_send_json_error(['message' => __('Episode data has expired. Please click "Fetch from Planning Center" again.', 'mypco-online')]);
+        }
+
+        $cached_episodes = $cache['episodes'];
+        $cached_included = $cache['included'];
 
         $imported = 0;
         $skipped  = 0;
@@ -298,21 +322,31 @@ class MyPCO_Series_Import {
                 continue;
             }
 
-            // Fetch full episode data with resources
-            $ep_response = $this->api_model->get_publishing_episode($episode_id);
-
-            if (!$ep_response || isset($ep_response['error'])) {
-                $error_msg = $ep_response['error'] ?? __('Failed to fetch episode', 'mypco-online');
-                $errors[] = $error_msg;
+            // Look up episode from the cached fetch data
+            if (!isset($cached_episodes[$episode_id])) {
+                $errors[] = sprintf(__('Episode %s not found in cached data.', 'mypco-online'), $episode_id);
                 $results[] = [
                     'id'      => $episode_id,
                     'status'  => 'error',
-                    'message' => $error_msg,
+                    'message' => __('Episode not found in cached data. Try fetching again.', 'mypco-online'),
                 ];
                 continue;
             }
 
-            $result = $this->import_episode($ep_response);
+            $ep_data = [
+                'data'     => $cached_episodes[$episode_id],
+                'included' => [],
+            ];
+
+            // Attach the relevant included data (series for this episode)
+            if (!empty($cached_episodes[$episode_id]['relationships']['series']['data']['id'])) {
+                $sid = $cached_episodes[$episode_id]['relationships']['series']['data']['id'];
+                if (isset($cached_included['Series'][$sid])) {
+                    $ep_data['included'][] = $cached_included['Series'][$sid];
+                }
+            }
+
+            $result = $this->import_episode($ep_data);
 
             if (is_wp_error($result)) {
                 $errors[] = $result->get_error_message();
