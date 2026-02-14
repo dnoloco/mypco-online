@@ -48,9 +48,6 @@ class MyPCO_Series_Admin {
         // Force meta box display order (overrides any saved user preference)
         $this->loader->add_filter('get_user_option_meta-box-order_mypco_message', $this, 'force_meta_box_order');
 
-        // Collapse Speaker and Series Info by default
-        $this->loader->add_filter('get_user_option_closedpostboxes_mypco_message', $this, 'default_closed_meta_boxes');
-
         // AJAX: create speaker from Message editor meta box
         $this->loader->add_action('wp_ajax_mypco_add_speaker', $this, 'ajax_add_speaker');
 
@@ -1396,20 +1393,6 @@ class MyPCO_Series_Admin {
             'side'     => '',
             'advanced' => '',
         ];
-    }
-
-    /**
-     * Collapse Message Speaker and Series Info meta boxes by default.
-     *
-     * Only applies when the user has no saved preference yet (first visit).
-     * Once the user toggles any meta box, WordPress saves their preference
-     * and this default is no longer used.
-     */
-    public function default_closed_meta_boxes($closed) {
-        if ($closed === false) {
-            return ['mypco_speaker_meta', 'mypco_series_info'];
-        }
-        return $closed;
     }
 
     /**

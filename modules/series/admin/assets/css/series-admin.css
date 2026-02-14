@@ -149,6 +149,12 @@
     margin-bottom: 24px;
 }
 
+/* Spacing around sidebar taxonomy panels */
+#mypco_seriesdiv,
+#mypco_service_typediv {
+    margin-bottom: 24px;
+}
+
 /* Shaded header bar */
 #mypco_message_info .postbox-header,
 #mypco_scripture_meta .postbox-header,
