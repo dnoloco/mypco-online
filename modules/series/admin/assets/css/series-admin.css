@@ -255,3 +255,31 @@
     line-height: 28px;
     font-size: 16px;
 }
+
+/* =====================================================================
+   Speaker Links – Repeatable Rows
+   ===================================================================== */
+
+.mypco-speaker-link-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.mypco-speaker-link-row .mypco-link-label {
+    max-width: 180px;
+}
+
+.mypco-speaker-link-row .mypco-link-url {
+    flex: 1;
+    max-width: 300px;
+}
+
+.mypco-remove-speaker-link {
+    color: #b32d2e;
+    min-width: 30px;
+    padding: 0 8px;
+    line-height: 28px;
+    font-size: 16px;
+}

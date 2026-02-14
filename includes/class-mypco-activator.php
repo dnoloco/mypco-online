@@ -148,6 +148,7 @@ class MyPCO_Activator {
             title varchar(200) DEFAULT NULL,
             bio text DEFAULT NULL,
             image_url text DEFAULT NULL,
+            links text DEFAULT NULL,
             PRIMARY KEY  (id),
             KEY name (name)
         ) $charset_collate;";

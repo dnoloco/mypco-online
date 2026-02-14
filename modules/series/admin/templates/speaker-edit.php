@@ -70,6 +70,47 @@ $page_title = $is_edit ? __('Edit Speaker', 'mypco-online') : __('Add New Speake
                     </div>
                 </td>
             </tr>
+            <tr>
+                <th scope="row">
+                    <label><?php _e('Links', 'mypco-online'); ?></label>
+                </th>
+                <td>
+                    <?php
+                    $links = [];
+                    if ($is_edit && !empty($speaker->links)) {
+                        $links = json_decode($speaker->links, true);
+                        if (!is_array($links)) {
+                            $links = [];
+                        }
+                    }
+                    if (empty($links)) {
+                        $links = [['label' => '', 'url' => '']];
+                    }
+                    ?>
+                    <div id="mypco-speaker-links">
+                        <?php foreach ($links as $i => $link): ?>
+                            <div class="mypco-speaker-link-row" data-index="<?php echo (int) $i; ?>">
+                                <input type="text" name="speaker_links[<?php echo (int) $i; ?>][label]"
+                                       class="regular-text mypco-link-label"
+                                       value="<?php echo esc_attr($link['label'] ?? ''); ?>"
+                                       placeholder="<?php esc_attr_e('Label (e.g. Facebook)', 'mypco-online'); ?>" />
+                                <input type="url" name="speaker_links[<?php echo (int) $i; ?>][url]"
+                                       class="regular-text mypco-link-url"
+                                       value="<?php echo esc_url($link['url'] ?? ''); ?>"
+                                       placeholder="<?php esc_attr_e('https://...', 'mypco-online'); ?>" />
+                                <button type="button" class="button mypco-remove-speaker-link"
+                                        title="<?php esc_attr_e('Remove', 'mypco-online'); ?>">&times;</button>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <p style="margin-top:8px;">
+                        <button type="button" class="button" id="mypco-add-speaker-link">
+                            <?php _e('Add Link', 'mypco-online'); ?>
+                        </button>
+                    </p>
+                    <p class="description"><?php _e('Add links to social profiles, websites, or other resources.', 'mypco-online'); ?></p>
+                </td>
+            </tr>
         </table>
 
         <?php submit_button($is_edit ? __('Update Speaker', 'mypco-online') : __('Add Speaker', 'mypco-online')); ?>
