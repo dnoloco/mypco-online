@@ -194,12 +194,15 @@ class MyPCO_Series_Import {
             wp_send_json_error(['message' => __('No episodes found in Planning Center Publishing.', 'mypco-online')]);
         }
 
-        // Build a series lookup from included data
+        // Build a series lookup and episode resources lookup from included data
         $series_map = [];
+        $resources_map = []; // episode_resource ID → attributes
         if (!empty($response['included'])) {
             foreach ($response['included'] as $included) {
                 if ($included['type'] === 'Series') {
                     $series_map[$included['id']] = $included['attributes'];
+                } elseif ($included['type'] === 'EpisodeResource') {
+                    $resources_map[$included['id']] = $included;
                 }
             }
         }
@@ -229,8 +232,20 @@ class MyPCO_Series_Import {
             $has_sermon_audio = !empty($attrs['sermon_audio']['id']);
             $has_art         = !empty($attrs['art']['id']);
 
-            // Check for episode_resources relationship
-            $has_resources = !empty($episode['relationships']['episode_resources']['data']);
+            // Check for episode_resources with a URL
+            $has_resources = false;
+            if (!empty($episode['relationships']['episode_resources']['data'])) {
+                foreach ($episode['relationships']['episode_resources']['data'] as $res_ref) {
+                    $res_id = $res_ref['id'] ?? '';
+                    if (isset($resources_map[$res_id])) {
+                        $res_url = $resources_map[$res_id]['attributes']['url'] ?? '';
+                        if (!empty($res_url)) {
+                            $has_resources = true;
+                            break;
+                        }
+                    }
+                }
+            }
 
             // Parse the published date
             $published_date = '';
@@ -343,11 +358,19 @@ class MyPCO_Series_Import {
                 'included' => [],
             ];
 
-            // Attach the relevant included data (series for this episode)
+            // Attach the relevant included data (series + episode resources)
             if (!empty($cached_episodes[$episode_id]['relationships']['series']['data']['id'])) {
                 $sid = $cached_episodes[$episode_id]['relationships']['series']['data']['id'];
                 if (isset($cached_included['Series'][$sid])) {
                     $ep_data['included'][] = $cached_included['Series'][$sid];
+                }
+            }
+            if (!empty($cached_episodes[$episode_id]['relationships']['episode_resources']['data'])) {
+                foreach ($cached_episodes[$episode_id]['relationships']['episode_resources']['data'] as $res_ref) {
+                    $rid = $res_ref['id'] ?? '';
+                    if ($rid && isset($cached_included['EpisodeResource'][$rid])) {
+                        $ep_data['included'][] = $cached_included['EpisodeResource'][$rid];
+                    }
                 }
             }
 
@@ -473,8 +496,8 @@ class MyPCO_Series_Import {
         // --- Extract media from episode attributes ---
         $this->map_episode_resources($post_id, $ep_id, $included_map, $attrs);
 
-        // --- Fetch and map episode_resources (URL-type files) from the API ---
-        $this->map_episode_resource_files($post_id, $ep_id);
+        // --- Map episode_resources (URL-type files) from cached included data ---
+        $this->map_episode_resource_files($post_id, $ep_id, $included_map);
 
         // --- Map series ---
         $this->map_episode_series($post_id, $episode, $included_map);
@@ -567,30 +590,19 @@ class MyPCO_Series_Import {
     }
 
     /**
-     * Fetch episode_resources from the PCO API and store URL-type resources
-     * as files in the _mypco_message_files meta.
+     * Map EpisodeResource items (from cached included data) that have a URL
+     * into the _mypco_message_files meta.
      *
-     * Endpoint: /publishing/v2/episodes/{episode_id}/episode_resources
-     * Only resources with a non-empty url attribute are imported.
+     * Only resources with a non-empty url attribute are imported as files.
      */
-    private function map_episode_resource_files($post_id, $ep_id) {
-        if (!$this->api_model) {
+    private function map_episode_resource_files($post_id, $ep_id, $included_map) {
+        if (!isset($included_map['EpisodeResource'])) {
             return;
         }
 
-        $response = $this->api_model->get_publishing_episode_resources($ep_id);
+        $files = [];
 
-        if (!$response || isset($response['error']) || empty($response['data'])) {
-            return;
-        }
-
-        // Load any existing files already saved on this post
-        $existing_files = get_post_meta($post_id, '_mypco_message_files', true);
-        if (!is_array($existing_files)) {
-            $existing_files = [];
-        }
-
-        foreach ($response['data'] as $resource) {
+        foreach ($included_map['EpisodeResource'] as $resource) {
             $res_attrs = $resource['attributes'] ?? [];
             $res_url   = $res_attrs['url'] ?? '';
 
@@ -601,25 +613,14 @@ class MyPCO_Series_Import {
 
             $res_name = $res_attrs['title'] ?? ($res_attrs['name'] ?? '');
 
-            // Avoid duplicates by URL
-            $already_exists = false;
-            foreach ($existing_files as $ef) {
-                if (isset($ef['url']) && $ef['url'] === $res_url) {
-                    $already_exists = true;
-                    break;
-                }
-            }
-
-            if (!$already_exists) {
-                $existing_files[] = [
-                    'name' => sanitize_text_field($res_name),
-                    'url'  => esc_url_raw($res_url),
-                ];
-            }
+            $files[] = [
+                'name' => sanitize_text_field($res_name),
+                'url'  => esc_url_raw($res_url),
+            ];
         }
 
-        if (!empty($existing_files)) {
-            update_post_meta($post_id, '_mypco_message_files', $existing_files);
+        if (!empty($files)) {
+            update_post_meta($post_id, '_mypco_message_files', $files);
         }
     }
 
