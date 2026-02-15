@@ -256,7 +256,7 @@ class MyPCO_API_Model {
             'per_page' => min($per_page, 100),
             'offset'   => $offset,
             'order'    => $order === 'asc' ? 'published_at' : '-published_at',
-            'include'  => 'series',
+            'include'  => 'series,episode_resources',
         ];
         $key = 'mypco_pub_episodes_' . md5($per_page . $offset . $order);
         return $this->get_data_with_caching('publishing', $endpoint, $params, $key, 5 * MINUTE_IN_SECONDS);
