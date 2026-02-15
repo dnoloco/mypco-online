@@ -162,6 +162,7 @@ class MyPCO_Series_Admin {
                     'audio'          => __('Audio', 'mypco-online'),
                     'sermonAudio'    => __('Sermon Audio', 'mypco-online'),
                     'art'            => __('Image', 'mypco-online'),
+                    'files'          => __('Files', 'mypco-online'),
                     'none'           => __('None', 'mypco-online'),
                     'requestTimeout' => __('Request timed out. Try importing fewer episodes at a time.', 'mypco-online'),
                     'cacheExpired'   => __('Episode data expired. Please fetch again.', 'mypco-online'),
@@ -740,6 +741,10 @@ class MyPCO_Series_Admin {
 
         $audio = get_post_meta($post->ID, '_mypco_message_audio', true);
         $video = get_post_meta($post->ID, '_mypco_message_video', true);
+        $files = get_post_meta($post->ID, '_mypco_message_files', true);
+        if (!is_array($files)) {
+            $files = [];
+        }
         ?>
         <table class="form-table mypco-meta-table">
             <tr>
@@ -772,6 +777,55 @@ class MyPCO_Series_Admin {
                                 <?php echo $video ? '' : 'style="display:none;"'; ?>><?php esc_html_e('Remove', 'mypco-online'); ?></button>
                     </div>
                     <p class="description"><?php esc_html_e('Enter a URL or upload a video file.', 'mypco-online'); ?></p>
+                </td>
+            </tr>
+            <tr>
+                <th><?php esc_html_e('Files', 'mypco-online'); ?></th>
+                <td>
+                    <div id="mypco-message-files" class="mypco-files-repeater">
+                        <?php if (!empty($files)) : ?>
+                            <?php foreach ($files as $idx => $file) :
+                                $fname = isset($file['name']) ? $file['name'] : '';
+                                $furl  = isset($file['url'])  ? $file['url']  : '';
+                            ?>
+                            <div class="mypco-file-row" data-index="<?php echo (int) $idx; ?>">
+                                <span class="mypco-file-drag dashicons dashicons-menu" title="<?php esc_attr_e('Drag to reorder', 'mypco-online'); ?>"></span>
+                                <input type="text"
+                                       name="mypco_message_files[<?php echo (int) $idx; ?>][name]"
+                                       value="<?php echo esc_attr($fname); ?>"
+                                       class="regular-text mypco-file-name"
+                                       placeholder="<?php esc_attr_e('Name', 'mypco-online'); ?>" />
+                                <input type="url"
+                                       name="mypco_message_files[<?php echo (int) $idx; ?>][url]"
+                                       value="<?php echo esc_url($furl); ?>"
+                                       class="regular-text mypco-file-url"
+                                       placeholder="<?php esc_attr_e('File URL', 'mypco-online'); ?>" />
+                                <button type="button" class="button mypco-file-upload-btn"><?php esc_html_e('Upload', 'mypco-online'); ?></button>
+                                <button type="button" class="button mypco-file-remove-btn" title="<?php esc_attr_e('Remove', 'mypco-online'); ?>">&times;</button>
+                            </div>
+                            <?php endforeach; ?>
+                        <?php else : ?>
+                            <div class="mypco-file-row" data-index="0">
+                                <span class="mypco-file-drag dashicons dashicons-menu" title="<?php esc_attr_e('Drag to reorder', 'mypco-online'); ?>"></span>
+                                <input type="text"
+                                       name="mypco_message_files[0][name]"
+                                       value=""
+                                       class="regular-text mypco-file-name"
+                                       placeholder="<?php esc_attr_e('Name', 'mypco-online'); ?>" />
+                                <input type="url"
+                                       name="mypco_message_files[0][url]"
+                                       value=""
+                                       class="regular-text mypco-file-url"
+                                       placeholder="<?php esc_attr_e('File URL', 'mypco-online'); ?>" />
+                                <button type="button" class="button mypco-file-upload-btn"><?php esc_html_e('Upload', 'mypco-online'); ?></button>
+                                <button type="button" class="button mypco-file-remove-btn" title="<?php esc_attr_e('Remove', 'mypco-online'); ?>">&times;</button>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <p style="margin-top:8px;">
+                        <button type="button" class="button" id="mypco-add-file"><?php esc_html_e('+ Add File', 'mypco-online'); ?></button>
+                    </p>
+                    <p class="description"><?php esc_html_e('Attach downloadable files such as notes, outlines, or study guides.', 'mypco-online'); ?></p>
                 </td>
             </tr>
         </table>
@@ -811,6 +865,25 @@ class MyPCO_Series_Admin {
             } else {
                 delete_post_meta($post_id, '_mypco_message_video');
             }
+        }
+
+        // Save files repeater
+        if (isset($_POST['mypco_message_files']) && is_array($_POST['mypco_message_files'])) {
+            $clean_files = [];
+            foreach ($_POST['mypco_message_files'] as $file) {
+                $name = isset($file['name']) ? sanitize_text_field($file['name']) : '';
+                $url  = isset($file['url'])  ? esc_url_raw($file['url'])          : '';
+                if ($name || $url) {
+                    $clean_files[] = ['name' => $name, 'url' => $url];
+                }
+            }
+            if (!empty($clean_files)) {
+                update_post_meta($post_id, '_mypco_message_files', $clean_files);
+            } else {
+                delete_post_meta($post_id, '_mypco_message_files');
+            }
+        } else {
+            delete_post_meta($post_id, '_mypco_message_files');
         }
     }
 

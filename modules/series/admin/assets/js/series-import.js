@@ -72,6 +72,7 @@
                 if (ep.has_audio) mediaHtml.push('<span class="mypco-import-media-tag mypco-media-audio">' + i18n.audio + '</span>');
                 if (ep.has_sermon_audio) mediaHtml.push('<span class="mypco-import-media-tag mypco-media-sermon-audio">' + i18n.sermonAudio + '</span>');
                 if (ep.has_art) mediaHtml.push('<span class="mypco-import-media-tag mypco-media-art">' + i18n.art + '</span>');
+                if (ep.has_resources) mediaHtml.push('<span class="mypco-import-media-tag mypco-media-files">' + i18n.files + '</span>');
                 if (!mediaHtml.length) mediaHtml.push('<span class="mypco-import-media-tag mypco-media-none">' + i18n.none + '</span>');
 
                 var statusHtml = ep.already_imported

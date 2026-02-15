@@ -434,5 +434,92 @@
 
             $btn.hide();
         });
+
+        // =====================================================================
+        // Files Repeater – Add / Remove / Upload / Reorder
+        // =====================================================================
+
+        // Make the file list sortable (drag to reorder)
+        if ($('#mypco-message-files').length && $.fn.sortable) {
+            $('#mypco-message-files').sortable({
+                handle: '.mypco-file-drag',
+                items: '.mypco-file-row',
+                axis: 'y',
+                tolerance: 'pointer',
+                update: function() {
+                    reindexFileRows();
+                }
+            });
+        }
+
+        // Add a new file row
+        $(document).on('click', '#mypco-add-file', function() {
+            var $container = $('#mypco-message-files');
+            var index = $container.find('.mypco-file-row').length;
+
+            var $row = $(
+                '<div class="mypco-file-row" data-index="' + index + '">' +
+                    '<span class="mypco-file-drag dashicons dashicons-menu" title="Drag to reorder"></span>' +
+                    '<input type="text" name="mypco_message_files[' + index + '][name]" ' +
+                        'class="regular-text mypco-file-name" placeholder="Name" />' +
+                    '<input type="url" name="mypco_message_files[' + index + '][url]" ' +
+                        'class="regular-text mypco-file-url" placeholder="File URL" />' +
+                    '<button type="button" class="button mypco-file-upload-btn">Upload</button>' +
+                    '<button type="button" class="button mypco-file-remove-btn" title="Remove">&times;</button>' +
+                '</div>'
+            );
+
+            $container.append($row);
+        });
+
+        // Remove a file row
+        $(document).on('click', '.mypco-file-remove-btn', function() {
+            var $container = $('#mypco-message-files');
+            var $row = $(this).closest('.mypco-file-row');
+
+            if ($container.find('.mypco-file-row').length <= 1) {
+                // Clear the last row instead of removing it
+                $row.find('input').val('');
+                return;
+            }
+
+            $row.remove();
+            reindexFileRows();
+        });
+
+        // Upload file via WP Media Library
+        $(document).on('click', '.mypco-file-upload-btn', function(e) {
+            e.preventDefault();
+
+            var $btn  = $(this);
+            var $row  = $btn.closest('.mypco-file-row');
+            var $url  = $row.find('.mypco-file-url');
+            var $name = $row.find('.mypco-file-name');
+
+            var frame = wp.media({
+                title: 'Select File',
+                button: { text: 'Use this file' },
+                multiple: false
+            });
+
+            frame.on('select', function() {
+                var attachment = frame.state().get('selection').first().toJSON();
+                $url.val(attachment.url);
+                // Auto-fill name if empty
+                if (!$name.val()) {
+                    $name.val(attachment.title || attachment.filename || '');
+                }
+            });
+
+            frame.open();
+        });
+
+        function reindexFileRows() {
+            $('#mypco-message-files .mypco-file-row').each(function(idx) {
+                $(this).attr('data-index', idx);
+                $(this).find('.mypco-file-name').attr('name', 'mypco_message_files[' + idx + '][name]');
+                $(this).find('.mypco-file-url').attr('name', 'mypco_message_files[' + idx + '][url]');
+            });
+        }
     });
 })(jQuery);

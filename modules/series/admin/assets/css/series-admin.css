@@ -430,7 +430,72 @@
     color: #065f46;
 }
 
+.mypco-media-files {
+    background: #fce7f3;
+    color: #9d174d;
+}
+
 .mypco-media-none {
     background: #f0f0f1;
     color: #999;
+}
+
+/* =====================================================================
+   Files Repeater (Media Meta Box)
+   ===================================================================== */
+
+.mypco-files-repeater {
+    max-width: 700px;
+}
+
+.mypco-file-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+    padding: 4px 0;
+}
+
+.mypco-file-row.ui-sortable-helper {
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    border-radius: 3px;
+    padding: 4px 6px;
+}
+
+.mypco-file-drag {
+    cursor: move;
+    color: #c3c4c7;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+    line-height: 1;
+}
+
+.mypco-file-drag:hover {
+    color: #50575e;
+}
+
+.mypco-file-name {
+    max-width: 180px !important;
+    flex-shrink: 0;
+}
+
+.mypco-file-url {
+    flex: 1;
+    min-width: 0;
+}
+
+.mypco-file-upload-btn {
+    flex-shrink: 0;
+}
+
+.mypco-file-remove-btn {
+    color: #b32d2e;
+    min-width: 30px;
+    padding: 0 8px;
+    line-height: 28px;
+    font-size: 16px;
+    flex-shrink: 0;
 }

@@ -157,6 +157,7 @@ class MyPCO_Series_Import {
                         <tr><td><code>library_video_embed_code</code></td><td><?php echo esc_html($names['message_singular']); ?> Video Embed</td></tr>
                         <tr><td><code>library_audio_url</code> / <code>sermon_audio</code></td><td><?php echo esc_html($names['message_singular']); ?> Audio URL</td></tr>
                         <tr><td><code>library_video_thumbnail_url</code></td><td><?php echo esc_html($names['message_singular']); ?> Video Thumbnail</td></tr>
+                        <tr><td><?php esc_html_e('Episode Resources (URL)', 'mypco-online'); ?></td><td><?php echo esc_html($names['message_singular']); ?> Files</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -228,6 +229,9 @@ class MyPCO_Series_Import {
             $has_sermon_audio = !empty($attrs['sermon_audio']['id']);
             $has_art         = !empty($attrs['art']['id']);
 
+            // Check for episode_resources relationship
+            $has_resources = !empty($episode['relationships']['episode_resources']['data']);
+
             // Parse the published date
             $published_date = '';
             if (!empty($attrs['published_to_library_at'])) {
@@ -247,6 +251,7 @@ class MyPCO_Series_Import {
                 'has_audio'        => $has_audio,
                 'has_sermon_audio' => $has_sermon_audio,
                 'has_art'          => $has_art,
+                'has_resources'    => $has_resources,
                 'already_imported' => in_array($ep_id, $imported_ids, true),
             ];
         }
@@ -465,8 +470,11 @@ class MyPCO_Series_Import {
             update_post_meta($post_id, '_mypco_message_image', esc_url_raw($artwork_url));
         }
 
-        // --- Extract media from resources ---
+        // --- Extract media from episode attributes ---
         $this->map_episode_resources($post_id, $ep_id, $included_map, $attrs);
+
+        // --- Fetch and map episode_resources (URL-type files) from the API ---
+        $this->map_episode_resource_files($post_id, $ep_id);
 
         // --- Map series ---
         $this->map_episode_series($post_id, $episode, $included_map);
@@ -555,6 +563,63 @@ class MyPCO_Series_Import {
         // Store video thumbnail if available
         if (!empty($attrs['library_video_thumbnail_url'])) {
             update_post_meta($post_id, '_mypco_message_video_thumbnail', esc_url_raw($attrs['library_video_thumbnail_url']));
+        }
+    }
+
+    /**
+     * Fetch episode_resources from the PCO API and store URL-type resources
+     * as files in the _mypco_message_files meta.
+     *
+     * Endpoint: /publishing/v2/episodes/{episode_id}/episode_resources
+     * Only resources with a non-empty url attribute are imported.
+     */
+    private function map_episode_resource_files($post_id, $ep_id) {
+        if (!$this->api_model) {
+            return;
+        }
+
+        $response = $this->api_model->get_publishing_episode_resources($ep_id);
+
+        if (!$response || isset($response['error']) || empty($response['data'])) {
+            return;
+        }
+
+        // Load any existing files already saved on this post
+        $existing_files = get_post_meta($post_id, '_mypco_message_files', true);
+        if (!is_array($existing_files)) {
+            $existing_files = [];
+        }
+
+        foreach ($response['data'] as $resource) {
+            $res_attrs = $resource['attributes'] ?? [];
+            $res_url   = $res_attrs['url'] ?? '';
+
+            // Only import resources that have a URL
+            if (empty($res_url)) {
+                continue;
+            }
+
+            $res_name = $res_attrs['title'] ?? ($res_attrs['name'] ?? '');
+
+            // Avoid duplicates by URL
+            $already_exists = false;
+            foreach ($existing_files as $ef) {
+                if (isset($ef['url']) && $ef['url'] === $res_url) {
+                    $already_exists = true;
+                    break;
+                }
+            }
+
+            if (!$already_exists) {
+                $existing_files[] = [
+                    'name' => sanitize_text_field($res_name),
+                    'url'  => esc_url_raw($res_url),
+                ];
+            }
+        }
+
+        if (!empty($existing_files)) {
+            update_post_meta($post_id, '_mypco_message_files', $existing_files);
         }
     }
 
