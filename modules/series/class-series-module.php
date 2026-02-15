@@ -94,6 +94,9 @@ class MyPCO_Series_Module extends MyPCO_Module_Base {
         $this->loader->add_action('init', $this, 'register_post_types');
         $this->loader->add_action('init', $this, 'register_taxonomies');
 
+        // Customize editor title placeholders
+        $this->loader->add_filter('enter_title_here', $this, 'custom_title_placeholder', 10, 2);
+
         // Load and initialize admin component
         if (is_admin()) {
             $this->load_admin_component();
@@ -251,6 +254,27 @@ class MyPCO_Series_Module extends MyPCO_Module_Base {
             flush_rewrite_rules();
             update_option('mypco_rewrite_version', $rewrite_version);
         }
+    }
+
+    /**
+     * Customize the "Add title" placeholder in the post editor.
+     *
+     * @param string  $placeholder Default placeholder text.
+     * @param WP_Post $post        The current post object.
+     * @return string
+     */
+    public function custom_title_placeholder($placeholder, $post) {
+        if ($post->post_type === 'mypco_message') {
+            $names = self::get_custom_labels();
+            return sprintf(__('Enter %s title here', 'mypco-online'), $names['message_singular']);
+        }
+
+        if ($post->post_type === 'mypco_speaker') {
+            $names = self::get_custom_labels();
+            return sprintf(__('Enter %s name here', 'mypco-online'), $names['speaker_singular']);
+        }
+
+        return $placeholder;
     }
 
     /**
