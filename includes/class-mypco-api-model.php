@@ -256,7 +256,7 @@ class MyPCO_API_Model {
             'per_page' => min($per_page, 100),
             'offset'   => $offset,
             'order'    => $order === 'asc' ? 'published_at' : '-published_at',
-            'include'  => 'series,episode_resources',
+            'include'  => 'series,episode_resources,speakerships',
         ];
         $key = 'mypco_pub_episodes_' . md5($per_page . $offset . $order);
         return $this->get_data_with_caching('publishing', $endpoint, $params, $key, 5 * MINUTE_IN_SECONDS);
@@ -271,7 +271,7 @@ class MyPCO_API_Model {
     public function get_publishing_episode($episode_id) {
         $endpoint = "/v2/episodes/{$episode_id}";
         $params = [
-            'include' => 'series,episode_resources',
+            'include' => 'series,episode_resources,speakerships',
         ];
         $key = 'mypco_pub_episode_' . $episode_id;
         return $this->get_data_with_caching('publishing', $endpoint, $params, $key, 5 * MINUTE_IN_SECONDS);
@@ -296,6 +296,54 @@ class MyPCO_API_Model {
      * @param int $offset   Offset for pagination.
      * @return array|false API response or false on error.
      */
+    /**
+     * Fetches all speakers from the Publishing API.
+     *
+     * @param int $per_page Number of speakers per page.
+     * @param int $offset   Offset for pagination.
+     * @return array|false API response or false on error.
+     */
+    public function get_publishing_speakers($per_page = 100, $offset = 0) {
+        $endpoint = '/v2/speakers';
+        $params = [
+            'per_page' => min($per_page, 100),
+            'offset'   => $offset,
+        ];
+        $key = 'mypco_pub_speakers_' . md5($per_page . $offset);
+        return $this->get_data_with_caching('publishing', $endpoint, $params, $key, 5 * MINUTE_IN_SECONDS);
+    }
+
+    /**
+     * Fetches all speakers from Publishing, handling pagination automatically.
+     *
+     * @return array All speaker data, keyed by speaker ID.
+     */
+    public function get_all_publishing_speakers() {
+        $all_speakers = [];
+        $offset = 0;
+        $per_page = 100;
+
+        do {
+            $response = $this->get_publishing_speakers($per_page, $offset);
+
+            if (!$response || isset($response['error'])) {
+                return $all_speakers;
+            }
+
+            if (isset($response['data'])) {
+                foreach ($response['data'] as $speaker) {
+                    $all_speakers[$speaker['id']] = $speaker;
+                }
+            }
+
+            $total = isset($response['meta']['total_count']) ? (int) $response['meta']['total_count'] : 0;
+            $offset += $per_page;
+
+        } while ($offset < $total && !empty($response['data']));
+
+        return $all_speakers;
+    }
+
     public function get_publishing_series($per_page = 100, $offset = 0) {
         $endpoint = '/v2/series';
         $params = [
