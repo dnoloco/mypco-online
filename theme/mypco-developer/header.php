@@ -51,6 +51,13 @@
 
 <!-- Full-screen overlay menu -->
 <div class="overlay-menu" id="overlay-menu" aria-hidden="true">
+	<button class="overlay-menu__close" id="overlay-close" aria-label="<?php esc_attr_e( 'Close menu', 'mypco-developer' ); ?>">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+			<line x1="18" y1="6" x2="6" y2="18"/>
+			<line x1="6" y1="6" x2="18" y2="18"/>
+		</svg>
+	</button>
+
 	<div class="overlay-menu__inner">
 		<nav class="overlay-menu__nav" aria-label="<?php esc_attr_e( 'Overlay', 'mypco-developer' ); ?>">
 			<?php
@@ -70,8 +77,26 @@
 					'depth'          => 1,
 					'walker'         => new MyPCO_Overlay_Walker(),
 				) );
-			}
+			} else {
+				// Fallback placeholder links when no menu is assigned
 			?>
+				<ul class="overlay-menu__list">
+					<li class="overlay-menu__item"><a class="overlay-menu__link" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Home', 'mypco-developer' ); ?></a></li>
+					<li class="overlay-menu__item"><a class="overlay-menu__link" href="#"><?php esc_html_e( 'About', 'mypco-developer' ); ?></a></li>
+					<li class="overlay-menu__item"><a class="overlay-menu__link" href="#"><?php esc_html_e( 'Contact', 'mypco-developer' ); ?></a></li>
+				</ul>
+				<p class="overlay-menu__hint">
+					<?php
+					if ( current_user_can( 'edit_theme_options' ) ) {
+						printf(
+							/* translators: %s: URL to the Menus admin page */
+							__( 'Assign a menu in <a href="%s">Appearance &rarr; Menus</a>', 'mypco-developer' ),
+							esc_url( admin_url( 'nav-menus.php' ) )
+						);
+					}
+					?>
+				</p>
+			<?php } ?>
 		</nav>
 	</div>
 </div>
