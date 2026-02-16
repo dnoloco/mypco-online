@@ -6,9 +6,10 @@
 /* Dashboard Container Layout */
 #dashboard-widgets.columns-3 .postbox-container {
     width: 33.33%;
+    box-sizing: border-box;
 }
 
-@media only screen and (max-width: 799px) {
+@media only screen and (max-width: 782px) {
     #dashboard-widgets.columns-3 .postbox-container {
         width: 100%;
     }
@@ -119,9 +120,15 @@
 
 /* Responsive */
 @media screen and (max-width: 1200px) {
-    #dashboard-widgets.columns-3 .postbox-container { width: 50%; }
-    #postbox-container-3 { width: 100% !important; clear: both; }
+    #dashboard-widgets.columns-3 #postbox-container-1,
+    #dashboard-widgets.columns-3 #postbox-container-2 {
+        width: 50%;
+    }
+    #dashboard-widgets.columns-3 #postbox-container-3 {
+        width: 100%;
+        clear: both;
+    }
 }
 @media screen and (max-width: 782px) {
-    #dashboard-widgets.columns-3 .postbox-container { width: 100%; float: none; padding: 0; }
+    #dashboard-widgets.columns-3 .postbox-container { width: 100% !important; float: none; padding: 0; }
 }

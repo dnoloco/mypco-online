@@ -148,8 +148,15 @@ class MyPCO_Admin {
             </ul>
             <hr>
             <p><strong>Plugin Info</strong></p>
+            <?php
+            $active_modules = get_option('mypco_active_modules', []);
+            $active_count = 0;
+            foreach ($active_modules as $mod) {
+                if (!empty($mod['enabled'])) $active_count++;
+            }
+            ?>
             <p><strong>Version:</strong> <?php echo esc_html($this->version); ?><br>
-                <strong>Modules:</strong> 4 installed</p>
+                <strong>Modules:</strong> <?php echo (int) $active_count; ?> active</p>
         </div>
         <?php
     }
@@ -158,6 +165,9 @@ class MyPCO_Admin {
      * Render the Installed Modules Table (Right Column)
      */
     public function render_modules_box() {
+        $manager = new MyPCO_Module_Manager($this->loader, $this->api_model);
+        $manager->init_modules();
+        $modules = $manager->get_registered_modules();
         ?>
         <table class="wp-list-table widefat fixed striped">
             <thead>
@@ -168,26 +178,30 @@ class MyPCO_Admin {
             </tr>
             </thead>
             <tbody>
+            <?php foreach ($modules as $key => $module) :
+                if (!empty($module['is_addon'])) continue;
+
+                $tier = $module['tier'] ?? 'premium';
+                if ($tier === 'free' || $tier === 'freemium') {
+                    $tier_icon = '<span class="dashicons dashicons-yes" style="color:green"></span> Free';
+                } else {
+                    $tier_icon = '<span class="dashicons dashicons-star-filled" style="color:#ffb900"></span> Premium';
+                }
+
+                $is_active = $manager->is_module_enabled($key);
+            ?>
             <tr>
-                <td><strong>Calendar</strong><br><small>Display PCO Calendar events</small></td>
-                <td><span class="dashicons dashicons-yes" style="color:green"></span> Free</td>
-                <td><span style="color:green">● Active</span></td>
+                <td><strong><?php echo esc_html($module['name']); ?></strong><br><small><?php echo esc_html($module['description']); ?></small></td>
+                <td><?php echo $tier_icon; ?></td>
+                <td>
+                    <?php if ($is_active) : ?>
+                        <span style="color:green">● Active</span>
+                    <?php else : ?>
+                        <span style="color:#999">○ Inactive</span>
+                    <?php endif; ?>
+                </td>
             </tr>
-            <tr>
-                <td><strong>Groups</strong><br><small>Display PCO Groups</small></td>
-                <td><span class="dashicons dashicons-yes" style="color:green"></span> Free</td>
-                <td><span style="color:green">● Active</span></td>
-            </tr>
-            <tr>
-                <td><strong>Services</strong><br><small>Manage service plans</small></td>
-                <td><span class="dashicons dashicons-star-filled" style="color:#ffb900"></span> Premium</td>
-                <td><span style="color:#999">○ Inactive</span></td>
-            </tr>
-            <tr>
-                <td><strong>Messages</strong><br><small>Clearstream SMS Integration</small></td>
-                <td><span class="dashicons dashicons-star-filled" style="color:#ffb900"></span> Premium</td>
-                <td><span style="color:#999">○ Inactive</span></td>
-            </tr>
+            <?php endforeach; ?>
             </tbody>
         </table>
         <?php
@@ -197,13 +211,49 @@ class MyPCO_Admin {
      * Render the Quick Links (Left Column)
      */
     public function render_quick_links_metabox() {
+        $active_modules = get_option('mypco_active_modules', []);
+
+        $module_links = [
+            'calendar' => [
+                'icon'  => 'dashicons-calendar-alt',
+                'label' => 'Calendar',
+                'url'   => admin_url('admin.php?page=mypco-calendar'),
+            ],
+            'groups' => [
+                'icon'  => 'dashicons-groups',
+                'label' => 'Groups',
+                'url'   => admin_url('admin.php?page=mypco-groups'),
+            ],
+            'services' => [
+                'icon'  => 'dashicons-clipboard',
+                'label' => 'Service Plans',
+                'url'   => admin_url('admin.php?page=mypco-services'),
+            ],
+            'series' => [
+                'icon'  => 'dashicons-microphone',
+                'label' => 'Messages',
+                'url'   => admin_url('edit.php?post_type=mypco_message'),
+            ],
+            'signups' => [
+                'icon'  => 'dashicons-tickets-alt',
+                'label' => 'Signups',
+                'url'   => admin_url('admin.php?page=mypco-signups'),
+            ],
+            'contacts' => [
+                'icon'  => 'dashicons-email-alt',
+                'label' => 'Contacts',
+                'url'   => admin_url('admin.php?page=mypco-contacts'),
+            ],
+        ];
         ?>
         <ul class="mypco-dashboard-list">
-            <li><span class="dashicons dashicons-admin-network"></span> <a href="<?php echo admin_url('admin.php?page=mypco-settings'); ?>">API Credentials</a></li>
-            <li><span class="dashicons dashicons-admin-plugins"></span> <a href="<?php echo admin_url('admin.php?page=mypco-modules'); ?>">Manage Modules</a></li>
-            <li><span class="dashicons dashicons-calendar-alt"></span> <a href="<?php echo admin_url('admin.php?page=mypco-calendar'); ?>">Calendar Settings</a></li>
-            <li><span class="dashicons dashicons-groups"></span> <a href="<?php echo admin_url('admin.php?page=mypco-groups'); ?>">Groups Settings</a></li>
-            <li><span class="dashicons dashicons-clipboard"></span> <a href="<?php echo admin_url('admin.php?page=mypco-services'); ?>">Service Plans</a></li>
+            <li><span class="dashicons dashicons-admin-network"></span> <a href="<?php echo esc_url(admin_url('admin.php?page=mypco-settings')); ?>">API Credentials</a></li>
+            <li><span class="dashicons dashicons-admin-plugins"></span> <a href="<?php echo esc_url(admin_url('admin.php?page=mypco-modules')); ?>">Manage Modules</a></li>
+            <?php foreach ($module_links as $key => $link) :
+                if (empty($active_modules[$key]['enabled'])) continue;
+            ?>
+            <li><span class="dashicons <?php echo esc_attr($link['icon']); ?>"></span> <a href="<?php echo esc_url($link['url']); ?>"><?php echo esc_html($link['label']); ?></a></li>
+            <?php endforeach; ?>
         </ul>
         <?php
     }
