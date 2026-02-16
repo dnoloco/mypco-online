@@ -87,6 +87,7 @@
                             (ep.already_imported ? ' disabled' : '') + ' />' +
                         '</th>' +
                         '<td><strong>' + escHtml(ep.title) + '</strong></td>' +
+                        '<td>' + escHtml(ep.speaker_name || '—') + '</td>' +
                         '<td>' + escHtml(ep.series_name || '—') + '</td>' +
                         '<td>' + escHtml(ep.published_date || '—') + '</td>' +
                         '<td>' + mediaHtml.join(' ') + '</td>' +

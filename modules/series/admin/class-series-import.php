@@ -113,6 +113,7 @@ class MyPCO_Series_Import {
                                 <input type="checkbox" id="mypco-import-select-all" checked />
                             </td>
                             <th class="manage-column"><?php esc_html_e('Title', 'mypco-online'); ?></th>
+                            <th class="manage-column"><?php echo esc_html($names['speaker_singular']); ?></th>
                             <th class="manage-column"><?php echo esc_html($names['series_singular']); ?></th>
                             <th class="manage-column"><?php esc_html_e('Date', 'mypco-online'); ?></th>
                             <th class="manage-column"><?php esc_html_e('Media', 'mypco-online'); ?></th>
@@ -150,6 +151,7 @@ class MyPCO_Series_Import {
                         <tr><td><?php esc_html_e('Episode Title', 'mypco-online'); ?></td><td><?php echo esc_html($names['message_singular']); ?> Title</td></tr>
                         <tr><td><?php esc_html_e('Episode Description', 'mypco-online'); ?></td><td><?php echo esc_html($names['message_singular']); ?> Description + Content</td></tr>
                         <tr><td><code>published_to_library_at</code></td><td><?php echo esc_html($names['message_singular']); ?> Date</td></tr>
+                        <tr><td><code>speaker</code></td><td><?php echo esc_html($names['speaker_singular']); ?></td></tr>
                         <tr><td><?php esc_html_e('Series', 'mypco-online'); ?></td><td><?php echo esc_html($names['series_singular']); ?> Taxonomy</td></tr>
                         <tr><td><?php esc_html_e('Series Artwork', 'mypco-online'); ?></td><td><?php echo esc_html($names['series_singular']); ?> Image</td></tr>
                         <tr><td><code>art</code> / <code>library_video_thumbnail_url</code></td><td><?php echo esc_html($names['message_singular']); ?> Image</td></tr>
@@ -226,6 +228,14 @@ class MyPCO_Series_Import {
                 }
             }
 
+            // Resolve speaker name (PCO may use 'speaker' or 'speaker_name')
+            $speaker_name = '';
+            if (!empty($attrs['speaker'])) {
+                $speaker_name = $attrs['speaker'];
+            } elseif (!empty($attrs['speaker_name'])) {
+                $speaker_name = $attrs['speaker_name'];
+            }
+
             // Determine media availability
             $has_video       = !empty($attrs['library_video_url']) || !empty($attrs['library_video_embed_code']);
             $has_audio       = !empty($attrs['library_audio_url']);
@@ -262,6 +272,7 @@ class MyPCO_Series_Import {
                 'published_date'   => $published_date,
                 'series_id'        => $series_id,
                 'series_name'      => $series_name,
+                'speaker_name'     => $speaker_name,
                 'has_video'        => $has_video,
                 'has_audio'        => $has_audio,
                 'has_sermon_audio' => $has_sermon_audio,
@@ -499,6 +510,9 @@ class MyPCO_Series_Import {
         // --- Map episode_resources (URL-type files) from cached included data ---
         $this->map_episode_resource_files($post_id, $ep_id, $included_map);
 
+        // --- Map speaker ---
+        $this->map_episode_speaker($post_id, $attrs);
+
         // --- Map series ---
         $this->map_episode_series($post_id, $episode, $included_map);
 
@@ -679,6 +693,53 @@ class MyPCO_Series_Import {
         }
 
         wp_set_post_terms($post_id, [$term_id], 'mypco_series');
+    }
+
+    /**
+     * Map the episode's speaker to an mypco_speaker post and link to the message.
+     *
+     * Looks for a 'speaker' or 'speaker_name' attribute on the episode.
+     * If found, finds or creates a matching mypco_speaker post and stores
+     * the speaker ID as _mypco_speaker_id meta on the message post.
+     */
+    private function map_episode_speaker($post_id, $attrs) {
+        // PCO Publishing may use 'speaker' or 'speaker_name'
+        $speaker_name = '';
+        if (!empty($attrs['speaker'])) {
+            $speaker_name = trim($attrs['speaker']);
+        } elseif (!empty($attrs['speaker_name'])) {
+            $speaker_name = trim($attrs['speaker_name']);
+        }
+
+        if (empty($speaker_name)) {
+            return;
+        }
+
+        // Look for an existing speaker post with this name
+        $existing = get_posts([
+            'post_type'      => 'mypco_speaker',
+            'posts_per_page' => 1,
+            'title'          => $speaker_name,
+            'post_status'    => 'publish',
+            'fields'         => 'ids',
+        ]);
+
+        if (!empty($existing)) {
+            $speaker_id = $existing[0];
+        } else {
+            // Create a new speaker post
+            $speaker_id = wp_insert_post([
+                'post_type'   => 'mypco_speaker',
+                'post_title'  => sanitize_text_field($speaker_name),
+                'post_status' => 'publish',
+            ], true);
+
+            if (is_wp_error($speaker_id)) {
+                return;
+            }
+        }
+
+        update_post_meta($post_id, '_mypco_speaker_id', $speaker_id);
     }
 
     // =========================================================================
