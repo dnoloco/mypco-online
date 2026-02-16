@@ -1,0 +1,1015 @@
+/* ==========================================================================
+   MyPCO Developer Theme — Main Stylesheet
+   A minimal theme with parallax scrolling and scroll-reveal animations.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. RESET & BASE
+   -------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html {
+	font-size: 16px;
+	scroll-behavior: smooth;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+body {
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+		Oxygen, Ubuntu, sans-serif;
+	font-weight: 400;
+	line-height: 1.6;
+	color: #1a1a1a;
+	background-color: #ffffff;
+	overflow-x: hidden;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+	display: block;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+}
+
+ul, ol {
+	list-style: none;
+}
+
+/* --------------------------------------------------------------------------
+   2. TYPOGRAPHY
+   -------------------------------------------------------------------------- */
+
+h1, h2, h3, h4, h5, h6 {
+	font-weight: 700;
+	line-height: 1.15;
+	letter-spacing: -0.02em;
+}
+
+/* --------------------------------------------------------------------------
+   3. SITE HEADER
+   -------------------------------------------------------------------------- */
+
+.site-header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 100;
+	padding: 1.5rem 2.5rem;
+	transition: background-color 0.4s ease, padding 0.4s ease;
+}
+
+.site-header--scrolled {
+	background-color: rgba(255, 255, 255, 0.95);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	padding: 1rem 2.5rem;
+	box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+}
+
+/* When on dark sections, keep header text white */
+.site-header--dark {
+	color: #ffffff;
+}
+
+.site-header--dark.site-header--scrolled {
+	color: #1a1a1a;
+}
+
+.site-header__inner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	max-width: 1440px;
+	margin: 0 auto;
+}
+
+.site-header__logo a,
+.site-header__title {
+	font-size: 1.125rem;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+	color: inherit;
+	text-decoration: none;
+}
+
+.site-header__logo img {
+	max-height: 36px;
+	width: auto;
+}
+
+.site-header__actions {
+	display: flex;
+	align-items: center;
+	gap: 2rem;
+}
+
+/* Inline header nav (visible on desktop) */
+.site-header__nav {
+	display: none;
+}
+
+@media (min-width: 768px) {
+	.site-header__nav {
+		display: block;
+	}
+}
+
+.header-nav {
+	display: flex;
+	gap: 2rem;
+}
+
+.header-nav li a {
+	font-size: 0.875rem;
+	font-weight: 500;
+	letter-spacing: 0.02em;
+	color: inherit;
+	text-decoration: none;
+	position: relative;
+	padding-bottom: 2px;
+}
+
+.header-nav li a::after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 0;
+	height: 1px;
+	background-color: currentColor;
+	transition: width 0.3s ease;
+}
+
+.header-nav li a:hover::after {
+	width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   4. HAMBURGER / MENU TOGGLE
+   -------------------------------------------------------------------------- */
+
+.menu-toggle {
+	position: relative;
+	z-index: 200;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 32px;
+	height: 32px;
+	gap: 6px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+}
+
+.menu-toggle__line {
+	display: block;
+	width: 24px;
+	height: 1.5px;
+	background-color: currentColor;
+	transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1),
+	            opacity 0.3s ease;
+	transform-origin: center;
+}
+
+/* Open state — X shape */
+.menu-toggle--open .menu-toggle__line:first-child {
+	transform: translateY(3.75px) rotate(45deg);
+}
+
+.menu-toggle--open .menu-toggle__line:last-child {
+	transform: translateY(-3.75px) rotate(-45deg);
+}
+
+/* --------------------------------------------------------------------------
+   5. OVERLAY MENU
+   -------------------------------------------------------------------------- */
+
+.overlay-menu {
+	position: fixed;
+	inset: 0;
+	z-index: 150;
+	background-color: #0a0a0a;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+	            visibility 0.5s;
+}
+
+.overlay-menu--open {
+	opacity: 1;
+	visibility: visible;
+}
+
+.overlay-menu__inner {
+	text-align: center;
+}
+
+.overlay-menu__list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.overlay-menu__item {
+	overflow: hidden;
+}
+
+.overlay-menu__link {
+	display: inline-block;
+	font-size: clamp(2rem, 6vw, 4.5rem);
+	font-weight: 700;
+	color: #ffffff;
+	letter-spacing: -0.03em;
+	line-height: 1.2;
+	transform: translateY(110%);
+	transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1),
+	            color 0.3s ease;
+}
+
+.overlay-menu--open .overlay-menu__link {
+	transform: translateY(0);
+}
+
+/* Stagger the animation */
+.overlay-menu--open .overlay-menu__item:nth-child(1) .overlay-menu__link { transition-delay: 0.1s; }
+.overlay-menu--open .overlay-menu__item:nth-child(2) .overlay-menu__link { transition-delay: 0.15s; }
+.overlay-menu--open .overlay-menu__item:nth-child(3) .overlay-menu__link { transition-delay: 0.2s; }
+.overlay-menu--open .overlay-menu__item:nth-child(4) .overlay-menu__link { transition-delay: 0.25s; }
+.overlay-menu--open .overlay-menu__item:nth-child(5) .overlay-menu__link { transition-delay: 0.3s; }
+.overlay-menu--open .overlay-menu__item:nth-child(6) .overlay-menu__link { transition-delay: 0.35s; }
+
+.overlay-menu__link:hover {
+	color: #888888;
+}
+
+/* --------------------------------------------------------------------------
+   6. HERO SECTION
+   -------------------------------------------------------------------------- */
+
+.hero {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-start;
+	min-height: 100vh;
+	min-height: 100dvh;
+	padding: 8rem 2.5rem 4rem;
+	background-color: #ffffff;
+}
+
+.hero__content {
+	max-width: 960px;
+	width: 100%;
+	margin: 0 auto;
+}
+
+.hero__headline {
+	font-size: clamp(2.5rem, 7vw, 6rem);
+	font-weight: 800;
+	line-height: 1.05;
+	letter-spacing: -0.03em;
+	color: #0a0a0a;
+}
+
+.hero__static {
+	display: block;
+}
+
+.hero__typed {
+	display: block;
+	color: #555555;
+}
+
+.hero__typed-text {
+	border-right: none;
+}
+
+.hero__cursor {
+	display: inline-block;
+	font-weight: 300;
+	animation: cursorBlink 0.8s steps(1) infinite;
+	margin-left: 2px;
+}
+
+@keyframes cursorBlink {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0; }
+}
+
+.hero__subtitle {
+	margin-top: 2rem;
+	font-size: clamp(1rem, 2vw, 1.25rem);
+	font-weight: 400;
+	color: #888888;
+	max-width: 480px;
+}
+
+/* Scroll indicator */
+.hero__scroll-indicator {
+	position: absolute;
+	bottom: 2.5rem;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.hero__scroll-line {
+	width: 1px;
+	height: 60px;
+	background: linear-gradient(to bottom, #0a0a0a, transparent);
+	animation: scrollPulse 2s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+	0%, 100% { opacity: 0.3; transform: scaleY(1); }
+	50% { opacity: 1; transform: scaleY(1.2); }
+}
+
+/* --------------------------------------------------------------------------
+   7. SECTIONS — GENERAL
+   -------------------------------------------------------------------------- */
+
+.section {
+	padding: 8rem 2.5rem;
+}
+
+.section--light {
+	background-color: #ffffff;
+	color: #1a1a1a;
+}
+
+.section--dark {
+	background-color: #0a0a0a;
+	color: #ffffff;
+}
+
+.section--full {
+	min-height: 100vh;
+	min-height: 100dvh;
+	display: flex;
+	align-items: center;
+}
+
+.section__inner {
+	max-width: 1200px;
+	margin: 0 auto;
+	width: 100%;
+}
+
+.section__inner--narrow {
+	max-width: 780px;
+}
+
+.section__label {
+	display: block;
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: #888888;
+	margin-bottom: 1rem;
+}
+
+.section__heading {
+	font-size: clamp(2rem, 5vw, 3.5rem);
+	font-weight: 700;
+	letter-spacing: -0.03em;
+	line-height: 1.1;
+	margin-bottom: 1.5rem;
+	max-width: 720px;
+}
+
+.section__text {
+	font-size: clamp(1rem, 1.5vw, 1.125rem);
+	line-height: 1.7;
+	color: #666666;
+	margin-bottom: 1rem;
+	max-width: 640px;
+}
+
+.section--dark .section__text {
+	color: #999999;
+}
+
+.section__link {
+	display: inline-block;
+	font-size: 0.9375rem;
+	font-weight: 600;
+	color: #1a1a1a;
+	padding-bottom: 2px;
+	border-bottom: 1px solid currentColor;
+	transition: color 0.3s ease;
+	margin-top: 0.5rem;
+}
+
+.section__link:hover {
+	color: #555555;
+}
+
+/* --------------------------------------------------------------------------
+   8. CARD GRID (services / capabilities)
+   -------------------------------------------------------------------------- */
+
+.card-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 2rem;
+	margin-top: 3rem;
+}
+
+@media (min-width: 640px) {
+	.card-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+.card {
+	padding: 2rem;
+	border: 1px solid #e8e8e8;
+	border-radius: 2px;
+	transition: border-color 0.3s ease;
+}
+
+.card:hover {
+	border-color: #1a1a1a;
+}
+
+.card__number {
+	display: block;
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: #bbbbbb;
+	letter-spacing: 0.05em;
+	margin-bottom: 1rem;
+}
+
+.card__title {
+	font-size: 1.25rem;
+	font-weight: 700;
+	margin-bottom: 0.75rem;
+}
+
+.card__text {
+	font-size: 0.9375rem;
+	line-height: 1.6;
+	color: #666666;
+}
+
+/* --------------------------------------------------------------------------
+   9. PARALLAX BREAK
+   -------------------------------------------------------------------------- */
+
+.parallax-break {
+	position: relative;
+	height: 60vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: #1a1a1a;
+	overflow: hidden;
+}
+
+.parallax-break__overlay {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		135deg,
+		rgba(10, 10, 10, 0.9) 0%,
+		rgba(30, 30, 30, 0.7) 100%
+	);
+}
+
+.parallax-break__content {
+	position: relative;
+	z-index: 1;
+	text-align: center;
+	padding: 2rem;
+}
+
+.parallax-break__quote {
+	font-size: clamp(1.5rem, 4vw, 2.5rem);
+	font-weight: 300;
+	font-style: italic;
+	color: #ffffff;
+	max-width: 700px;
+	line-height: 1.4;
+	letter-spacing: -0.01em;
+}
+
+/* --------------------------------------------------------------------------
+   10. SPLIT LAYOUT
+   -------------------------------------------------------------------------- */
+
+.split {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 3rem;
+}
+
+@media (min-width: 768px) {
+	.split {
+		grid-template-columns: 1fr 1fr;
+		gap: 4rem;
+		align-items: start;
+	}
+}
+
+/* --------------------------------------------------------------------------
+   11. MODULE GRID
+   -------------------------------------------------------------------------- */
+
+.module-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 1.5rem;
+	margin-top: 3rem;
+}
+
+@media (min-width: 640px) {
+	.module-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (min-width: 960px) {
+	.module-grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+.module-card {
+	padding: 2rem;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 2px;
+	transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.module-card:hover {
+	border-color: rgba(255, 255, 255, 0.3);
+	transform: translateY(-2px);
+}
+
+.module-card__icon {
+	width: 32px;
+	height: 32px;
+	margin-bottom: 1.25rem;
+	color: #ffffff;
+}
+
+.module-card__icon svg {
+	width: 100%;
+	height: 100%;
+}
+
+.module-card__title {
+	font-size: 1.125rem;
+	font-weight: 700;
+	margin-bottom: 0.5rem;
+	color: #ffffff;
+}
+
+.module-card__text {
+	font-size: 0.875rem;
+	line-height: 1.6;
+	color: #999999;
+}
+
+/* --------------------------------------------------------------------------
+   12. CTA SECTION
+   -------------------------------------------------------------------------- */
+
+.section--cta {
+	background-color: #f5f5f0;
+	color: #1a1a1a;
+}
+
+.cta {
+	text-align: center;
+	max-width: 600px;
+	margin: 0 auto;
+}
+
+.cta__heading {
+	font-size: clamp(2rem, 4vw, 3rem);
+	font-weight: 700;
+	letter-spacing: -0.03em;
+	margin-bottom: 1rem;
+}
+
+.cta__text {
+	font-size: 1.0625rem;
+	color: #666666;
+	line-height: 1.7;
+	margin-bottom: 2rem;
+}
+
+.cta__button {
+	display: inline-block;
+	padding: 0.875rem 2.5rem;
+	background-color: #0a0a0a;
+	color: #ffffff;
+	font-size: 0.875rem;
+	font-weight: 600;
+	letter-spacing: 0.03em;
+	border: none;
+	border-radius: 0;
+	cursor: pointer;
+	transition: background-color 0.3s ease, transform 0.2s ease;
+	text-decoration: none;
+}
+
+.cta__button:hover {
+	background-color: #333333;
+	transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+   13. PAGE HERO (inner pages)
+   -------------------------------------------------------------------------- */
+
+.page-hero {
+	padding: 10rem 2.5rem 4rem;
+	background-color: #0a0a0a;
+	color: #ffffff;
+}
+
+.page-hero--compact {
+	padding: 10rem 2.5rem 3rem;
+}
+
+.page-hero__inner {
+	max-width: 780px;
+	margin: 0 auto;
+}
+
+.page-hero__date {
+	display: block;
+	font-size: 0.8125rem;
+	font-weight: 500;
+	color: #888888;
+	letter-spacing: 0.05em;
+	margin-bottom: 1rem;
+}
+
+.page-hero__title {
+	font-size: clamp(2rem, 5vw, 3.5rem);
+	font-weight: 700;
+	letter-spacing: -0.03em;
+	line-height: 1.1;
+}
+
+/* --------------------------------------------------------------------------
+   14. PAGE CONTENT (prose)
+   -------------------------------------------------------------------------- */
+
+.page-content {
+	font-size: 1.0625rem;
+	line-height: 1.8;
+	color: #333333;
+}
+
+.page-content h2 {
+	font-size: 1.75rem;
+	margin: 2.5rem 0 1rem;
+}
+
+.page-content h3 {
+	font-size: 1.375rem;
+	margin: 2rem 0 0.75rem;
+}
+
+.page-content p {
+	margin-bottom: 1.25rem;
+}
+
+.page-content a {
+	color: #0a0a0a;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+.page-content ul,
+.page-content ol {
+	margin: 1rem 0 1.5rem 1.5rem;
+}
+
+.page-content ul {
+	list-style: disc;
+}
+
+.page-content ol {
+	list-style: decimal;
+}
+
+.page-content li {
+	margin-bottom: 0.5rem;
+}
+
+.page-content blockquote {
+	border-left: 3px solid #0a0a0a;
+	padding-left: 1.5rem;
+	margin: 2rem 0;
+	font-style: italic;
+	color: #555555;
+}
+
+.page-content img {
+	margin: 2rem 0;
+	border-radius: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   15. POST CARDS (blog listing)
+   -------------------------------------------------------------------------- */
+
+.posts-list {
+	display: flex;
+	flex-direction: column;
+	gap: 3rem;
+}
+
+.post-card {
+	padding-bottom: 3rem;
+	border-bottom: 1px solid #e8e8e8;
+}
+
+.post-card:last-child {
+	border-bottom: none;
+}
+
+.post-card__date {
+	display: block;
+	font-size: 0.8125rem;
+	font-weight: 500;
+	color: #888888;
+	letter-spacing: 0.03em;
+	margin-bottom: 0.5rem;
+}
+
+.post-card__title {
+	font-size: 1.75rem;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+	margin-bottom: 0.75rem;
+}
+
+.post-card__title a {
+	color: #0a0a0a;
+	text-decoration: none;
+	transition: color 0.3s ease;
+}
+
+.post-card__title a:hover {
+	color: #555555;
+}
+
+.post-card__excerpt {
+	font-size: 1rem;
+	line-height: 1.7;
+	color: #666666;
+	margin-bottom: 1rem;
+}
+
+.post-card__link {
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: #0a0a0a;
+	border-bottom: 1px solid currentColor;
+	padding-bottom: 1px;
+}
+
+/* Post navigation */
+.post-navigation {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 4rem;
+	padding-top: 2rem;
+	border-top: 1px solid #e8e8e8;
+}
+
+.post-navigation a {
+	font-size: 0.9375rem;
+	font-weight: 500;
+	color: #1a1a1a;
+	text-decoration: none;
+	transition: color 0.3s ease;
+}
+
+.post-navigation a:hover {
+	color: #555555;
+}
+
+/* Pagination */
+.pagination {
+	margin-top: 3rem;
+}
+
+.pagination .nav-links {
+	display: flex;
+	gap: 0.75rem;
+	justify-content: center;
+}
+
+.pagination a,
+.pagination span {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 2.5rem;
+	height: 2.5rem;
+	font-size: 0.875rem;
+	font-weight: 500;
+	color: #1a1a1a;
+	text-decoration: none;
+}
+
+.pagination .current {
+	font-weight: 700;
+	border-bottom: 2px solid #0a0a0a;
+}
+
+/* --------------------------------------------------------------------------
+   16. SCROLL REVEAL ANIMATIONS
+   -------------------------------------------------------------------------- */
+
+.reveal {
+	opacity: 0;
+	transform: translateY(40px);
+	transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1),
+	            transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.reveal--visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* --------------------------------------------------------------------------
+   17. FOOTER
+   -------------------------------------------------------------------------- */
+
+.site-footer {
+	background-color: #0a0a0a;
+	color: #ffffff;
+	padding: 4rem 2.5rem 2rem;
+}
+
+.site-footer__inner {
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+.site-footer__top {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+	padding-bottom: 3rem;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (min-width: 768px) {
+	.site-footer__top {
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: flex-start;
+	}
+}
+
+.site-footer__title {
+	font-size: 1.125rem;
+	font-weight: 700;
+	color: #ffffff;
+	text-decoration: none;
+}
+
+.footer-nav {
+	display: flex;
+	gap: 2rem;
+	flex-wrap: wrap;
+}
+
+.footer-nav li a {
+	font-size: 0.875rem;
+	font-weight: 400;
+	color: #999999;
+	text-decoration: none;
+	transition: color 0.3s ease;
+}
+
+.footer-nav li a:hover {
+	color: #ffffff;
+}
+
+.site-footer__bottom {
+	padding-top: 2rem;
+}
+
+.site-footer__copy {
+	font-size: 0.8125rem;
+	color: #666666;
+}
+
+/* --------------------------------------------------------------------------
+   18. RESPONSIVE
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 767px) {
+	.site-header {
+		padding: 1.25rem 1.5rem;
+	}
+
+	.site-header--scrolled {
+		padding: 0.875rem 1.5rem;
+	}
+
+	.hero {
+		padding: 7rem 1.5rem 3rem;
+	}
+
+	.section {
+		padding: 5rem 1.5rem;
+	}
+
+	.page-hero {
+		padding: 8rem 1.5rem 3rem;
+	}
+
+	.card-grid {
+		gap: 1.25rem;
+	}
+
+	.card {
+		padding: 1.5rem;
+	}
+
+	.module-card {
+		padding: 1.5rem;
+	}
+
+	.site-footer {
+		padding: 3rem 1.5rem 1.5rem;
+	}
+}
+
+@media (max-width: 479px) {
+	.hero__headline {
+		font-size: 2.25rem;
+	}
+
+	.section__heading {
+		font-size: 1.75rem;
+	}
+
+	.cta__heading {
+		font-size: 1.75rem;
+	}
+}
+
+/* --------------------------------------------------------------------------
+   19. UTILITY
+   -------------------------------------------------------------------------- */
+
+/* WordPress admin bar offset */
+.admin-bar .site-header {
+	top: 32px;
+}
+
+@media (max-width: 782px) {
+	.admin-bar .site-header {
+		top: 46px;
+	}
+}
+
+/* No-content state */
+.no-content {
+	text-align: center;
+	padding: 4rem 0;
+}
+
+.no-content h2 {
+	font-size: 2rem;
+	margin-bottom: 0.5rem;
+}
+
+.no-content p {
+	color: #888888;
+}
