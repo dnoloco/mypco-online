@@ -200,8 +200,14 @@ class MyPCO_Series_Import {
         $speakers_raw = $this->api_model->get_all_publishing_speakers();
         $speakers_map = []; // speaker ID → name
         foreach ($speakers_raw as $spk_id => $spk) {
-            $speakers_map[$spk_id] = $spk['attributes']['full_name']
-                ?? ($spk['attributes']['name'] ?? ($spk['attributes']['first_name'] ?? ''));
+            $sa = $spk['attributes'];
+            if (!empty($sa['full_name'])) {
+                $speakers_map[$spk_id] = $sa['full_name'];
+            } elseif (!empty($sa['first_name']) || !empty($sa['last_name'])) {
+                $speakers_map[$spk_id] = trim(($sa['first_name'] ?? '') . ' ' . ($sa['last_name'] ?? ''));
+            } else {
+                $speakers_map[$spk_id] = $sa['name'] ?? '';
+            }
         }
 
         // Build a series lookup, episode resources lookup, and speakerships lookup from included data
