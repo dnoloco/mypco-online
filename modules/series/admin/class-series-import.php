@@ -196,15 +196,29 @@ class MyPCO_Series_Import {
             wp_send_json_error(['message' => __('No episodes found in Planning Center Publishing.', 'mypco-online')]);
         }
 
-        // Build a series lookup and episode resources lookup from included data
+        // Fetch all speakers to build a speaker ID → name map
+        $speakers_raw = $this->api_model->get_all_publishing_speakers();
+        $speakers_map = []; // speaker ID → name
+        foreach ($speakers_raw as $spk_id => $spk) {
+            $speakers_map[$spk_id] = $spk['attributes']['full_name']
+                ?? ($spk['attributes']['name'] ?? ($spk['attributes']['first_name'] ?? ''));
+        }
+
+        // Build a series lookup, episode resources lookup, and speakerships lookup from included data
         $series_map = [];
-        $resources_map = []; // episode_resource ID → attributes
+        $resources_map = [];    // episode_resource ID → full included item
+        $speakerships_map = []; // speakership ID → speaker ID
         if (!empty($response['included'])) {
             foreach ($response['included'] as $included) {
                 if ($included['type'] === 'Series') {
                     $series_map[$included['id']] = $included['attributes'];
                 } elseif ($included['type'] === 'EpisodeResource') {
                     $resources_map[$included['id']] = $included;
+                } elseif ($included['type'] === 'Speakership') {
+                    $speaker_ref = $included['relationships']['speaker']['data']['id'] ?? '';
+                    if ($speaker_ref) {
+                        $speakerships_map[$included['id']] = $speaker_ref;
+                    }
                 }
             }
         }
@@ -228,12 +242,23 @@ class MyPCO_Series_Import {
                 }
             }
 
-            // Resolve speaker name (PCO may use 'speaker' or 'speaker_name')
+            // Resolve speaker name via speakerships relationship
             $speaker_name = '';
-            if (!empty($attrs['speaker'])) {
+            if (!empty($episode['relationships']['speakerships']['data'])) {
+                foreach ($episode['relationships']['speakerships']['data'] as $ss_ref) {
+                    $ss_id = $ss_ref['id'] ?? '';
+                    if ($ss_id && isset($speakerships_map[$ss_id])) {
+                        $spk_id = $speakerships_map[$ss_id];
+                        if (isset($speakers_map[$spk_id])) {
+                            $speaker_name = $speakers_map[$spk_id];
+                            break; // Use the first speaker
+                        }
+                    }
+                }
+            }
+            // Fallback: check episode attributes directly
+            if (empty($speaker_name) && !empty($attrs['speaker'])) {
                 $speaker_name = $attrs['speaker'];
-            } elseif (!empty($attrs['speaker_name'])) {
-                $speaker_name = $attrs['speaker_name'];
             }
 
             // Determine media availability
@@ -296,8 +321,10 @@ class MyPCO_Series_Import {
             }
         }
         set_transient(self::IMPORT_CACHE_KEY, [
-            'episodes' => $cache,
-            'included' => $included_cache,
+            'episodes'     => $cache,
+            'included'     => $included_cache,
+            'speakers_map' => $speakers_map,
+            'speakerships_map' => $speakerships_map,
         ], 15 * MINUTE_IN_SECONDS);
 
         wp_send_json_success([
@@ -333,8 +360,10 @@ class MyPCO_Series_Import {
             wp_send_json_error(['message' => __('Episode data has expired. Please click "Fetch from Planning Center" again.', 'mypco-online')]);
         }
 
-        $cached_episodes = $cache['episodes'];
-        $cached_included = $cache['included'];
+        $cached_episodes     = $cache['episodes'];
+        $cached_included     = $cache['included'];
+        $cached_speakers     = isset($cache['speakers_map']) ? $cache['speakers_map'] : [];
+        $cached_speakerships = isset($cache['speakerships_map']) ? $cache['speakerships_map'] : [];
 
         $imported = 0;
         $skipped  = 0;
@@ -384,6 +413,22 @@ class MyPCO_Series_Import {
                     }
                 }
             }
+
+            // Resolve speaker name from speakerships → speakers
+            $speaker_name = '';
+            if (!empty($cached_episodes[$episode_id]['relationships']['speakerships']['data'])) {
+                foreach ($cached_episodes[$episode_id]['relationships']['speakerships']['data'] as $ss_ref) {
+                    $ss_id = $ss_ref['id'] ?? '';
+                    if ($ss_id && isset($cached_speakerships[$ss_id])) {
+                        $spk_id = $cached_speakerships[$ss_id];
+                        if (isset($cached_speakers[$spk_id])) {
+                            $speaker_name = $cached_speakers[$spk_id];
+                            break;
+                        }
+                    }
+                }
+            }
+            $ep_data['speaker_name'] = $speaker_name;
 
             $result = $this->import_episode($ep_data);
 
@@ -511,7 +556,8 @@ class MyPCO_Series_Import {
         $this->map_episode_resource_files($post_id, $ep_id, $included_map);
 
         // --- Map speaker ---
-        $this->map_episode_speaker($post_id, $attrs);
+        $speaker_name = isset($ep_response['speaker_name']) ? $ep_response['speaker_name'] : '';
+        $this->map_episode_speaker($post_id, $speaker_name);
 
         // --- Map series ---
         $this->map_episode_series($post_id, $episode, $included_map);
@@ -698,18 +744,14 @@ class MyPCO_Series_Import {
     /**
      * Map the episode's speaker to an mypco_speaker post and link to the message.
      *
-     * Looks for a 'speaker' or 'speaker_name' attribute on the episode.
-     * If found, finds or creates a matching mypco_speaker post and stores
+     * Finds or creates a matching mypco_speaker post by name and stores
      * the speaker ID as _mypco_speaker_id meta on the message post.
+     *
+     * @param int    $post_id      The message post ID.
+     * @param string $speaker_name The resolved speaker name.
      */
-    private function map_episode_speaker($post_id, $attrs) {
-        // PCO Publishing may use 'speaker' or 'speaker_name'
-        $speaker_name = '';
-        if (!empty($attrs['speaker'])) {
-            $speaker_name = trim($attrs['speaker']);
-        } elseif (!empty($attrs['speaker_name'])) {
-            $speaker_name = trim($attrs['speaker_name']);
-        }
+    private function map_episode_speaker($post_id, $speaker_name) {
+        $speaker_name = trim($speaker_name);
 
         if (empty($speaker_name)) {
             return;
