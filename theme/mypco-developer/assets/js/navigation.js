@@ -9,8 +9,9 @@
 ( function () {
 	'use strict';
 
-	const toggle  = document.getElementById( 'menu-toggle' );
-	const overlay = document.getElementById( 'overlay-menu' );
+	const toggle   = document.getElementById( 'menu-toggle' );
+	const overlay  = document.getElementById( 'overlay-menu' );
+	const closeBtn = document.getElementById( 'overlay-close' );
 
 	if ( ! toggle || ! overlay ) return;
 
@@ -49,6 +50,13 @@
 			openMenu();
 		}
 	} );
+
+	// Close via the dedicated close button inside the overlay
+	if ( closeBtn ) {
+		closeBtn.addEventListener( 'click', function () {
+			closeMenu();
+		} );
+	}
 
 	// Close on Escape key
 	document.addEventListener( 'keydown', function ( e ) {

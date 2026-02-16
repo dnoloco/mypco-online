@@ -219,8 +219,50 @@ h1, h2, h3, h4, h5, h6 {
 	visibility: visible;
 }
 
+/* Close button — top-right, always visible in overlay */
+.overlay-menu__close {
+	position: absolute;
+	top: 1.5rem;
+	right: 2.5rem;
+	z-index: 10;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 48px;
+	height: 48px;
+	background: none;
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	border-radius: 50%;
+	cursor: pointer;
+	color: #ffffff;
+	transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.overlay-menu__close svg {
+	width: 20px;
+	height: 20px;
+}
+
+.overlay-menu__close:hover {
+	border-color: #ffffff;
+	transform: rotate(90deg);
+}
+
 .overlay-menu__inner {
 	text-align: center;
+}
+
+/* Hint for admins when no menu is assigned */
+.overlay-menu__hint {
+	margin-top: 2rem;
+	font-size: 0.8125rem;
+	color: #555555;
+}
+
+.overlay-menu__hint a {
+	color: #888888;
+	text-decoration: underline;
+	text-underline-offset: 2px;
 }
 
 .overlay-menu__list {
@@ -933,6 +975,11 @@ h1, h2, h3, h4, h5, h6 {
    -------------------------------------------------------------------------- */
 
 @media (max-width: 767px) {
+	.overlay-menu__close {
+		top: 1.25rem;
+		right: 1.5rem;
+	}
+
 	.site-header {
 		padding: 1.25rem 1.5rem;
 	}
