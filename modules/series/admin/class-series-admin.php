@@ -217,12 +217,20 @@ class MyPCO_Series_Admin {
             $image       = get_term_meta($term->term_id, '_mypco_series_image', true);
         }
 
+        $names = MyPCO_Series_Module::get_custom_labels();
+
         if (empty($terms) || is_wp_error($terms)) : ?>
-            <p><em><?php esc_html_e('Select a Series from the Series panel to edit its info here.', 'mypco-online'); ?></em></p>
+            <p><em><?php echo esc_html(sprintf(
+                /* translators: %s: series label */
+                __('Select a %s from the %s panel to edit its info here.', 'mypco-online'),
+                $names['series_singular'],
+                $names['series_singular']
+            )); ?></em></p>
         <?php else : ?>
             <p><?php printf(
-                /* translators: %s: series term name */
-                esc_html__('Editing info for series: %s', 'mypco-online'),
+                /* translators: %1$s: series label, %2$s: series term name */
+                esc_html__('Editing info for %1$s: %2$s', 'mypco-online'),
+                strtolower($names['series_singular']),
                 '<strong>' . esc_html($term_name) . '</strong>'
             ); ?></p>
             <table class="form-table mypco-meta-table">
@@ -364,7 +372,12 @@ class MyPCO_Series_Admin {
                         </div>
                         <span id="mypco_add_speaker_status" style="display:none;font-style:italic;font-size:12px;margin-left:4px;"></span>
                     </div>
-                    <p class="description"><?php esc_html_e('Choose the speaker for this message.', 'mypco-online'); ?></p>
+                    <p class="description"><?php echo esc_html(sprintf(
+                        /* translators: %1$s: speaker label, %2$s: message label */
+                        __('Choose the %1$s for this %2$s.', 'mypco-online'),
+                        strtolower($names['speaker_singular']),
+                        strtolower($names['message_singular'])
+                    )); ?></p>
                 </td>
             </tr>
         </table>
@@ -708,6 +721,7 @@ class MyPCO_Series_Admin {
     public function render_message_info_meta_box($post) {
         wp_nonce_field('mypco_message_info_meta_save', 'mypco_message_info_meta_nonce');
 
+        $names        = MyPCO_Series_Module::get_custom_labels();
         $description  = get_post_meta($post->ID, '_mypco_message_description', true);
         $message_date = get_post_meta($post->ID, '_mypco_message_date', true);
         $image        = get_post_meta($post->ID, '_mypco_message_image', true);
@@ -718,7 +732,11 @@ class MyPCO_Series_Admin {
                 <td>
                     <textarea id="mypco_message_description" name="mypco_message_description"
                               rows="4"><?php echo esc_textarea($description); ?></textarea>
-                    <p class="description"><?php esc_html_e('A short summary of the message.', 'mypco-online'); ?></p>
+                    <p class="description"><?php echo esc_html(sprintf(
+                        /* translators: %s: message label */
+                        __('A short summary of the %s.', 'mypco-online'),
+                        strtolower($names['message_singular'])
+                    )); ?></p>
                 </td>
             </tr>
             <tr>
@@ -726,7 +744,11 @@ class MyPCO_Series_Admin {
                 <td>
                     <input type="date" id="mypco_message_date" name="mypco_message_date"
                            value="<?php echo esc_attr($message_date); ?>" />
-                    <p class="description"><?php esc_html_e('The date this message was delivered.', 'mypco-online'); ?></p>
+                    <p class="description"><?php echo esc_html(sprintf(
+                        /* translators: %s: message label */
+                        __('The date this %s was delivered.', 'mypco-online'),
+                        strtolower($names['message_singular'])
+                    )); ?></p>
                 </td>
             </tr>
             <tr>
