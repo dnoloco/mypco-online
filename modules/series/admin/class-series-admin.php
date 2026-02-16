@@ -60,6 +60,10 @@ class MyPCO_Series_Admin {
         $this->loader->add_filter('manage_mypco_speaker_posts_columns', $this, 'speaker_list_columns');
         $this->loader->add_action('manage_mypco_speaker_posts_custom_column', $this, 'speaker_list_column_content', 10, 2);
 
+        // Message list table columns
+        $this->loader->add_filter('manage_mypco_message_posts_columns', $this, 'message_list_columns');
+        $this->loader->add_action('manage_mypco_message_posts_custom_column', $this, 'message_list_column_content', 10, 2);
+
         // AJAX: create speaker from Message editor meta box
         $this->loader->add_action('wp_ajax_mypco_add_speaker', $this, 'ajax_add_speaker');
 
@@ -610,6 +614,72 @@ class MyPCO_Series_Admin {
                 (string) $post_id
             ));
             echo (int) $count;
+        }
+    }
+
+    // =========================================================================
+    // Message Post Type – List Table Columns
+    // =========================================================================
+
+    /**
+     * Define custom columns for the mypco_message list table.
+     */
+    public function message_list_columns($columns) {
+        $names = MyPCO_Series_Module::get_custom_labels();
+
+        $new_columns = [];
+        $new_columns['cb'] = isset($columns['cb']) ? $columns['cb'] : '<input type="checkbox" />';
+        $new_columns['title'] = isset($columns['title']) ? $columns['title'] : __('Title', 'mypco-online');
+        $new_columns['message_series'] = $names['series_singular'];
+        $new_columns['message_speaker'] = $names['speaker_singular'];
+        $new_columns['message_date_published'] = __('Date Published', 'mypco-online');
+
+        return $new_columns;
+    }
+
+    /**
+     * Render content for custom message list table columns.
+     */
+    public function message_list_column_content($column, $post_id) {
+        if ($column === 'message_series') {
+            $terms = wp_get_post_terms($post_id, 'mypco_series');
+            if (!is_wp_error($terms) && !empty($terms)) {
+                $names = [];
+                foreach ($terms as $term) {
+                    $names[] = esc_html($term->name);
+                }
+                echo implode(', ', $names);
+            } else {
+                echo '—';
+            }
+        }
+
+        if ($column === 'message_speaker') {
+            $speaker_id = get_post_meta($post_id, '_mypco_speaker_id', true);
+            if ($speaker_id) {
+                $speaker = get_post($speaker_id);
+                if ($speaker && $speaker->post_status !== 'trash') {
+                    echo esc_html($speaker->post_title);
+                } else {
+                    echo '—';
+                }
+            } else {
+                echo '—';
+            }
+        }
+
+        if ($column === 'message_date_published') {
+            $message_date = get_post_meta($post_id, '_mypco_message_date', true);
+            if ($message_date) {
+                $timestamp = strtotime($message_date);
+                if ($timestamp) {
+                    echo esc_html(date('n.j.y', $timestamp));
+                } else {
+                    echo '—';
+                }
+            } else {
+                echo '—';
+            }
         }
     }
 
