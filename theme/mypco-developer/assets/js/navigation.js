@@ -53,10 +53,19 @@
 
 	// Close via the dedicated close button inside the overlay
 	if ( closeBtn ) {
-		closeBtn.addEventListener( 'click', function () {
+		closeBtn.addEventListener( 'click', function ( e ) {
+			e.preventDefault();
+			e.stopPropagation();
 			closeMenu();
 		} );
 	}
+
+	// Close when clicking the overlay background (not the menu links)
+	overlay.addEventListener( 'click', function ( e ) {
+		if ( e.target === overlay || e.target.classList.contains( 'overlay-menu__inner' ) ) {
+			closeMenu();
+		}
+	} );
 
 	// Close on Escape key
 	document.addEventListener( 'keydown', function ( e ) {

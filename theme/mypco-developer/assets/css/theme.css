@@ -207,7 +207,7 @@ h1, h2, h3, h4, h5, h6 {
 	background-color: #0a0a0a;
 	display: flex;
 	align-items: center;
-	justify-content: center;
+	justify-content: flex-end;
 	opacity: 0;
 	visibility: hidden;
 	transition: opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
@@ -238,9 +238,21 @@ h1, h2, h3, h4, h5, h6 {
 	transition: border-color 0.3s ease, transform 0.3s ease;
 }
 
+/* Push close button below the WP admin bar */
+.admin-bar .overlay-menu__close {
+	top: calc(1.5rem + 32px);
+}
+
+@media (max-width: 782px) {
+	.admin-bar .overlay-menu__close {
+		top: calc(1.25rem + 46px);
+	}
+}
+
 .overlay-menu__close svg {
 	width: 20px;
 	height: 20px;
+	pointer-events: none;
 }
 
 .overlay-menu__close:hover {
@@ -249,7 +261,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .overlay-menu__inner {
-	text-align: center;
+	width: 100%;
+	padding: 6rem 2.5rem 2rem;
+	text-align: right;
 }
 
 /* Hint for admins when no menu is assigned */
@@ -268,11 +282,13 @@ h1, h2, h3, h4, h5, h6 {
 .overlay-menu__list {
 	display: flex;
 	flex-direction: column;
+	align-items: flex-end;
 	gap: 0.5rem;
 }
 
 .overlay-menu__item {
 	overflow: hidden;
+	text-align: right;
 }
 
 .overlay-menu__link {
@@ -282,6 +298,7 @@ h1, h2, h3, h4, h5, h6 {
 	color: #ffffff;
 	letter-spacing: -0.03em;
 	line-height: 1.2;
+	text-align: right;
 	transform: translateY(110%);
 	transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1),
 	            color 0.3s ease;
@@ -976,8 +993,12 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (max-width: 767px) {
 	.overlay-menu__close {
-		top: 1.25rem;
 		right: 1.5rem;
+	}
+
+	.overlay-menu__inner {
+		padding-left: 1.5rem;
+		padding-right: 1.5rem;
 	}
 
 	.site-header {
