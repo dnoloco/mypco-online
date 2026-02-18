@@ -11,15 +11,14 @@ get_header();
 $variation_count = absint( get_theme_mod( 'mypco_hero_variation_count', 5 ) );
 $variation_count = max( 1, min( 5, $variation_count ) );
 $display_mode    = get_theme_mod( 'mypco_hero_display_mode', 'random' );
-$headline_color  = get_theme_mod( 'mypco_hero_headline_color', '#1a1a1a' );
-$subtitle_color  = get_theme_mod( 'mypco_hero_subtitle_color', '#1a1a1a' );
 $var_defaults    = mypco_hero_variation_defaults();
 
 $variations = array();
 for ( $i = 1; $i <= $variation_count; $i++ ) {
-	$d = $var_defaults[ $i ];
+	$d         = $var_defaults[ $i ];
+	$words_raw = get_theme_mod( "mypco_hero_variation_{$i}_headline", $d['headline'] );
 	$variations[] = array(
-		'headline' => get_theme_mod( "mypco_hero_variation_{$i}_headline", $d['headline'] ),
+		'words'    => array_map( 'trim', explode( ',', $words_raw ) ),
 		'subtitle' => get_theme_mod( "mypco_hero_variation_{$i}_subtitle", $d['subtitle'] ),
 	);
 }
@@ -33,16 +32,28 @@ if ( 'specific' === $display_mode ) {
 }
 
 $active = $variations[ $active_index ];
+
+// Styling settings.
+$headline_color = get_theme_mod( 'mypco_hero_headline_color', '#1a1a1a' );
+$subtitle_color = get_theme_mod( 'mypco_hero_subtitle_color', '#1a1a1a' );
+$headline_font  = get_theme_mod( 'mypco_hero_headline_font', 'DM Sans' );
+$subtitle_font  = get_theme_mod( 'mypco_hero_subtitle_font', 'DM Sans' );
+$headline_size  = floatval( get_theme_mod( 'mypco_hero_headline_size', '11' ) );
+$subtitle_size  = floatval( get_theme_mod( 'mypco_hero_subtitle_size', '2.5' ) );
+$typing_speed   = absint( get_theme_mod( 'mypco_hero_typing_speed', 80 ) );
+$typing_pause   = absint( get_theme_mod( 'mypco_hero_typing_pause', 2000 ) );
 ?>
 
 <!-- ============================================
      SECTION 1 — Hero with typing headline
      ============================================ -->
 <section class="hero" id="hero"
-	style="--hero-headline-color: <?php echo esc_attr( $headline_color ); ?>; --hero-subtitle-color: <?php echo esc_attr( $subtitle_color ); ?>;">
+	style="--hero-headline-color: <?php echo esc_attr( $headline_color ); ?>; --hero-subtitle-color: <?php echo esc_attr( $subtitle_color ); ?>; --hero-headline-font: '<?php echo esc_attr( $headline_font ); ?>', sans-serif; --hero-subtitle-font: '<?php echo esc_attr( $subtitle_font ); ?>', sans-serif; --hero-headline-size: <?php echo esc_attr( $headline_size ); ?>vw; --hero-subtitle-size: <?php echo esc_attr( $subtitle_size ); ?>vw;">
 	<div class="hero__content">
 		<h1 class="hero__headline" id="typed-output"
-			data-headline="<?php echo esc_attr( $active['headline'] ); ?>">
+			data-words="<?php echo esc_attr( wp_json_encode( $active['words'] ) ); ?>"
+			data-typing-speed="<?php echo esc_attr( $typing_speed ); ?>"
+			data-typing-pause="<?php echo esc_attr( $typing_pause ); ?>">
 			<span class="hero__typed-text"></span><span class="hero__cursor">|</span>
 		</h1>
 		<hr class="hero__divider">
