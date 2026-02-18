@@ -321,7 +321,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* --------------------------------------------------------------------------
-   6. HERO SECTION
+   6. HERO SECTION — Rotating headlines with gradient text
    -------------------------------------------------------------------------- */
 
 .hero {
@@ -337,35 +337,63 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .hero__content {
-	max-width: 960px;
 	width: 100%;
 	margin: 0 auto;
 }
 
 .hero__headline {
+	--hero-gradient: linear-gradient(90deg, #6366f1, #ec4899);
+	--hero-color-end: #ec4899;
+
 	font-size: clamp(2.5rem, 7vw, 6rem);
 	font-weight: 800;
-	line-height: 1.05;
+	line-height: 0.95;
 	letter-spacing: -0.03em;
-	color: #0a0a0a;
 }
 
+/* Static headline — gradient text */
 .hero__static {
 	display: block;
+	width: 100%;
+	background: var(--hero-gradient);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	transition: opacity 0.5s ease, transform 0.5s ease;
+	padding-bottom: 0.1em;
 }
 
+/* Fade-out state */
+.hero__static--fading {
+	opacity: 0;
+	transform: translateY(-16px);
+}
+
+/* Entry state (applied for one frame then removed to trigger transition) */
+.hero__static--entering {
+	opacity: 0;
+	transform: translateY(16px);
+	transition: none;
+}
+
+/* Typed row — gradient text */
 .hero__typed {
 	display: block;
-	color: #555555;
+	width: 100%;
+	margin-top: 0.15em;
 }
 
 .hero__typed-text {
-	border-right: none;
+	background: var(--hero-gradient);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
 }
 
 .hero__cursor {
 	display: inline-block;
 	font-weight: 300;
+	color: var(--hero-color-end, #ec4899);
 	animation: cursorBlink 0.8s steps(1) infinite;
 	margin-left: 2px;
 }
@@ -376,7 +404,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .hero__subtitle {
-	margin-top: 2rem;
+	margin-top: 1.5rem;
 	font-size: clamp(1rem, 2vw, 1.25rem);
 	font-weight: 400;
 	color: #888888;

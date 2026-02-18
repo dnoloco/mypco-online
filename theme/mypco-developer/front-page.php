@@ -7,22 +7,35 @@
 
 get_header();
 
-$headline    = get_theme_mod( 'mypco_hero_headline', 'We craft' );
-$words_raw   = get_theme_mod( 'mypco_typing_words', 'digital experiences,meaningful connections,creative solutions,community platforms' );
-$subtitle    = get_theme_mod( 'mypco_hero_subtitle', 'Minimal design. Purposeful technology. Scroll to explore.' );
-$words_array = array_map( 'trim', explode( ',', $words_raw ) );
+// Build hero slides data from Customizer settings.
+$slide_count    = absint( get_theme_mod( 'mypco_hero_slide_count', 3 ) );
+$slide_count    = max( 1, min( 5, $slide_count ) );
+$slide_defaults = mypco_hero_slide_defaults();
+$subtitle       = get_theme_mod( 'mypco_hero_subtitle', 'Minimal design. Purposeful technology. Scroll to explore.' );
+
+$slides = array();
+for ( $i = 1; $i <= $slide_count; $i++ ) {
+	$d         = $slide_defaults[ $i ];
+	$words_raw = get_theme_mod( "mypco_hero_slide_{$i}_words", $d['words'] );
+	$slides[]  = array(
+		'headline'   => get_theme_mod( "mypco_hero_slide_{$i}_headline", $d['headline'] ),
+		'words'      => array_map( 'trim', explode( ',', $words_raw ) ),
+		'colorStart' => get_theme_mod( "mypco_hero_slide_{$i}_color_start", $d['color_start'] ),
+		'colorEnd'   => get_theme_mod( "mypco_hero_slide_{$i}_color_end", $d['color_end'] ),
+	);
+}
 ?>
 
 <!-- ============================================
-     SECTION 1 — Hero with typing animation
+     SECTION 1 — Hero with rotating headlines & typing animation
      ============================================ -->
 <section class="hero" id="hero">
 	<div class="hero__content">
-		<h1 class="hero__headline">
-			<span class="hero__static"><?php echo esc_html( $headline ); ?></span>
-			<br>
-			<span class="hero__typed" id="typed-output" data-words="<?php echo esc_attr( wp_json_encode( $words_array ) ); ?>">
-				<span class="hero__typed-text"></span><span class="hero__cursor">|</span>
+		<h1 class="hero__headline" id="hero-rotator"
+			data-slides="<?php echo esc_attr( wp_json_encode( $slides ) ); ?>">
+			<span class="hero__static" id="hero-headline"><?php echo esc_html( $slides[0]['headline'] ); ?></span>
+			<span class="hero__typed">
+				<span class="hero__typed-text" id="hero-typed-text"></span><span class="hero__cursor">|</span>
 			</span>
 		</h1>
 		<p class="hero__subtitle reveal" data-reveal-delay="600"><?php echo esc_html( $subtitle ); ?></p>
