@@ -123,28 +123,73 @@ function mypco_developer_customize_register( $wp_customize ) {
 		'priority' => 30,
 	) );
 
-	// Hero headline static part
-	$wp_customize->add_setting( 'mypco_hero_headline', array(
-		'default'           => 'We craft',
-		'sanitize_callback' => 'sanitize_text_field',
+	// Number of hero slides
+	$wp_customize->add_setting( 'mypco_hero_slide_count', array(
+		'default'           => 3,
+		'sanitize_callback' => 'absint',
 	) );
-	$wp_customize->add_control( 'mypco_hero_headline', array(
-		'label'   => __( 'Hero Headline (static part)', 'mypco-developer' ),
-		'section' => 'mypco_hero',
-		'type'    => 'text',
+	$wp_customize->add_control( 'mypco_hero_slide_count', array(
+		'label'       => __( 'Number of Hero Slides', 'mypco-developer' ),
+		'section'     => 'mypco_hero',
+		'type'        => 'select',
+		'choices'     => array(
+			1 => '1',
+			2 => '2',
+			3 => '3',
+			4 => '4',
+			5 => '5',
+		),
+		'description' => __( 'How many headline slides to rotate through. Settings below for unused slides are ignored.', 'mypco-developer' ),
 	) );
 
-	// Typing words (comma-separated)
-	$wp_customize->add_setting( 'mypco_typing_words', array(
-		'default'           => 'digital experiences,meaningful connections,creative solutions,community platforms',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'mypco_typing_words', array(
-		'label'       => __( 'Typing Words (comma-separated)', 'mypco-developer' ),
-		'section'     => 'mypco_hero',
-		'type'        => 'textarea',
-		'description' => __( 'Words that cycle in the typing animation, separated by commas.', 'mypco-developer' ),
-	) );
+	$slide_defaults = mypco_hero_slide_defaults();
+
+	for ( $i = 1; $i <= 5; $i++ ) {
+		$d = $slide_defaults[ $i ];
+
+		// Headline
+		$wp_customize->add_setting( "mypco_hero_slide_{$i}_headline", array(
+			'default'           => $d['headline'],
+			'sanitize_callback' => 'sanitize_text_field',
+		) );
+		$wp_customize->add_control( "mypco_hero_slide_{$i}_headline", array(
+			'label'   => sprintf( __( 'Slide %d — Headline', 'mypco-developer' ), $i ),
+			'section' => 'mypco_hero',
+			'type'    => 'text',
+		) );
+
+		// Typing words
+		$wp_customize->add_setting( "mypco_hero_slide_{$i}_words", array(
+			'default'           => $d['words'],
+			'sanitize_callback' => 'sanitize_text_field',
+		) );
+		$wp_customize->add_control( "mypco_hero_slide_{$i}_words", array(
+			'label'       => sprintf( __( 'Slide %d — Typing Words', 'mypco-developer' ), $i ),
+			'section'     => 'mypco_hero',
+			'type'        => 'textarea',
+			'description' => __( 'Comma-separated words for the typing animation.', 'mypco-developer' ),
+		) );
+
+		// Gradient start color
+		$wp_customize->add_setting( "mypco_hero_slide_{$i}_color_start", array(
+			'default'           => $d['color_start'],
+			'sanitize_callback' => 'sanitize_hex_color',
+		) );
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "mypco_hero_slide_{$i}_color_start", array(
+			'label'   => sprintf( __( 'Slide %d — Gradient Start Color', 'mypco-developer' ), $i ),
+			'section' => 'mypco_hero',
+		) ) );
+
+		// Gradient end color
+		$wp_customize->add_setting( "mypco_hero_slide_{$i}_color_end", array(
+			'default'           => $d['color_end'],
+			'sanitize_callback' => 'sanitize_hex_color',
+		) );
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "mypco_hero_slide_{$i}_color_end", array(
+			'label'   => sprintf( __( 'Slide %d — Gradient End Color', 'mypco-developer' ), $i ),
+			'section' => 'mypco_hero',
+		) ) );
+	}
 
 	// Hero subtitle
 	$wp_customize->add_setting( 'mypco_hero_subtitle', array(
@@ -156,6 +201,18 @@ function mypco_developer_customize_register( $wp_customize ) {
 		'section' => 'mypco_hero',
 		'type'    => 'text',
 	) );
+}
+/**
+ * Default values for hero slides.
+ */
+function mypco_hero_slide_defaults() {
+	return array(
+		1 => array( 'headline' => 'We craft',   'words' => 'digital experiences,meaningful connections',   'color_start' => '#6366f1', 'color_end' => '#ec4899' ),
+		2 => array( 'headline' => 'We build',   'words' => 'modern platforms,powerful tools',              'color_start' => '#f59e0b', 'color_end' => '#ef4444' ),
+		3 => array( 'headline' => 'We create',  'words' => 'creative solutions,community platforms',       'color_start' => '#10b981', 'color_end' => '#3b82f6' ),
+		4 => array( 'headline' => 'We design',  'words' => 'intuitive interfaces,beautiful systems',       'color_start' => '#8b5cf6', 'color_end' => '#06b6d4' ),
+		5 => array( 'headline' => 'We deliver', 'words' => 'real results,lasting impact',                  'color_start' => '#f43f5e', 'color_end' => '#f97316' ),
+	);
 }
 add_action( 'customize_register', 'mypco_developer_customize_register' );
 
