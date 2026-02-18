@@ -102,11 +102,13 @@
 
 		if ( section ) {
 			const isDark = section.classList.contains( 'section--dark' )
-				|| section.classList.contains( 'hero' )
 				|| section.classList.contains( 'page-hero' )
 				|| section.classList.contains( 'parallax-break' );
 
-			if ( isDark ) {
+			// Hero fades from white at top so header stays dark
+			if ( section.classList.contains( 'hero' ) ) {
+				header.classList.remove( 'site-header--dark' );
+			} else if ( isDark ) {
 				header.classList.add( 'site-header--dark' );
 			} else {
 				header.classList.remove( 'site-header--dark' );

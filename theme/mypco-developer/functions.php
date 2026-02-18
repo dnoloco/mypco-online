@@ -164,13 +164,23 @@ function mypco_developer_customize_register( $wp_customize ) {
 		'description' => __( 'How many variations are available. Settings below for unused variations are ignored.', 'mypco-developer' ),
 	) );
 
-	// Hero text colour
-	$wp_customize->add_setting( 'mypco_hero_text_color', array(
+	// Hero headline text colour
+	$wp_customize->add_setting( 'mypco_hero_headline_color', array(
 		'default'           => '#ffffff',
 		'sanitize_callback' => 'sanitize_hex_color',
 	) );
-	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'mypco_hero_text_color', array(
-		'label'   => __( 'Hero Text Color', 'mypco-developer' ),
+	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'mypco_hero_headline_color', array(
+		'label'   => __( 'Headline Text Color', 'mypco-developer' ),
+		'section' => 'mypco_hero',
+	) ) );
+
+	// Hero typing words text colour
+	$wp_customize->add_setting( 'mypco_hero_typed_color', array(
+		'default'           => '#ffffff',
+		'sanitize_callback' => 'sanitize_hex_color',
+	) );
+	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'mypco_hero_typed_color', array(
+		'label'   => __( 'Typing Words Text Color', 'mypco-developer' ),
 		'section' => 'mypco_hero',
 	) ) );
 
@@ -241,11 +251,11 @@ function mypco_developer_customize_register( $wp_customize ) {
  */
 function mypco_hero_variation_defaults() {
 	return array(
-		1 => array( 'headline' => 'We craft',   'words' => 'digital experiences,meaningful connections',   'bg_start' => '#4f46e5', 'bg_end' => '#7c3aed' ),
-		2 => array( 'headline' => 'We build',   'words' => 'modern platforms,powerful tools',              'bg_start' => '#059669', 'bg_end' => '#0d9488' ),
-		3 => array( 'headline' => 'We create',  'words' => 'creative solutions,community platforms',       'bg_start' => '#2563eb', 'bg_end' => '#7c3aed' ),
-		4 => array( 'headline' => 'We design',  'words' => 'intuitive interfaces,beautiful systems',       'bg_start' => '#dc2626', 'bg_end' => '#ea580c' ),
-		5 => array( 'headline' => 'We deliver', 'words' => 'real results,lasting impact',                  'bg_start' => '#0891b2', 'bg_end' => '#2563eb' ),
+		1 => array( 'headline' => 'We craft',   'words' => 'digital experiences,meaningful connections',   'bg_start' => '#d97706', 'bg_end' => '#9333ea' ),
+		2 => array( 'headline' => 'We build',   'words' => 'modern platforms,powerful tools',              'bg_start' => '#059669', 'bg_end' => '#0284c7' ),
+		3 => array( 'headline' => 'We create',  'words' => 'creative solutions,community platforms',       'bg_start' => '#4f46e5', 'bg_end' => '#be185d' ),
+		4 => array( 'headline' => 'We design',  'words' => 'intuitive interfaces,beautiful systems',       'bg_start' => '#dc2626', 'bg_end' => '#d97706' ),
+		5 => array( 'headline' => 'We deliver', 'words' => 'real results,lasting impact',                  'bg_start' => '#0891b2', 'bg_end' => '#7c3aed' ),
 	);
 }
 add_action( 'customize_register', 'mypco_developer_customize_register' );

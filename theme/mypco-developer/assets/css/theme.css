@@ -321,7 +321,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* --------------------------------------------------------------------------
-   6. HERO SECTION — Gradient background with typing animation
+   6. HERO SECTION — White-to-color gradient background with typing animation
    -------------------------------------------------------------------------- */
 
 .hero {
@@ -333,8 +333,10 @@ h1, h2, h3, h4, h5, h6 {
 	min-height: 100vh;
 	min-height: 100dvh;
 	padding: 8rem 2.5rem 4rem;
-	background-color: #0a0a0a; /* fallback when no inline gradient */
-	color: #ffffff;
+	/* Layered: white fade on top, diagonal colour gradient beneath */
+	background:
+		linear-gradient(180deg, #ffffff 5%, rgba(255, 255, 255, 0) 50%),
+		linear-gradient(135deg, var(--hero-bg-start, #d97706), var(--hero-bg-end, #9333ea));
 }
 
 .hero__content {
@@ -347,23 +349,20 @@ h1, h2, h3, h4, h5, h6 {
 	font-weight: 800;
 	line-height: 0.95;
 	letter-spacing: -0.03em;
-	color: inherit;
 }
 
 .hero__static {
 	display: block;
 	width: 100%;
 	padding-bottom: 0.1em;
+	color: var(--hero-headline-color, #ffffff);
 }
 
 .hero__typed {
 	display: block;
 	width: 100%;
 	margin-top: 0.15em;
-}
-
-.hero__typed-text {
-	color: inherit;
+	color: var(--hero-typed-color, #ffffff);
 }
 
 .hero__cursor {
@@ -382,7 +381,8 @@ h1, h2, h3, h4, h5, h6 {
 	margin-top: 1.5rem;
 	font-size: clamp(1rem, 2vw, 1.25rem);
 	font-weight: 400;
-	opacity: 0.7;
+	color: var(--hero-typed-color, #ffffff);
+	opacity: 0.8;
 	max-width: 480px;
 }
 
@@ -392,6 +392,7 @@ h1, h2, h3, h4, h5, h6 {
 	bottom: 2.5rem;
 	left: 50%;
 	transform: translateX(-50%);
+	color: var(--hero-typed-color, #ffffff);
 }
 
 .hero__scroll-line {
