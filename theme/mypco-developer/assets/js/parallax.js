@@ -102,13 +102,11 @@
 
 		if ( section ) {
 			const isDark = section.classList.contains( 'section--dark' )
+				|| section.classList.contains( 'hero' )
 				|| section.classList.contains( 'page-hero' )
 				|| section.classList.contains( 'parallax-break' );
 
-			// Hero (light background) should not trigger dark header
-			if ( section.classList.contains( 'hero' ) ) {
-				header.classList.remove( 'site-header--dark' );
-			} else if ( isDark ) {
+			if ( isDark ) {
 				header.classList.add( 'site-header--dark' );
 			} else {
 				header.classList.remove( 'site-header--dark' );

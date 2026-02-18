@@ -7,35 +7,49 @@
 
 get_header();
 
-// Build hero slides data from Customizer settings.
-$slide_count    = absint( get_theme_mod( 'mypco_hero_slide_count', 3 ) );
-$slide_count    = max( 1, min( 5, $slide_count ) );
-$slide_defaults = mypco_hero_slide_defaults();
-$subtitle       = get_theme_mod( 'mypco_hero_subtitle', 'Minimal design. Purposeful technology. Scroll to explore.' );
+// Build hero variations from Customizer settings.
+$variation_count = absint( get_theme_mod( 'mypco_hero_variation_count', 5 ) );
+$variation_count = max( 1, min( 5, $variation_count ) );
+$display_mode    = get_theme_mod( 'mypco_hero_display_mode', 'random' );
+$text_color      = get_theme_mod( 'mypco_hero_text_color', '#ffffff' );
+$subtitle        = get_theme_mod( 'mypco_hero_subtitle', 'Minimal design. Purposeful technology. Scroll to explore.' );
+$var_defaults    = mypco_hero_variation_defaults();
 
-$slides = array();
-for ( $i = 1; $i <= $slide_count; $i++ ) {
-	$d         = $slide_defaults[ $i ];
-	$words_raw = get_theme_mod( "mypco_hero_slide_{$i}_words", $d['words'] );
-	$slides[]  = array(
-		'headline'   => get_theme_mod( "mypco_hero_slide_{$i}_headline", $d['headline'] ),
-		'words'      => array_map( 'trim', explode( ',', $words_raw ) ),
-		'colorStart' => get_theme_mod( "mypco_hero_slide_{$i}_color_start", $d['color_start'] ),
-		'colorEnd'   => get_theme_mod( "mypco_hero_slide_{$i}_color_end", $d['color_end'] ),
+$variations = array();
+for ( $i = 1; $i <= $variation_count; $i++ ) {
+	$d         = $var_defaults[ $i ];
+	$words_raw = get_theme_mod( "mypco_hero_variation_{$i}_words", $d['words'] );
+	$variations[] = array(
+		'headline' => get_theme_mod( "mypco_hero_variation_{$i}_headline", $d['headline'] ),
+		'words'    => array_map( 'trim', explode( ',', $words_raw ) ),
+		'bg_start' => get_theme_mod( "mypco_hero_variation_{$i}_bg_start", $d['bg_start'] ),
+		'bg_end'   => get_theme_mod( "mypco_hero_variation_{$i}_bg_end", $d['bg_end'] ),
 	);
 }
+
+// Select which variation to display.
+if ( 'specific' === $display_mode ) {
+	$active_index = absint( get_theme_mod( 'mypco_hero_default_variation', 1 ) ) - 1;
+	$active_index = max( 0, min( $variation_count - 1, $active_index ) );
+} else {
+	$active_index = wp_rand( 0, $variation_count - 1 );
+}
+
+$active      = $variations[ $active_index ];
+$words_array = $active['words'];
+$bg_gradient = sprintf( 'linear-gradient(135deg, %s, %s)', $active['bg_start'], $active['bg_end'] );
 ?>
 
 <!-- ============================================
-     SECTION 1 — Hero with rotating headlines & typing animation
+     SECTION 1 — Hero with typing animation
      ============================================ -->
-<section class="hero" id="hero">
+<section class="hero" id="hero"
+	style="background: <?php echo esc_attr( $bg_gradient ); ?>; color: <?php echo esc_attr( $text_color ); ?>;">
 	<div class="hero__content">
-		<h1 class="hero__headline" id="hero-rotator"
-			data-slides="<?php echo esc_attr( wp_json_encode( $slides ) ); ?>">
-			<span class="hero__static" id="hero-headline"><?php echo esc_html( $slides[0]['headline'] ); ?></span>
-			<span class="hero__typed">
-				<span class="hero__typed-text" id="hero-typed-text"></span><span class="hero__cursor">|</span>
+		<h1 class="hero__headline">
+			<span class="hero__static"><?php echo esc_html( $active['headline'] ); ?></span>
+			<span class="hero__typed" id="typed-output" data-words="<?php echo esc_attr( wp_json_encode( $words_array ) ); ?>">
+				<span class="hero__typed-text"></span><span class="hero__cursor">|</span>
 			</span>
 		</h1>
 		<p class="hero__subtitle reveal" data-reveal-delay="600"><?php echo esc_html( $subtitle ); ?></p>
