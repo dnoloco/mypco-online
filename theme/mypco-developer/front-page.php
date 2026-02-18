@@ -8,23 +8,19 @@
 get_header();
 
 // Build hero variations from Customizer settings.
-$variation_count  = absint( get_theme_mod( 'mypco_hero_variation_count', 5 ) );
-$variation_count  = max( 1, min( 5, $variation_count ) );
-$display_mode     = get_theme_mod( 'mypco_hero_display_mode', 'random' );
-$headline_color   = get_theme_mod( 'mypco_hero_headline_color', '#ffffff' );
-$typed_color      = get_theme_mod( 'mypco_hero_typed_color', '#ffffff' );
-$subtitle         = get_theme_mod( 'mypco_hero_subtitle', 'Minimal design. Purposeful technology. Scroll to explore.' );
-$var_defaults     = mypco_hero_variation_defaults();
+$variation_count = absint( get_theme_mod( 'mypco_hero_variation_count', 5 ) );
+$variation_count = max( 1, min( 5, $variation_count ) );
+$display_mode    = get_theme_mod( 'mypco_hero_display_mode', 'random' );
+$headline_color  = get_theme_mod( 'mypco_hero_headline_color', '#1a1a1a' );
+$subtitle_color  = get_theme_mod( 'mypco_hero_subtitle_color', '#1a1a1a' );
+$var_defaults    = mypco_hero_variation_defaults();
 
 $variations = array();
 for ( $i = 1; $i <= $variation_count; $i++ ) {
-	$d         = $var_defaults[ $i ];
-	$words_raw = get_theme_mod( "mypco_hero_variation_{$i}_words", $d['words'] );
+	$d = $var_defaults[ $i ];
 	$variations[] = array(
 		'headline' => get_theme_mod( "mypco_hero_variation_{$i}_headline", $d['headline'] ),
-		'words'    => array_map( 'trim', explode( ',', $words_raw ) ),
-		'bg_start' => get_theme_mod( "mypco_hero_variation_{$i}_bg_start", $d['bg_start'] ),
-		'bg_end'   => get_theme_mod( "mypco_hero_variation_{$i}_bg_end", $d['bg_end'] ),
+		'subtitle' => get_theme_mod( "mypco_hero_variation_{$i}_subtitle", $d['subtitle'] ),
 	);
 }
 
@@ -36,23 +32,21 @@ if ( 'specific' === $display_mode ) {
 	$active_index = wp_rand( 0, $variation_count - 1 );
 }
 
-$active      = $variations[ $active_index ];
-$words_array = $active['words'];
+$active = $variations[ $active_index ];
 ?>
 
 <!-- ============================================
-     SECTION 1 — Hero with typing animation
+     SECTION 1 — Hero with typing headline
      ============================================ -->
 <section class="hero" id="hero"
-	style="--hero-bg-start: <?php echo esc_attr( $active['bg_start'] ); ?>; --hero-bg-end: <?php echo esc_attr( $active['bg_end'] ); ?>; --hero-headline-color: <?php echo esc_attr( $headline_color ); ?>; --hero-typed-color: <?php echo esc_attr( $typed_color ); ?>;">
+	style="--hero-headline-color: <?php echo esc_attr( $headline_color ); ?>; --hero-subtitle-color: <?php echo esc_attr( $subtitle_color ); ?>;">
 	<div class="hero__content">
-		<h1 class="hero__headline">
-			<span class="hero__static"><?php echo esc_html( $active['headline'] ); ?></span>
-			<span class="hero__typed" id="typed-output" data-words="<?php echo esc_attr( wp_json_encode( $words_array ) ); ?>">
-				<span class="hero__typed-text"></span><span class="hero__cursor">|</span>
-			</span>
+		<h1 class="hero__headline" id="typed-output"
+			data-headline="<?php echo esc_attr( $active['headline'] ); ?>">
+			<span class="hero__typed-text"></span><span class="hero__cursor">|</span>
 		</h1>
-		<p class="hero__subtitle reveal" data-reveal-delay="600"><?php echo esc_html( $subtitle ); ?></p>
+		<hr class="hero__divider">
+		<p class="hero__subtitle"><?php echo esc_html( $active['subtitle'] ); ?></p>
 	</div>
 
 	<div class="hero__scroll-indicator">
