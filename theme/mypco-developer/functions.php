@@ -48,10 +48,10 @@ add_action( 'after_setup_theme', 'mypco_developer_setup' );
  * Enqueue scripts and styles.
  */
 function mypco_developer_scripts() {
-	// Google Fonts — Inter
+	// Google Fonts — Inter + DM Sans (hero)
 	wp_enqueue_style(
 		'mypco-developer-fonts',
-		'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap',
+		'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&display=swap',
 		array(),
 		null
 	);
@@ -166,7 +166,7 @@ function mypco_developer_customize_register( $wp_customize ) {
 
 	// Hero headline text colour
 	$wp_customize->add_setting( 'mypco_hero_headline_color', array(
-		'default'           => '#ffffff',
+		'default'           => '#1a1a1a',
 		'sanitize_callback' => 'sanitize_hex_color',
 	) );
 	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'mypco_hero_headline_color', array(
@@ -174,13 +174,13 @@ function mypco_developer_customize_register( $wp_customize ) {
 		'section' => 'mypco_hero',
 	) ) );
 
-	// Hero typing words text colour
-	$wp_customize->add_setting( 'mypco_hero_typed_color', array(
-		'default'           => '#ffffff',
+	// Hero subtitle text colour
+	$wp_customize->add_setting( 'mypco_hero_subtitle_color', array(
+		'default'           => '#1a1a1a',
 		'sanitize_callback' => 'sanitize_hex_color',
 	) );
-	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'mypco_hero_typed_color', array(
-		'label'   => __( 'Typing Words Text Color', 'mypco-developer' ),
+	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'mypco_hero_subtitle_color', array(
+		'label'   => __( 'Subtitle Text Color', 'mypco-developer' ),
 		'section' => 'mypco_hero',
 	) ) );
 
@@ -190,7 +190,7 @@ function mypco_developer_customize_register( $wp_customize ) {
 	for ( $i = 1; $i <= 5; $i++ ) {
 		$d = $var_defaults[ $i ];
 
-		// Headline
+		// Headline (typed)
 		$wp_customize->add_setting( "mypco_hero_variation_{$i}_headline", array(
 			'default'           => $d['headline'],
 			'sanitize_callback' => 'sanitize_text_field',
@@ -201,49 +201,17 @@ function mypco_developer_customize_register( $wp_customize ) {
 			'type'    => 'text',
 		) );
 
-		// Typing words
-		$wp_customize->add_setting( "mypco_hero_variation_{$i}_words", array(
-			'default'           => $d['words'],
+		// Subtitle
+		$wp_customize->add_setting( "mypco_hero_variation_{$i}_subtitle", array(
+			'default'           => $d['subtitle'],
 			'sanitize_callback' => 'sanitize_text_field',
 		) );
-		$wp_customize->add_control( "mypco_hero_variation_{$i}_words", array(
-			'label'       => sprintf( __( 'Variation %d — Typing Words', 'mypco-developer' ), $i ),
-			'section'     => 'mypco_hero',
-			'type'        => 'textarea',
-			'description' => __( 'Comma-separated words for the typing animation.', 'mypco-developer' ),
-		) );
-
-		// Background gradient start colour
-		$wp_customize->add_setting( "mypco_hero_variation_{$i}_bg_start", array(
-			'default'           => $d['bg_start'],
-			'sanitize_callback' => 'sanitize_hex_color',
-		) );
-		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "mypco_hero_variation_{$i}_bg_start", array(
-			'label'   => sprintf( __( 'Variation %d — Background Gradient Start', 'mypco-developer' ), $i ),
+		$wp_customize->add_control( "mypco_hero_variation_{$i}_subtitle", array(
+			'label'   => sprintf( __( 'Variation %d — Subtitle', 'mypco-developer' ), $i ),
 			'section' => 'mypco_hero',
-		) ) );
-
-		// Background gradient end colour
-		$wp_customize->add_setting( "mypco_hero_variation_{$i}_bg_end", array(
-			'default'           => $d['bg_end'],
-			'sanitize_callback' => 'sanitize_hex_color',
+			'type'    => 'text',
 		) );
-		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "mypco_hero_variation_{$i}_bg_end", array(
-			'label'   => sprintf( __( 'Variation %d — Background Gradient End', 'mypco-developer' ), $i ),
-			'section' => 'mypco_hero',
-		) ) );
 	}
-
-	// Hero subtitle
-	$wp_customize->add_setting( 'mypco_hero_subtitle', array(
-		'default'           => 'Minimal design. Purposeful technology. Scroll to explore.',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'mypco_hero_subtitle', array(
-		'label'   => __( 'Hero Subtitle', 'mypco-developer' ),
-		'section' => 'mypco_hero',
-		'type'    => 'text',
-	) );
 }
 
 /**
@@ -251,11 +219,11 @@ function mypco_developer_customize_register( $wp_customize ) {
  */
 function mypco_hero_variation_defaults() {
 	return array(
-		1 => array( 'headline' => 'We craft',   'words' => 'digital experiences,meaningful connections',   'bg_start' => '#d97706', 'bg_end' => '#9333ea' ),
-		2 => array( 'headline' => 'We build',   'words' => 'modern platforms,powerful tools',              'bg_start' => '#059669', 'bg_end' => '#0284c7' ),
-		3 => array( 'headline' => 'We create',  'words' => 'creative solutions,community platforms',       'bg_start' => '#4f46e5', 'bg_end' => '#be185d' ),
-		4 => array( 'headline' => 'We design',  'words' => 'intuitive interfaces,beautiful systems',       'bg_start' => '#dc2626', 'bg_end' => '#d97706' ),
-		5 => array( 'headline' => 'We deliver', 'words' => 'real results,lasting impact',                  'bg_start' => '#0891b2', 'bg_end' => '#7c3aed' ),
+		1 => array( 'headline' => 'unlock',    'subtitle' => 'the another angle.' ),
+		2 => array( 'headline' => 'discover',  'subtitle' => 'what matters most.' ),
+		3 => array( 'headline' => 'explore',   'subtitle' => 'new possibilities.' ),
+		4 => array( 'headline' => 'create',    'subtitle' => 'something meaningful.' ),
+		5 => array( 'headline' => 'build',     'subtitle' => 'lasting connections.' ),
 	);
 }
 add_action( 'customize_register', 'mypco_developer_customize_register' );

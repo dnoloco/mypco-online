@@ -321,7 +321,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* --------------------------------------------------------------------------
-   6. HERO SECTION — White-to-color gradient background with typing animation
+   6. HERO SECTION — Typed headline + subtitle
    -------------------------------------------------------------------------- */
 
 .hero {
@@ -333,36 +333,20 @@ h1, h2, h3, h4, h5, h6 {
 	min-height: 100vh;
 	min-height: 100dvh;
 	padding: 8rem 2.5rem 4rem;
-	/* Layered: white fade on top, diagonal colour gradient beneath */
-	background:
-		linear-gradient(180deg, #ffffff 5%, rgba(255, 255, 255, 0) 50%),
-		linear-gradient(135deg, var(--hero-bg-start, #d97706), var(--hero-bg-end, #9333ea));
+	background-color: #edebe6;
 }
 
 .hero__content {
 	width: 100%;
-	margin: 0 auto;
 }
 
 .hero__headline {
-	font-size: clamp(2.5rem, 7vw, 6rem);
-	font-weight: 800;
-	line-height: 0.95;
-	letter-spacing: -0.03em;
-}
-
-.hero__static {
-	display: block;
-	width: 100%;
-	padding-bottom: 0.1em;
-	color: var(--hero-headline-color, #ffffff);
-}
-
-.hero__typed {
-	display: block;
-	width: 100%;
-	margin-top: 0.15em;
-	color: var(--hero-typed-color, #ffffff);
+	font-family: 'DM Sans', sans-serif;
+	font-size: clamp(3.5rem, 11vw, 12rem);
+	font-weight: 400;
+	line-height: 1;
+	letter-spacing: -0.02em;
+	color: var(--hero-headline-color, #1a1a1a);
 }
 
 .hero__cursor {
@@ -370,6 +354,12 @@ h1, h2, h3, h4, h5, h6 {
 	font-weight: 300;
 	animation: cursorBlink 0.8s steps(1) infinite;
 	margin-left: 2px;
+	transition: opacity 0.5s ease;
+}
+
+.hero__cursor--hidden {
+	opacity: 0;
+	animation: none;
 }
 
 @keyframes cursorBlink {
@@ -377,13 +367,19 @@ h1, h2, h3, h4, h5, h6 {
 	50% { opacity: 0; }
 }
 
+.hero__divider {
+	width: 100%;
+	border: none;
+	border-top: 1px solid var(--hero-headline-color, #1a1a1a);
+	margin: 0.4em 0 0.4em;
+}
+
 .hero__subtitle {
-	margin-top: 1.5rem;
-	font-size: clamp(1rem, 2vw, 1.25rem);
+	font-family: 'DM Sans', sans-serif;
+	font-size: clamp(1.125rem, 2.5vw, 1.5rem);
 	font-weight: 400;
-	color: var(--hero-typed-color, #ffffff);
-	opacity: 0.8;
-	max-width: 480px;
+	line-height: 1.4;
+	color: var(--hero-subtitle-color, #1a1a1a);
 }
 
 /* Scroll indicator */
@@ -392,7 +388,7 @@ h1, h2, h3, h4, h5, h6 {
 	bottom: 2.5rem;
 	left: 50%;
 	transform: translateX(-50%);
-	color: var(--hero-typed-color, #ffffff);
+	color: var(--hero-headline-color, #1a1a1a);
 }
 
 .hero__scroll-line {
@@ -1043,10 +1039,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media (max-width: 479px) {
-	.hero__headline {
-		font-size: 2.25rem;
-	}
-
 	.section__heading {
 		font-size: 1.75rem;
 	}
