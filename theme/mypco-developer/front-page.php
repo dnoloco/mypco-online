@@ -8,12 +8,13 @@
 get_header();
 
 // Build hero variations from Customizer settings.
-$variation_count = absint( get_theme_mod( 'mypco_hero_variation_count', 5 ) );
-$variation_count = max( 1, min( 5, $variation_count ) );
-$display_mode    = get_theme_mod( 'mypco_hero_display_mode', 'random' );
-$text_color      = get_theme_mod( 'mypco_hero_text_color', '#ffffff' );
-$subtitle        = get_theme_mod( 'mypco_hero_subtitle', 'Minimal design. Purposeful technology. Scroll to explore.' );
-$var_defaults    = mypco_hero_variation_defaults();
+$variation_count  = absint( get_theme_mod( 'mypco_hero_variation_count', 5 ) );
+$variation_count  = max( 1, min( 5, $variation_count ) );
+$display_mode     = get_theme_mod( 'mypco_hero_display_mode', 'random' );
+$headline_color   = get_theme_mod( 'mypco_hero_headline_color', '#ffffff' );
+$typed_color      = get_theme_mod( 'mypco_hero_typed_color', '#ffffff' );
+$subtitle         = get_theme_mod( 'mypco_hero_subtitle', 'Minimal design. Purposeful technology. Scroll to explore.' );
+$var_defaults     = mypco_hero_variation_defaults();
 
 $variations = array();
 for ( $i = 1; $i <= $variation_count; $i++ ) {
@@ -37,14 +38,13 @@ if ( 'specific' === $display_mode ) {
 
 $active      = $variations[ $active_index ];
 $words_array = $active['words'];
-$bg_gradient = sprintf( 'linear-gradient(135deg, %s, %s)', $active['bg_start'], $active['bg_end'] );
 ?>
 
 <!-- ============================================
      SECTION 1 — Hero with typing animation
      ============================================ -->
 <section class="hero" id="hero"
-	style="background: <?php echo esc_attr( $bg_gradient ); ?>; color: <?php echo esc_attr( $text_color ); ?>;">
+	style="--hero-bg-start: <?php echo esc_attr( $active['bg_start'] ); ?>; --hero-bg-end: <?php echo esc_attr( $active['bg_end'] ); ?>; --hero-headline-color: <?php echo esc_attr( $headline_color ); ?>; --hero-typed-color: <?php echo esc_attr( $typed_color ); ?>;">
 	<div class="hero__content">
 		<h1 class="hero__headline">
 			<span class="hero__static"><?php echo esc_html( $active['headline'] ); ?></span>
