@@ -321,7 +321,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* --------------------------------------------------------------------------
-   6. HERO SECTION — Rotating headlines with gradient text
+   6. HERO SECTION — Gradient background with typing animation
    -------------------------------------------------------------------------- */
 
 .hero {
@@ -333,7 +333,8 @@ h1, h2, h3, h4, h5, h6 {
 	min-height: 100vh;
 	min-height: 100dvh;
 	padding: 8rem 2.5rem 4rem;
-	background-color: #ffffff;
+	background-color: #0a0a0a; /* fallback when no inline gradient */
+	color: #ffffff;
 }
 
 .hero__content {
@@ -342,41 +343,19 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .hero__headline {
-	--hero-gradient: linear-gradient(90deg, #6366f1, #ec4899);
-	--hero-color-end: #ec4899;
-
 	font-size: clamp(2.5rem, 7vw, 6rem);
 	font-weight: 800;
 	line-height: 0.95;
 	letter-spacing: -0.03em;
+	color: inherit;
 }
 
-/* Static headline — gradient text */
 .hero__static {
 	display: block;
 	width: 100%;
-	background: var(--hero-gradient);
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
-	background-clip: text;
-	transition: opacity 0.5s ease, transform 0.5s ease;
 	padding-bottom: 0.1em;
 }
 
-/* Fade-out state */
-.hero__static--fading {
-	opacity: 0;
-	transform: translateY(-16px);
-}
-
-/* Entry state (applied for one frame then removed to trigger transition) */
-.hero__static--entering {
-	opacity: 0;
-	transform: translateY(16px);
-	transition: none;
-}
-
-/* Typed row — gradient text */
 .hero__typed {
 	display: block;
 	width: 100%;
@@ -384,16 +363,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .hero__typed-text {
-	background: var(--hero-gradient);
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
-	background-clip: text;
+	color: inherit;
 }
 
 .hero__cursor {
 	display: inline-block;
 	font-weight: 300;
-	color: var(--hero-color-end, #ec4899);
 	animation: cursorBlink 0.8s steps(1) infinite;
 	margin-left: 2px;
 }
@@ -407,7 +382,7 @@ h1, h2, h3, h4, h5, h6 {
 	margin-top: 1.5rem;
 	font-size: clamp(1rem, 2vw, 1.25rem);
 	font-weight: 400;
-	color: #888888;
+	opacity: 0.7;
 	max-width: 480px;
 }
 
@@ -422,7 +397,7 @@ h1, h2, h3, h4, h5, h6 {
 .hero__scroll-line {
 	width: 1px;
 	height: 60px;
-	background: linear-gradient(to bottom, #0a0a0a, transparent);
+	background: linear-gradient(to bottom, currentColor, transparent);
 	animation: scrollPulse 2s ease-in-out infinite;
 }
 
