@@ -4,7 +4,7 @@
  * Handles opening/closing the full-screen overlay menu,
  * including the hamburger-to-X animation and body scroll lock.
  *
- * @package MyPCO_Developer
+ * @package Simple_Church
  */
 ( function () {
 	'use strict';

@@ -2,7 +2,7 @@
 /**
  * Single post template.
  *
- * @package MyPCO_Developer
+ * @package Simple_Church
  */
 
 get_header();

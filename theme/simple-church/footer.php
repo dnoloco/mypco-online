@@ -2,7 +2,7 @@
 /**
  * Theme footer.
  *
- * @package MyPCO_Developer
+ * @package Simple_Church
  */
 ?>
 </main>
@@ -17,7 +17,7 @@
 			</div>
 
 			<?php if ( has_nav_menu( 'footer' ) ) : ?>
-				<nav class="site-footer__nav" aria-label="<?php esc_attr_e( 'Footer', 'mypco-developer' ); ?>">
+				<nav class="site-footer__nav" aria-label="<?php esc_attr_e( 'Footer', 'simple-church' ); ?>">
 					<?php
 					wp_nav_menu( array(
 						'theme_location' => 'footer',
@@ -32,7 +32,7 @@
 
 		<div class="site-footer__bottom">
 			<p class="site-footer__copy">
-				&copy; <?php echo esc_html( date( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?>. <?php esc_html_e( 'All rights reserved.', 'mypco-developer' ); ?>
+				&copy; <?php echo esc_html( date( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?>. <?php esc_html_e( 'All rights reserved.', 'simple-church' ); ?>
 			</p>
 		</div>
 	</div>
