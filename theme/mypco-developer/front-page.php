@@ -43,7 +43,6 @@ $subtitle_size  = floatval( get_theme_mod( 'mypco_hero_subtitle_size', '2.5' ) )
 $typing_speed     = absint( get_theme_mod( 'mypco_hero_typing_speed', 80 ) );
 $typing_pause     = absint( get_theme_mod( 'mypco_hero_typing_pause', 2000 ) );
 $vertical_offset  = absint( get_theme_mod( 'mypco_hero_vertical_offset', 100 ) );
-$above_line_text  = get_theme_mod( 'mypco_hero_above_line_text', 'Hope begins with Jesus.' );
 $bottom_tagline   = get_theme_mod( 'mypco_hero_bottom_tagline', 'Hope Begins with Jesus.' );
 ?>
 
@@ -59,9 +58,6 @@ $bottom_tagline   = get_theme_mod( 'mypco_hero_bottom_tagline', 'Hope Begins wit
 			data-typing-pause="<?php echo esc_attr( $typing_pause ); ?>">
 			<span class="hero__typed-text"></span><span class="hero__cursor">|</span>
 		</h1>
-		<?php if ( $above_line_text ) : ?>
-			<p class="hero__above-line"><?php echo esc_html( $above_line_text ); ?></p>
-		<?php endif; ?>
 		<hr class="hero__divider">
 		<p class="hero__subtitle"><?php echo esc_html( $active['subtitle'] ); ?></p>
 	</div>
