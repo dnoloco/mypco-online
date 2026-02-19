@@ -247,6 +247,42 @@ function mypco_developer_customize_register( $wp_customize ) {
 		'section' => 'mypco_hero',
 	) ) );
 
+	// ── Layout ──────────────────────────────────────────────────────
+
+	$wp_customize->add_setting( 'mypco_hero_vertical_offset', array(
+		'default'           => 100,
+		'sanitize_callback' => 'absint',
+	) );
+	$wp_customize->add_control( 'mypco_hero_vertical_offset', array(
+		'label'       => __( 'Vertical Offset (px)', 'mypco-developer' ),
+		'section'     => 'mypco_hero',
+		'type'        => 'number',
+		'input_attrs' => array( 'min' => 0, 'max' => 400, 'step' => 10 ),
+		'description' => __( 'Move the headline block upward by this many pixels. Default 100.', 'mypco-developer' ),
+	) );
+
+	$wp_customize->add_setting( 'mypco_hero_above_line_text', array(
+		'default'           => 'Hope begins with Jesus.',
+		'sanitize_callback' => 'sanitize_text_field',
+	) );
+	$wp_customize->add_control( 'mypco_hero_above_line_text', array(
+		'label'       => __( 'Above-Line Text', 'mypco-developer' ),
+		'section'     => 'mypco_hero',
+		'type'        => 'text',
+		'description' => __( 'Text displayed between the headline and the divider line. Leave empty to hide.', 'mypco-developer' ),
+	) );
+
+	$wp_customize->add_setting( 'mypco_hero_bottom_tagline', array(
+		'default'           => 'Hope Begins with Jesus.',
+		'sanitize_callback' => 'sanitize_text_field',
+	) );
+	$wp_customize->add_control( 'mypco_hero_bottom_tagline', array(
+		'label'       => __( 'Bottom Tagline', 'mypco-developer' ),
+		'section'     => 'mypco_hero',
+		'type'        => 'text',
+		'description' => __( 'Centered text at the bottom of the hero, above the scroll indicator. Leave empty to hide.', 'mypco-developer' ),
+	) );
+
 	// ── Typing animation ─────────────────────────────────────────────
 
 	$wp_customize->add_setting( 'mypco_hero_typing_speed', array(

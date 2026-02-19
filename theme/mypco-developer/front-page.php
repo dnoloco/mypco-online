@@ -40,15 +40,18 @@ $headline_font  = get_theme_mod( 'mypco_hero_headline_font', 'DM Sans' );
 $subtitle_font  = get_theme_mod( 'mypco_hero_subtitle_font', 'DM Sans' );
 $headline_size  = floatval( get_theme_mod( 'mypco_hero_headline_size', '11' ) );
 $subtitle_size  = floatval( get_theme_mod( 'mypco_hero_subtitle_size', '2.5' ) );
-$typing_speed   = absint( get_theme_mod( 'mypco_hero_typing_speed', 80 ) );
-$typing_pause   = absint( get_theme_mod( 'mypco_hero_typing_pause', 2000 ) );
+$typing_speed     = absint( get_theme_mod( 'mypco_hero_typing_speed', 80 ) );
+$typing_pause     = absint( get_theme_mod( 'mypco_hero_typing_pause', 2000 ) );
+$vertical_offset  = absint( get_theme_mod( 'mypco_hero_vertical_offset', 100 ) );
+$above_line_text  = get_theme_mod( 'mypco_hero_above_line_text', 'Hope begins with Jesus.' );
+$bottom_tagline   = get_theme_mod( 'mypco_hero_bottom_tagline', 'Hope Begins with Jesus.' );
 ?>
 
 <!-- ============================================
      SECTION 1 — Hero with typing headline
      ============================================ -->
 <section class="hero" id="hero"
-	style="--hero-headline-color: <?php echo esc_attr( $headline_color ); ?>; --hero-subtitle-color: <?php echo esc_attr( $subtitle_color ); ?>; --hero-headline-font: '<?php echo esc_attr( $headline_font ); ?>', sans-serif; --hero-subtitle-font: '<?php echo esc_attr( $subtitle_font ); ?>', sans-serif; --hero-headline-size: <?php echo esc_attr( $headline_size ); ?>vw; --hero-subtitle-size: <?php echo esc_attr( $subtitle_size ); ?>vw;">
+	style="--hero-headline-color: <?php echo esc_attr( $headline_color ); ?>; --hero-subtitle-color: <?php echo esc_attr( $subtitle_color ); ?>; --hero-headline-font: '<?php echo esc_attr( $headline_font ); ?>', sans-serif; --hero-subtitle-font: '<?php echo esc_attr( $subtitle_font ); ?>', sans-serif; --hero-headline-size: <?php echo esc_attr( $headline_size ); ?>vw; --hero-subtitle-size: <?php echo esc_attr( $subtitle_size ); ?>vw; --hero-offset: <?php echo esc_attr( $vertical_offset ); ?>px;">
 	<div class="hero__content">
 		<h1 class="hero__headline" id="typed-output"
 			data-words="<?php echo esc_attr( wp_json_encode( $active['words'] ) ); ?>"
@@ -56,9 +59,18 @@ $typing_pause   = absint( get_theme_mod( 'mypco_hero_typing_pause', 2000 ) );
 			data-typing-pause="<?php echo esc_attr( $typing_pause ); ?>">
 			<span class="hero__typed-text"></span><span class="hero__cursor">|</span>
 		</h1>
+		<?php if ( $above_line_text ) : ?>
+			<p class="hero__above-line"><?php echo esc_html( $above_line_text ); ?></p>
+		<?php endif; ?>
 		<hr class="hero__divider">
 		<p class="hero__subtitle"><?php echo esc_html( $active['subtitle'] ); ?></p>
 	</div>
+
+	<?php if ( $bottom_tagline ) : ?>
+		<div class="hero__bottom-tagline">
+			<p><?php echo esc_html( $bottom_tagline ); ?></p>
+		</div>
+	<?php endif; ?>
 
 	<div class="hero__scroll-indicator">
 		<div class="hero__scroll-line"></div>
