@@ -44,13 +44,16 @@ $typing_speed     = absint( get_theme_mod( 'mypco_hero_typing_speed', 80 ) );
 $typing_pause     = absint( get_theme_mod( 'mypco_hero_typing_pause', 2000 ) );
 $vertical_offset  = absint( get_theme_mod( 'mypco_hero_vertical_offset', 100 ) );
 $bottom_tagline   = get_theme_mod( 'mypco_hero_bottom_tagline', 'Hope Begins with Jesus.' );
+$tagline_font     = get_theme_mod( 'mypco_hero_tagline_font', 'DM Sans' );
+$tagline_size     = floatval( get_theme_mod( 'mypco_hero_tagline_size', '1' ) );
+$tagline_color    = get_theme_mod( 'mypco_hero_tagline_color', '#1a1a1a' );
 ?>
 
 <!-- ============================================
      SECTION 1 — Hero with typing headline
      ============================================ -->
 <section class="hero" id="hero"
-	style="--hero-headline-color: <?php echo esc_attr( $headline_color ); ?>; --hero-subtitle-color: <?php echo esc_attr( $subtitle_color ); ?>; --hero-headline-font: '<?php echo esc_attr( $headline_font ); ?>', sans-serif; --hero-subtitle-font: '<?php echo esc_attr( $subtitle_font ); ?>', sans-serif; --hero-headline-size: <?php echo esc_attr( $headline_size ); ?>vw; --hero-subtitle-size: <?php echo esc_attr( $subtitle_size ); ?>vw; --hero-offset: <?php echo esc_attr( $vertical_offset ); ?>px;">
+	style="--hero-headline-color: <?php echo esc_attr( $headline_color ); ?>; --hero-subtitle-color: <?php echo esc_attr( $subtitle_color ); ?>; --hero-headline-font: '<?php echo esc_attr( $headline_font ); ?>', sans-serif; --hero-subtitle-font: '<?php echo esc_attr( $subtitle_font ); ?>', sans-serif; --hero-headline-size: <?php echo esc_attr( $headline_size ); ?>vw; --hero-subtitle-size: <?php echo esc_attr( $subtitle_size ); ?>vw; --hero-offset: <?php echo esc_attr( $vertical_offset ); ?>px; --hero-tagline-font: '<?php echo esc_attr( $tagline_font ); ?>', sans-serif; --hero-tagline-size: <?php echo esc_attr( $tagline_size ); ?>vw; --hero-tagline-color: <?php echo esc_attr( $tagline_color ); ?>;">
 	<div class="hero__content">
 		<h1 class="hero__headline" id="typed-output"
 			data-words="<?php echo esc_attr( wp_json_encode( $active['words'] ) ); ?>"
