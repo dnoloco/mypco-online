@@ -2,7 +2,7 @@
 /**
  * Main index template — blog listing / fallback.
  *
- * @package MyPCO_Developer
+ * @package Simple_Church
  */
 
 get_header();
@@ -39,8 +39,8 @@ get_header();
 		<?php else : ?>
 
 			<div class="no-content reveal">
-				<h2><?php esc_html_e( 'Nothing here yet.', 'mypco-developer' ); ?></h2>
-				<p><?php esc_html_e( 'Check back soon for new content.', 'mypco-developer' ); ?></p>
+				<h2><?php esc_html_e( 'Nothing here yet.', 'simple-church' ); ?></h2>
+				<p><?php esc_html_e( 'Check back soon for new content.', 'simple-church' ); ?></p>
 			</div>
 
 		<?php endif; ?>

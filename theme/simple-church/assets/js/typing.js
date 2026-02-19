@@ -8,7 +8,7 @@
  * Speed and pause duration are read from data attributes so they can
  * be configured in the WordPress Customizer.
  *
- * @package MyPCO_Developer
+ * @package Simple_Church
  */
 ( function () {
 	'use strict';

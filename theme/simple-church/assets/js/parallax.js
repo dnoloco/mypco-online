@@ -8,7 +8,7 @@
  * - Header shrink/color change on scroll
  * - Header dark/light based on current section background
  *
- * @package MyPCO_Developer
+ * @package Simple_Church
  */
 ( function () {
 	'use strict';
