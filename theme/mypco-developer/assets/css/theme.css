@@ -384,12 +384,12 @@ h1, h2, h3, h4, h5, h6 {
 	left: 0;
 	right: 0;
 	text-align: center;
-	color: var(--hero-subtitle-color, #1a1a1a);
+	color: var(--hero-tagline-color, #1a1a1a);
 }
 
 .hero__bottom-tagline p {
-	font-family: var(--hero-subtitle-font, 'DM Sans', sans-serif);
-	font-size: clamp(0.875rem, 1.2vw, 1rem);
+	font-family: var(--hero-tagline-font, 'DM Sans', sans-serif);
+	font-size: var(--hero-tagline-size, 1vw);
 	font-weight: 400;
 	letter-spacing: 0.02em;
 }

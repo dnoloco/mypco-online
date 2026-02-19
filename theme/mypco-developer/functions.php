@@ -51,16 +51,18 @@ function mypco_developer_scripts() {
 	// Google Fonts — build URL from hero font choices + Inter for body
 	$headline_font = get_theme_mod( 'mypco_hero_headline_font', 'DM Sans' );
 	$subtitle_font = get_theme_mod( 'mypco_hero_subtitle_font', 'DM Sans' );
+	$tagline_font  = get_theme_mod( 'mypco_hero_tagline_font', 'DM Sans' );
 
 	$font_families = array( 'Inter:wght@300;400;500;600;700;800;900' );
+	$loaded_fonts  = array();
 
 	// Map font name → Google Fonts query string
 	$font_map = mypco_hero_font_map();
-	if ( isset( $font_map[ $headline_font ] ) ) {
-		$font_families[] = $font_map[ $headline_font ];
-	}
-	if ( $subtitle_font !== $headline_font && isset( $font_map[ $subtitle_font ] ) ) {
-		$font_families[] = $font_map[ $subtitle_font ];
+	foreach ( array( $headline_font, $subtitle_font, $tagline_font ) as $font_name ) {
+		if ( isset( $font_map[ $font_name ] ) && ! isset( $loaded_fonts[ $font_name ] ) ) {
+			$font_families[] = $font_map[ $font_name ];
+			$loaded_fonts[ $font_name ] = true;
+		}
 	}
 
 	wp_enqueue_style(
@@ -133,13 +135,18 @@ class MyPCO_Overlay_Walker extends Walker_Nav_Menu {
 function mypco_developer_customize_register( $wp_customize ) {
 	$font_choices = mypco_hero_font_choices();
 
-	// Hero section
-	$wp_customize->add_section( 'mypco_hero', array(
+	// ── Hero Panel ──────────────────────────────────────────────────
+	$wp_customize->add_panel( 'mypco_hero_panel', array(
 		'title'    => __( 'Hero Section', 'mypco-developer' ),
 		'priority' => 30,
 	) );
 
-	// ── Variation selection ──────────────────────────────────────────
+	// ── 1. Display Settings ─────────────────────────────────────────
+	$wp_customize->add_section( 'mypco_hero_display', array(
+		'title' => __( 'Display Settings', 'mypco-developer' ),
+		'panel' => 'mypco_hero_panel',
+		'priority' => 10,
+	) );
 
 	$wp_customize->add_setting( 'mypco_hero_display_mode', array(
 		'default'           => 'random',
@@ -147,7 +154,7 @@ function mypco_developer_customize_register( $wp_customize ) {
 	) );
 	$wp_customize->add_control( 'mypco_hero_display_mode', array(
 		'label'   => __( 'Display Mode', 'mypco-developer' ),
-		'section' => 'mypco_hero',
+		'section' => 'mypco_hero_display',
 		'type'    => 'select',
 		'choices' => array(
 			'random'   => __( 'Random on each page load', 'mypco-developer' ),
@@ -161,7 +168,7 @@ function mypco_developer_customize_register( $wp_customize ) {
 	) );
 	$wp_customize->add_control( 'mypco_hero_default_variation', array(
 		'label'       => __( 'Default Variation', 'mypco-developer' ),
-		'section'     => 'mypco_hero',
+		'section'     => 'mypco_hero_display',
 		'type'        => 'select',
 		'choices'     => array( 1 => '1', 2 => '2', 3 => '3', 4 => '4', 5 => '5' ),
 		'description' => __( 'Used when Display Mode is "specific".', 'mypco-developer' ),
@@ -173,21 +180,26 @@ function mypco_developer_customize_register( $wp_customize ) {
 	) );
 	$wp_customize->add_control( 'mypco_hero_variation_count', array(
 		'label'       => __( 'Number of Variations', 'mypco-developer' ),
-		'section'     => 'mypco_hero',
+		'section'     => 'mypco_hero_display',
 		'type'        => 'select',
 		'choices'     => array( 1 => '1', 2 => '2', 3 => '3', 4 => '4', 5 => '5' ),
 		'description' => __( 'How many variations are available.', 'mypco-developer' ),
 	) );
 
-	// ── Headline styling ─────────────────────────────────────────────
+	// ── 2. Headline Styling ─────────────────────────────────────────
+	$wp_customize->add_section( 'mypco_hero_headline', array(
+		'title' => __( 'Headline Styling', 'mypco-developer' ),
+		'panel' => 'mypco_hero_panel',
+		'priority' => 20,
+	) );
 
 	$wp_customize->add_setting( 'mypco_hero_headline_font', array(
 		'default'           => 'DM Sans',
 		'sanitize_callback' => 'sanitize_text_field',
 	) );
 	$wp_customize->add_control( 'mypco_hero_headline_font', array(
-		'label'   => __( 'Headline Font', 'mypco-developer' ),
-		'section' => 'mypco_hero',
+		'label'   => __( 'Font', 'mypco-developer' ),
+		'section' => 'mypco_hero_headline',
 		'type'    => 'select',
 		'choices' => $font_choices,
 	) );
@@ -197,8 +209,8 @@ function mypco_developer_customize_register( $wp_customize ) {
 		'sanitize_callback' => 'sanitize_text_field',
 	) );
 	$wp_customize->add_control( 'mypco_hero_headline_size', array(
-		'label'       => __( 'Headline Size (vw)', 'mypco-developer' ),
-		'section'     => 'mypco_hero',
+		'label'       => __( 'Size (vw)', 'mypco-developer' ),
+		'section'     => 'mypco_hero_headline',
 		'type'        => 'number',
 		'input_attrs' => array( 'min' => 3, 'max' => 20, 'step' => 0.5 ),
 		'description' => __( 'Viewport-width units. 11 is the default.', 'mypco-developer' ),
@@ -209,19 +221,24 @@ function mypco_developer_customize_register( $wp_customize ) {
 		'sanitize_callback' => 'sanitize_hex_color',
 	) );
 	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'mypco_hero_headline_color', array(
-		'label'   => __( 'Headline Text Color', 'mypco-developer' ),
-		'section' => 'mypco_hero',
+		'label'   => __( 'Text Color', 'mypco-developer' ),
+		'section' => 'mypco_hero_headline',
 	) ) );
 
-	// ── Subtitle styling ─────────────────────────────────────────────
+	// ── 3. Subtitle Styling ─────────────────────────────────────────
+	$wp_customize->add_section( 'mypco_hero_subtitle', array(
+		'title' => __( 'Subtitle Styling', 'mypco-developer' ),
+		'panel' => 'mypco_hero_panel',
+		'priority' => 30,
+	) );
 
 	$wp_customize->add_setting( 'mypco_hero_subtitle_font', array(
 		'default'           => 'DM Sans',
 		'sanitize_callback' => 'sanitize_text_field',
 	) );
 	$wp_customize->add_control( 'mypco_hero_subtitle_font', array(
-		'label'   => __( 'Subtitle Font', 'mypco-developer' ),
-		'section' => 'mypco_hero',
+		'label'   => __( 'Font', 'mypco-developer' ),
+		'section' => 'mypco_hero_subtitle',
 		'type'    => 'select',
 		'choices' => $font_choices,
 	) );
@@ -231,8 +248,8 @@ function mypco_developer_customize_register( $wp_customize ) {
 		'sanitize_callback' => 'sanitize_text_field',
 	) );
 	$wp_customize->add_control( 'mypco_hero_subtitle_size', array(
-		'label'       => __( 'Subtitle Size (vw)', 'mypco-developer' ),
-		'section'     => 'mypco_hero',
+		'label'       => __( 'Size (vw)', 'mypco-developer' ),
+		'section'     => 'mypco_hero_subtitle',
 		'type'        => 'number',
 		'input_attrs' => array( 'min' => 1, 'max' => 10, 'step' => 0.25 ),
 		'description' => __( 'Viewport-width units. 2.5 is the default.', 'mypco-developer' ),
@@ -243,22 +260,15 @@ function mypco_developer_customize_register( $wp_customize ) {
 		'sanitize_callback' => 'sanitize_hex_color',
 	) );
 	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'mypco_hero_subtitle_color', array(
-		'label'   => __( 'Subtitle Text Color', 'mypco-developer' ),
-		'section' => 'mypco_hero',
+		'label'   => __( 'Text Color', 'mypco-developer' ),
+		'section' => 'mypco_hero_subtitle',
 	) ) );
 
-	// ── Layout ──────────────────────────────────────────────────────
-
-	$wp_customize->add_setting( 'mypco_hero_vertical_offset', array(
-		'default'           => 100,
-		'sanitize_callback' => 'absint',
-	) );
-	$wp_customize->add_control( 'mypco_hero_vertical_offset', array(
-		'label'       => __( 'Vertical Offset (px)', 'mypco-developer' ),
-		'section'     => 'mypco_hero',
-		'type'        => 'number',
-		'input_attrs' => array( 'min' => 0, 'max' => 400, 'step' => 10 ),
-		'description' => __( 'Move the headline block upward by this many pixels. Default 100.', 'mypco-developer' ),
+	// ── 4. Bottom Tagline ───────────────────────────────────────────
+	$wp_customize->add_section( 'mypco_hero_tagline', array(
+		'title' => __( 'Bottom Tagline', 'mypco-developer' ),
+		'panel' => 'mypco_hero_panel',
+		'priority' => 40,
 	) );
 
 	$wp_customize->add_setting( 'mypco_hero_bottom_tagline', array(
@@ -266,13 +276,69 @@ function mypco_developer_customize_register( $wp_customize ) {
 		'sanitize_callback' => 'sanitize_text_field',
 	) );
 	$wp_customize->add_control( 'mypco_hero_bottom_tagline', array(
-		'label'       => __( 'Bottom Tagline', 'mypco-developer' ),
-		'section'     => 'mypco_hero',
+		'label'       => __( 'Text', 'mypco-developer' ),
+		'section'     => 'mypco_hero_tagline',
 		'type'        => 'text',
-		'description' => __( 'Centered text at the bottom of the hero, above the scroll indicator. Leave empty to hide.', 'mypco-developer' ),
+		'description' => __( 'Centered text above the scroll indicator. Leave empty to hide.', 'mypco-developer' ),
 	) );
 
-	// ── Typing animation ─────────────────────────────────────────────
+	$wp_customize->add_setting( 'mypco_hero_tagline_font', array(
+		'default'           => 'DM Sans',
+		'sanitize_callback' => 'sanitize_text_field',
+	) );
+	$wp_customize->add_control( 'mypco_hero_tagline_font', array(
+		'label'   => __( 'Font', 'mypco-developer' ),
+		'section' => 'mypco_hero_tagline',
+		'type'    => 'select',
+		'choices' => $font_choices,
+	) );
+
+	$wp_customize->add_setting( 'mypco_hero_tagline_size', array(
+		'default'           => '1',
+		'sanitize_callback' => 'sanitize_text_field',
+	) );
+	$wp_customize->add_control( 'mypco_hero_tagline_size', array(
+		'label'       => __( 'Size (vw)', 'mypco-developer' ),
+		'section'     => 'mypco_hero_tagline',
+		'type'        => 'number',
+		'input_attrs' => array( 'min' => 0.5, 'max' => 5, 'step' => 0.25 ),
+		'description' => __( 'Viewport-width units. 1 is the default.', 'mypco-developer' ),
+	) );
+
+	$wp_customize->add_setting( 'mypco_hero_tagline_color', array(
+		'default'           => '#1a1a1a',
+		'sanitize_callback' => 'sanitize_hex_color',
+	) );
+	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'mypco_hero_tagline_color', array(
+		'label'   => __( 'Text Color', 'mypco-developer' ),
+		'section' => 'mypco_hero_tagline',
+	) ) );
+
+	// ── 5. Layout ───────────────────────────────────────────────────
+	$wp_customize->add_section( 'mypco_hero_layout', array(
+		'title' => __( 'Layout', 'mypco-developer' ),
+		'panel' => 'mypco_hero_panel',
+		'priority' => 50,
+	) );
+
+	$wp_customize->add_setting( 'mypco_hero_vertical_offset', array(
+		'default'           => 100,
+		'sanitize_callback' => 'absint',
+	) );
+	$wp_customize->add_control( 'mypco_hero_vertical_offset', array(
+		'label'       => __( 'Vertical Offset (px)', 'mypco-developer' ),
+		'section'     => 'mypco_hero_layout',
+		'type'        => 'number',
+		'input_attrs' => array( 'min' => 0, 'max' => 400, 'step' => 10 ),
+		'description' => __( 'Move the headline block upward by this many pixels. Default 100.', 'mypco-developer' ),
+	) );
+
+	// ── 6. Typing Animation ─────────────────────────────────────────
+	$wp_customize->add_section( 'mypco_hero_typing', array(
+		'title' => __( 'Typing Animation', 'mypco-developer' ),
+		'panel' => 'mypco_hero_panel',
+		'priority' => 60,
+	) );
 
 	$wp_customize->add_setting( 'mypco_hero_typing_speed', array(
 		'default'           => 80,
@@ -280,7 +346,7 @@ function mypco_developer_customize_register( $wp_customize ) {
 	) );
 	$wp_customize->add_control( 'mypco_hero_typing_speed', array(
 		'label'       => __( 'Typing Speed (ms per character)', 'mypco-developer' ),
-		'section'     => 'mypco_hero',
+		'section'     => 'mypco_hero_typing',
 		'type'        => 'number',
 		'input_attrs' => array( 'min' => 20, 'max' => 300, 'step' => 10 ),
 		'description' => __( 'Lower = faster. Default 80.', 'mypco-developer' ),
@@ -292,13 +358,18 @@ function mypco_developer_customize_register( $wp_customize ) {
 	) );
 	$wp_customize->add_control( 'mypco_hero_typing_pause', array(
 		'label'       => __( 'Pause Before Next Word (ms)', 'mypco-developer' ),
-		'section'     => 'mypco_hero',
+		'section'     => 'mypco_hero_typing',
 		'type'        => 'number',
 		'input_attrs' => array( 'min' => 500, 'max' => 10000, 'step' => 250 ),
 		'description' => __( 'How long the completed word stays visible. Default 2000.', 'mypco-developer' ),
 	) );
 
-	// ── Per-variation content ────────────────────────────────────────
+	// ── 7. Variations ───────────────────────────────────────────────
+	$wp_customize->add_section( 'mypco_hero_variations', array(
+		'title' => __( 'Variations', 'mypco-developer' ),
+		'panel' => 'mypco_hero_panel',
+		'priority' => 70,
+	) );
 
 	$var_defaults = mypco_hero_variation_defaults();
 
@@ -311,7 +382,7 @@ function mypco_developer_customize_register( $wp_customize ) {
 		) );
 		$wp_customize->add_control( "mypco_hero_variation_{$i}_headline", array(
 			'label'       => sprintf( __( 'Variation %d — Headlines', 'mypco-developer' ), $i ),
-			'section'     => 'mypco_hero',
+			'section'     => 'mypco_hero_variations',
 			'type'        => 'textarea',
 			'description' => __( 'Comma-separated words/phrases that cycle in the typing animation.', 'mypco-developer' ),
 		) );
@@ -322,7 +393,7 @@ function mypco_developer_customize_register( $wp_customize ) {
 		) );
 		$wp_customize->add_control( "mypco_hero_variation_{$i}_subtitle", array(
 			'label'   => sprintf( __( 'Variation %d — Subtitle', 'mypco-developer' ), $i ),
-			'section' => 'mypco_hero',
+			'section' => 'mypco_hero_variations',
 			'type'    => 'text',
 		) );
 	}
