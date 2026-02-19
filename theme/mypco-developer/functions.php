@@ -261,17 +261,6 @@ function mypco_developer_customize_register( $wp_customize ) {
 		'description' => __( 'Move the headline block upward by this many pixels. Default 100.', 'mypco-developer' ),
 	) );
 
-	$wp_customize->add_setting( 'mypco_hero_above_line_text', array(
-		'default'           => 'Hope begins with Jesus.',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'mypco_hero_above_line_text', array(
-		'label'       => __( 'Above-Line Text', 'mypco-developer' ),
-		'section'     => 'mypco_hero',
-		'type'        => 'text',
-		'description' => __( 'Text displayed between the headline and the divider line. Leave empty to hide.', 'mypco-developer' ),
-	) );
-
 	$wp_customize->add_setting( 'mypco_hero_bottom_tagline', array(
 		'default'           => 'Hope Begins with Jesus.',
 		'sanitize_callback' => 'sanitize_text_field',
