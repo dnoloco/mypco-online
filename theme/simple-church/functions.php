@@ -463,6 +463,33 @@ function simple_church_hero_variation_defaults() {
 }
 
 /**
+ * Register block pattern categories.
+ */
+function simple_church_register_pattern_categories() {
+	register_block_pattern_category( 'simple-church', array(
+		'label' => __( 'Simple Church', 'simple-church' ),
+	) );
+	register_block_pattern_category( 'simple-church-premium', array(
+		'label' => __( 'Simple Church — Premium', 'simple-church' ),
+	) );
+}
+add_action( 'init', 'simple_church_register_pattern_categories' );
+
+/**
+ * Enqueue the patterns interactive JS (tabs, accordion, stat counters).
+ */
+function simple_church_patterns_scripts() {
+	wp_enqueue_script(
+		'simple-church-patterns',
+		SIMPLE_CHURCH_URI . '/assets/js/patterns.js',
+		array(),
+		SIMPLE_CHURCH_VERSION,
+		true
+	);
+}
+add_action( 'wp_enqueue_scripts', 'simple_church_patterns_scripts' );
+
+/**
  * Disable the admin bar on the front-end for cleaner parallax experience.
  */
 function simple_church_disable_admin_bar_styles() {
