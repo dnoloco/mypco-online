@@ -559,7 +559,8 @@ h1, h2, h3, h4, h5, h6 {
 	overflow: hidden;
 }
 
-.parallax-break__overlay {
+.parallax-break::before {
+	content: "";
 	position: absolute;
 	inset: 0;
 	background: linear-gradient(
@@ -1088,6 +1089,115 @@ h1, h2, h3, h4, h5, h6 {
 
 .no-content p {
 	color: #888888;
+}
+
+/* --------------------------------------------------------------------------
+   19b. BLOCK-EDITOR OVERRIDES
+   When theme sections are built with WordPress group blocks the default
+   wp-block-group padding/margin must be neutralised so our own classes
+   (.section, .card-grid, .split, etc.) control the layout.
+   -------------------------------------------------------------------------- */
+
+.wp-block-group.section,
+.wp-block-group.section__inner,
+.wp-block-group.reveal-group,
+.wp-block-group.card-grid,
+.wp-block-group.card,
+.wp-block-group.split,
+.wp-block-group.split__left,
+.wp-block-group.split__right,
+.wp-block-group.cta,
+.wp-block-group.parallax-break,
+.wp-block-group.parallax-break__content {
+	padding: 0;
+	margin: 0;
+}
+
+/* The card-grid class needs to win over wp-block-group layout */
+.wp-block-group.card-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 2rem;
+	margin-top: 3rem;
+}
+
+@media (min-width: 640px) {
+	.wp-block-group.card-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+/* Ensure parallax-break works as a wp-block-group */
+.wp-block-group.parallax-break {
+	height: 60vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: #1a1a1a;
+	overflow: hidden;
+	position: relative;
+}
+
+.wp-block-group.parallax-break::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		135deg,
+		rgba(10, 10, 10, 0.9) 0%,
+		rgba(30, 30, 30, 0.7) 100%
+	);
+}
+
+/* Quote block inside parallax-break */
+.parallax-break .wp-block-quote.parallax-break__quote,
+.parallax-break .wp-block-quote.parallax-break__quote p {
+	font-size: clamp(1.5rem, 4vw, 2.5rem);
+	font-weight: 300;
+	font-style: italic;
+	color: #ffffff;
+	max-width: 700px;
+	line-height: 1.4;
+	letter-spacing: -0.01em;
+	border: none;
+	padding: 0;
+	margin: 0 auto;
+}
+
+/* Ensure split layout works as wp-block-group */
+.wp-block-group.split {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 3rem;
+}
+
+@media (min-width: 768px) {
+	.wp-block-group.split {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+/* CTA button as wp-block-button */
+.section--cta .wp-block-buttons {
+	justify-content: center;
+}
+
+.section--cta .wp-block-button__link {
+	display: inline-block;
+	padding: 1rem 2.5rem;
+	background: #1a1a1a;
+	color: #ffffff;
+	text-decoration: none;
+	font-weight: 600;
+	font-size: 0.9375rem;
+	border-radius: 0;
+	border: 2px solid #1a1a1a;
+	transition: background 0.3s ease, color 0.3s ease;
+}
+
+.section--cta .wp-block-button__link:hover {
+	background: transparent;
+	color: #1a1a1a;
 }
 
 /* ==========================================================================
