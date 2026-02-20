@@ -7,8 +7,8 @@
  * Keywords: parallax, quote, break, divider, dark
  */
 ?>
-<!-- wp:group {"className":"parallax-break","layout":{"type":"default"}} -->
-<div class="wp-block-group parallax-break">
+<!-- wp:group {"className":"parallax-break","style":{"color":{"background":"#1a1a1a","text":"#ffffff"}},"layout":{"type":"default"}} -->
+<div class="wp-block-group parallax-break" style="background-color:#1a1a1a;color:#ffffff">
 	<!-- wp:group {"className":"parallax-break__content reveal","layout":{"type":"default"}} -->
 	<div class="wp-block-group parallax-break__content reveal">
 		<!-- wp:quote {"className":"parallax-break__quote"} -->

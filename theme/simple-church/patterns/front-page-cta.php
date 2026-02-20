@@ -7,8 +7,8 @@
  * Keywords: cta, call to action, button, contact
  */
 ?>
-<!-- wp:group {"className":"section section--cta","layout":{"type":"default"}} -->
-<div class="wp-block-group section section--cta">
+<!-- wp:group {"className":"section section--cta","style":{"color":{"background":"#f5f5f0","text":"#1a1a1a"}},"layout":{"type":"default"}} -->
+<div class="wp-block-group section section--cta" style="background-color:#f5f5f0;color:#1a1a1a">
 	<!-- wp:group {"className":"section__inner","layout":{"type":"default"}} -->
 	<div class="wp-block-group section__inner">
 		<!-- wp:group {"className":"cta reveal","layout":{"type":"default"}} -->
