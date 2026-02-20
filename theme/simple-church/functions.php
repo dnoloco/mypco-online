@@ -50,6 +50,13 @@ function simple_church_setup() {
 		'overlay'   => __( 'Overlay Menu', 'simple-church' ),
 		'footer'    => __( 'Footer Menu', 'simple-church' ),
 	) );
+
+	// Allow wide and full-width blocks in the editor.
+	add_theme_support( 'align-wide' );
+
+	// Load theme CSS inside the block editor for WYSIWYG styling.
+	add_theme_support( 'editor-styles' );
+	add_editor_style( 'assets/css/theme.css' );
 }
 add_action( 'after_setup_theme', 'simple_church_setup' );
 
@@ -461,6 +468,142 @@ function simple_church_hero_variation_defaults() {
 		5 => array( 'headline' => 'dream,pursue,achieve',     'subtitle' => 'what matters most.' ),
 	);
 }
+
+/**
+ * Shortcode: [simple_church_features]
+ *
+ * Outputs the features / module grid. When the MyPCO Online plugin is active
+ * the cards display live Planning Center data via shortcodes; otherwise they
+ * show generic church feature descriptions.
+ *
+ * Use this inside a Shortcode block on any page (the "Front Page Layout"
+ * pattern already includes it).
+ */
+function simple_church_features_shortcode() {
+	$mypco_active = simple_church_is_mypco_active();
+	ob_start();
+
+	if ( $mypco_active ) :
+	?>
+		<div class="module-grid">
+			<div class="module-card reveal">
+				<div class="module-card__icon">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+				</div>
+				<h3 class="module-card__title"><?php esc_html_e( 'Events', 'simple-church' ); ?></h3>
+				<div class="module-card__text">
+					<?php
+					if ( shortcode_exists( 'mypco_calendar' ) ) {
+						echo do_shortcode( '[mypco_calendar count="3" view="list"]' );
+					} else {
+						echo '<p>' . esc_html__( 'Live events from Planning Center — activate the Calendar module to display.', 'simple-church' ) . '</p>';
+					}
+					?>
+				</div>
+			</div>
+			<div class="module-card reveal">
+				<div class="module-card__icon">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+				</div>
+				<h3 class="module-card__title"><?php esc_html_e( 'Groups', 'simple-church' ); ?></h3>
+				<div class="module-card__text">
+					<?php
+					if ( shortcode_exists( 'mypco_groups' ) ) {
+						echo do_shortcode( '[mypco_groups count="3"]' );
+					} else {
+						echo '<p>' . esc_html__( 'Community groups from Planning Center — activate the Groups module to display.', 'simple-church' ) . '</p>';
+					}
+					?>
+				</div>
+			</div>
+			<div class="module-card reveal">
+				<div class="module-card__icon">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+				</div>
+				<h3 class="module-card__title"><?php esc_html_e( 'Messages', 'simple-church' ); ?></h3>
+				<div class="module-card__text">
+					<?php
+					if ( shortcode_exists( 'mypco_messages' ) ) {
+						echo do_shortcode( '[mypco_messages count="3" view="list"]' );
+					} else {
+						echo '<p>' . esc_html__( 'Sermon archives from Planning Center — activate the Series module to display.', 'simple-church' ) . '</p>';
+					}
+					?>
+				</div>
+			</div>
+			<div class="module-card reveal">
+				<div class="module-card__icon">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+				</div>
+				<h3 class="module-card__title"><?php esc_html_e( 'Services', 'simple-church' ); ?></h3>
+				<p class="module-card__text"><?php esc_html_e( 'Service planning, volunteer management, and scheduling powered by Planning Center.', 'simple-church' ); ?></p>
+			</div>
+			<div class="module-card reveal">
+				<div class="module-card__icon">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+				</div>
+				<h3 class="module-card__title"><?php esc_html_e( 'Registrations', 'simple-church' ); ?></h3>
+				<p class="module-card__text"><?php esc_html_e( 'Event registration with integrated payment processing via Planning Center.', 'simple-church' ); ?></p>
+			</div>
+			<div class="module-card reveal">
+				<div class="module-card__icon">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+				</div>
+				<h3 class="module-card__title"><?php esc_html_e( 'Communication', 'simple-church' ); ?></h3>
+				<p class="module-card__text"><?php esc_html_e( 'Stay connected with your community through integrated messaging and outreach tools.', 'simple-church' ); ?></p>
+			</div>
+		</div>
+	<?php else : ?>
+		<div class="module-grid">
+			<div class="module-card reveal">
+				<div class="module-card__icon">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+				</div>
+				<h3 class="module-card__title"><?php esc_html_e( 'Events', 'simple-church' ); ?></h3>
+				<p class="module-card__text"><?php esc_html_e( 'Share upcoming events, services, and gatherings with your congregation.', 'simple-church' ); ?></p>
+			</div>
+			<div class="module-card reveal">
+				<div class="module-card__icon">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+				</div>
+				<h3 class="module-card__title"><?php esc_html_e( 'Groups', 'simple-church' ); ?></h3>
+				<p class="module-card__text"><?php esc_html_e( 'Help people find and join community groups where they can belong and grow.', 'simple-church' ); ?></p>
+			</div>
+			<div class="module-card reveal">
+				<div class="module-card__icon">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+				</div>
+				<h3 class="module-card__title"><?php esc_html_e( 'Messages', 'simple-church' ); ?></h3>
+				<p class="module-card__text"><?php esc_html_e( 'Share sermon archives organised by series, speakers, and topics.', 'simple-church' ); ?></p>
+			</div>
+			<div class="module-card reveal">
+				<div class="module-card__icon">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+				</div>
+				<h3 class="module-card__title"><?php esc_html_e( 'Worship', 'simple-church' ); ?></h3>
+				<p class="module-card__text"><?php esc_html_e( 'Plan services, coordinate volunteers, and schedule teams with ease.', 'simple-church' ); ?></p>
+			</div>
+			<div class="module-card reveal">
+				<div class="module-card__icon">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+				</div>
+				<h3 class="module-card__title"><?php esc_html_e( 'Registrations', 'simple-church' ); ?></h3>
+				<p class="module-card__text"><?php esc_html_e( 'Manage event sign-ups and registrations for your church activities.', 'simple-church' ); ?></p>
+			</div>
+			<div class="module-card reveal">
+				<div class="module-card__icon">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+				</div>
+				<h3 class="module-card__title"><?php esc_html_e( 'Communication', 'simple-church' ); ?></h3>
+				<p class="module-card__text"><?php esc_html_e( 'Stay connected with your community through messaging and outreach tools.', 'simple-church' ); ?></p>
+			</div>
+		</div>
+	<?php
+	endif;
+
+	return ob_get_clean();
+}
+add_shortcode( 'simple_church_features', 'simple_church_features_shortcode' );
 
 /**
  * Register block pattern categories.

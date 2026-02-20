@@ -1,10 +1,14 @@
 <?php
 /**
- * Front page template — hero with typing animation + parallax scroll sections.
+ * Front page template — hero with typing animation + editable content below.
  *
- * Standalone by default. When the MyPCO Online plugin is active, the features
- * grid and calendar section pull live data from Planning Center instead of
- * displaying static placeholder content.
+ * The hero section is controlled via the Customiser. Everything below it is
+ * rendered from the page content (block editor), allowing site owners to
+ * freely rearrange, add, or remove sections from Appearance → Editor or by
+ * editing the page assigned as the static front page.
+ *
+ * Tip: Use the "Front Page Layout" block pattern to insert the default set
+ * of sections with one click.
  *
  * @package Simple_Church
  */
@@ -51,9 +55,6 @@ $bottom_tagline   = get_theme_mod( 'simple_church_hero_bottom_tagline', 'Hope Be
 $tagline_font     = get_theme_mod( 'simple_church_hero_tagline_font', 'DM Sans' );
 $tagline_size     = floatval( get_theme_mod( 'simple_church_hero_tagline_size', '1' ) );
 $tagline_color    = get_theme_mod( 'simple_church_hero_tagline_color', '#1a1a1a' );
-
-// Detect whether the MyPCO Online plugin is active.
-$mypco_active = simple_church_is_mypco_active();
 ?>
 
 <!-- ============================================
@@ -83,301 +84,16 @@ $mypco_active = simple_church_is_mypco_active();
 	</div>
 </section>
 
-<!-- ============================================
-     SECTION 2 — Statement (scroll reveal, dark)
-     ============================================ -->
-<section class="section section--dark section--full" id="statement">
-	<div class="section__inner">
-		<div class="reveal-group">
-			<h2 class="section__heading reveal">
-				An approach built on simplicity.
-			</h2>
-			<p class="section__text reveal" data-reveal-delay="200">
-				We believe in stripping away the unnecessary to reveal what matters most.
-				Every pixel serves a purpose. Every interaction is intentional.
-			</p>
-			<p class="section__text reveal" data-reveal-delay="400">
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-				tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-				quis nostrud exercitation ullamco laboris.
-			</p>
-		</div>
-	</div>
-</section>
+<?php
+// ─── Editable page content ──────────────────────────────────────────
+// Everything below the hero comes from the block editor.
+// Go to Pages → (your front page) to add, edit, or rearrange sections.
+if ( have_posts() ) :
+	while ( have_posts() ) :
+		the_post();
+		the_content();
+	endwhile;
+endif;
 
-<!-- ============================================
-     SECTION 3 — Services / capabilities grid
-     ============================================ -->
-<section class="section section--light" id="services">
-	<div class="section__inner">
-		<div class="reveal-group">
-			<span class="section__label reveal"><?php esc_html_e( 'What we do', 'simple-church' ); ?></span>
-			<h2 class="section__heading reveal" data-reveal-delay="100">
-				<?php esc_html_e( 'Capabilities', 'simple-church' ); ?>
-			</h2>
-		</div>
-
-		<div class="card-grid">
-			<div class="card reveal" data-reveal-delay="0">
-				<span class="card__number">01</span>
-				<h3 class="card__title"><?php esc_html_e( 'Worship', 'simple-church' ); ?></h3>
-				<p class="card__text">
-					<?php esc_html_e( 'Gather together for meaningful worship experiences that inspire and encourage your congregation.', 'simple-church' ); ?>
-				</p>
-			</div>
-			<div class="card reveal" data-reveal-delay="100">
-				<span class="card__number">02</span>
-				<h3 class="card__title"><?php esc_html_e( 'Community', 'simple-church' ); ?></h3>
-				<p class="card__text">
-					<?php esc_html_e( 'Build authentic relationships through small groups, outreach programmes, and fellowship opportunities.', 'simple-church' ); ?>
-				</p>
-			</div>
-			<div class="card reveal" data-reveal-delay="200">
-				<span class="card__number">03</span>
-				<h3 class="card__title"><?php esc_html_e( 'Discipleship', 'simple-church' ); ?></h3>
-				<p class="card__text">
-					<?php esc_html_e( 'Equip and empower people to grow in their faith through teaching, mentoring, and resources.', 'simple-church' ); ?>
-				</p>
-			</div>
-			<div class="card reveal" data-reveal-delay="300">
-				<span class="card__number">04</span>
-				<h3 class="card__title"><?php esc_html_e( 'Outreach', 'simple-church' ); ?></h3>
-				<p class="card__text">
-					<?php esc_html_e( 'Serve your local community and beyond with compassion, generosity, and the love of Christ.', 'simple-church' ); ?>
-				</p>
-			</div>
-		</div>
-	</div>
-</section>
-
-<!-- ============================================
-     SECTION 4 — Parallax image break
-     ============================================ -->
-<section class="parallax-break" id="parallax-break">
-	<div class="parallax-break__overlay"></div>
-	<div class="parallax-break__content reveal">
-		<blockquote class="parallax-break__quote">
-			&ldquo;Simplicity is the ultimate sophistication.&rdquo;
-		</blockquote>
-	</div>
-</section>
-
-<!-- ============================================
-     SECTION 5 — About / story (split layout)
-     ============================================ -->
-<section class="section section--light" id="about">
-	<div class="section__inner">
-		<div class="split">
-			<div class="split__left">
-				<span class="section__label reveal"><?php esc_html_e( 'About', 'simple-church' ); ?></span>
-				<h2 class="section__heading reveal" data-reveal-delay="100">
-					<?php esc_html_e( 'Built for communities that value clarity.', 'simple-church' ); ?>
-				</h2>
-			</div>
-			<div class="split__right">
-				<p class="section__text reveal" data-reveal-delay="200">
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia
-					odio vitae vestibulum vestibulum. Cras vehicula, mi eget laoreet venenatis,
-					justo arcu scelerisque mauris, a facilisis nisi tellus vel nulla.
-				</p>
-				<p class="section__text reveal" data-reveal-delay="300">
-					Proin gravida nibh vel velit auctor aliquet. Aenean sollicitudin, lorem quis
-					bibendum auctor, nisi elit consequat ipsum, nec sagittis sem nibh id elit.
-					Duis sed odio sit amet nibh vulputate cursus a sit amet mauris.
-				</p>
-				<a href="#" class="section__link reveal" data-reveal-delay="400"><?php esc_html_e( 'Learn more', 'simple-church' ); ?> &rarr;</a>
-			</div>
-		</div>
-	</div>
-</section>
-
-<!-- ============================================
-     SECTION 6 — Features grid
-     When MyPCO Online is active the static cards are replaced with
-     live shortcode output. Otherwise generic church features display.
-     ============================================ -->
-<section class="section section--dark" id="features">
-	<div class="section__inner">
-		<div class="reveal-group">
-			<span class="section__label reveal"><?php esc_html_e( 'Features', 'simple-church' ); ?></span>
-			<h2 class="section__heading reveal" data-reveal-delay="100">
-				<?php esc_html_e( 'Everything you need, nothing you don\'t.', 'simple-church' ); ?>
-			</h2>
-		</div>
-
-		<?php if ( $mypco_active ) : ?>
-			<!-- ── MyPCO Online is active — render live data ── -->
-			<div class="module-grid">
-				<div class="module-card reveal" data-reveal-delay="0">
-					<div class="module-card__icon">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-							<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-							<line x1="16" y1="2" x2="16" y2="6"/>
-							<line x1="8" y1="2" x2="8" y2="6"/>
-							<line x1="3" y1="10" x2="21" y2="10"/>
-						</svg>
-					</div>
-					<h3 class="module-card__title"><?php esc_html_e( 'Events', 'simple-church' ); ?></h3>
-					<div class="module-card__text">
-						<?php if ( shortcode_exists( 'mypco_calendar' ) ) : ?>
-							<?php echo do_shortcode( '[mypco_calendar count="3" view="list"]' ); ?>
-						<?php else : ?>
-							<p><?php esc_html_e( 'Live events from Planning Center — activate the Calendar module to display.', 'simple-church' ); ?></p>
-						<?php endif; ?>
-					</div>
-				</div>
-				<div class="module-card reveal" data-reveal-delay="100">
-					<div class="module-card__icon">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-							<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-							<circle cx="9" cy="7" r="4"/>
-							<path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-							<path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-						</svg>
-					</div>
-					<h3 class="module-card__title"><?php esc_html_e( 'Groups', 'simple-church' ); ?></h3>
-					<div class="module-card__text">
-						<?php if ( shortcode_exists( 'mypco_groups' ) ) : ?>
-							<?php echo do_shortcode( '[mypco_groups count="3"]' ); ?>
-						<?php else : ?>
-							<p><?php esc_html_e( 'Community groups from Planning Center — activate the Groups module to display.', 'simple-church' ); ?></p>
-						<?php endif; ?>
-					</div>
-				</div>
-				<div class="module-card reveal" data-reveal-delay="200">
-					<div class="module-card__icon">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-							<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-							<path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-						</svg>
-					</div>
-					<h3 class="module-card__title"><?php esc_html_e( 'Messages', 'simple-church' ); ?></h3>
-					<div class="module-card__text">
-						<?php if ( shortcode_exists( 'mypco_messages' ) ) : ?>
-							<?php echo do_shortcode( '[mypco_messages count="3" view="list"]' ); ?>
-						<?php else : ?>
-							<p><?php esc_html_e( 'Sermon archives from Planning Center — activate the Series module to display.', 'simple-church' ); ?></p>
-						<?php endif; ?>
-					</div>
-				</div>
-				<div class="module-card reveal" data-reveal-delay="300">
-					<div class="module-card__icon">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-							<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-						</svg>
-					</div>
-					<h3 class="module-card__title"><?php esc_html_e( 'Services', 'simple-church' ); ?></h3>
-					<p class="module-card__text"><?php esc_html_e( 'Service planning, volunteer management, and scheduling powered by Planning Center.', 'simple-church' ); ?></p>
-				</div>
-				<div class="module-card reveal" data-reveal-delay="400">
-					<div class="module-card__icon">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-							<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-							<polyline points="14 2 14 8 20 8"/>
-							<line x1="16" y1="13" x2="8" y2="13"/>
-							<line x1="16" y1="17" x2="8" y2="17"/>
-						</svg>
-					</div>
-					<h3 class="module-card__title"><?php esc_html_e( 'Registrations', 'simple-church' ); ?></h3>
-					<p class="module-card__text"><?php esc_html_e( 'Event registration with integrated payment processing via Planning Center.', 'simple-church' ); ?></p>
-				</div>
-				<div class="module-card reveal" data-reveal-delay="500">
-					<div class="module-card__icon">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-							<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-						</svg>
-					</div>
-					<h3 class="module-card__title"><?php esc_html_e( 'Communication', 'simple-church' ); ?></h3>
-					<p class="module-card__text"><?php esc_html_e( 'Stay connected with your community through integrated messaging and outreach tools.', 'simple-church' ); ?></p>
-				</div>
-			</div>
-
-		<?php else : ?>
-			<!-- ── Standalone mode — generic church features ── -->
-			<div class="module-grid">
-				<div class="module-card reveal" data-reveal-delay="0">
-					<div class="module-card__icon">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-							<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-							<line x1="16" y1="2" x2="16" y2="6"/>
-							<line x1="8" y1="2" x2="8" y2="6"/>
-							<line x1="3" y1="10" x2="21" y2="10"/>
-						</svg>
-					</div>
-					<h3 class="module-card__title"><?php esc_html_e( 'Events', 'simple-church' ); ?></h3>
-					<p class="module-card__text"><?php esc_html_e( 'Share upcoming events, services, and gatherings with your congregation.', 'simple-church' ); ?></p>
-				</div>
-				<div class="module-card reveal" data-reveal-delay="100">
-					<div class="module-card__icon">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-							<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-							<circle cx="9" cy="7" r="4"/>
-							<path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-							<path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-						</svg>
-					</div>
-					<h3 class="module-card__title"><?php esc_html_e( 'Groups', 'simple-church' ); ?></h3>
-					<p class="module-card__text"><?php esc_html_e( 'Help people find and join community groups where they can belong and grow.', 'simple-church' ); ?></p>
-				</div>
-				<div class="module-card reveal" data-reveal-delay="200">
-					<div class="module-card__icon">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-							<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-							<path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-						</svg>
-					</div>
-					<h3 class="module-card__title"><?php esc_html_e( 'Messages', 'simple-church' ); ?></h3>
-					<p class="module-card__text"><?php esc_html_e( 'Share sermon archives organised by series, speakers, and topics.', 'simple-church' ); ?></p>
-				</div>
-				<div class="module-card reveal" data-reveal-delay="300">
-					<div class="module-card__icon">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-							<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-						</svg>
-					</div>
-					<h3 class="module-card__title"><?php esc_html_e( 'Worship', 'simple-church' ); ?></h3>
-					<p class="module-card__text"><?php esc_html_e( 'Plan services, coordinate volunteers, and schedule teams with ease.', 'simple-church' ); ?></p>
-				</div>
-				<div class="module-card reveal" data-reveal-delay="400">
-					<div class="module-card__icon">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-							<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-							<polyline points="14 2 14 8 20 8"/>
-							<line x1="16" y1="13" x2="8" y2="13"/>
-							<line x1="16" y1="17" x2="8" y2="17"/>
-						</svg>
-					</div>
-					<h3 class="module-card__title"><?php esc_html_e( 'Registrations', 'simple-church' ); ?></h3>
-					<p class="module-card__text"><?php esc_html_e( 'Manage event sign-ups and registrations for your church activities.', 'simple-church' ); ?></p>
-				</div>
-				<div class="module-card reveal" data-reveal-delay="500">
-					<div class="module-card__icon">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-							<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-						</svg>
-					</div>
-					<h3 class="module-card__title"><?php esc_html_e( 'Communication', 'simple-church' ); ?></h3>
-					<p class="module-card__text"><?php esc_html_e( 'Stay connected with your community through messaging and outreach tools.', 'simple-church' ); ?></p>
-				</div>
-			</div>
-		<?php endif; ?>
-
-	</div>
-</section>
-
-<!-- ============================================
-     SECTION 7 — CTA
-     ============================================ -->
-<section class="section section--cta" id="cta">
-	<div class="section__inner">
-		<div class="cta reveal">
-			<h2 class="cta__heading"><?php esc_html_e( 'Ready to get started?', 'simple-church' ); ?></h2>
-			<p class="cta__text">
-				<?php esc_html_e( 'Let us help you build something meaningful for your community.', 'simple-church' ); ?>
-			</p>
-			<a href="#" class="cta__button"><?php esc_html_e( 'Get in touch', 'simple-church' ); ?></a>
-		</div>
-	</div>
-</section>
-
-<?php get_footer(); ?>
+get_footer();
+?>
