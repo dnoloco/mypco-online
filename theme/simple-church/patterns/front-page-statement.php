@@ -13,16 +13,16 @@
 	<div class="wp-block-group section__inner">
 		<!-- wp:group {"className":"reveal-group","layout":{"type":"default"}} -->
 		<div class="wp-block-group reveal-group">
-			<!-- wp:heading {"className":"section__heading reveal"} -->
-			<h2 class="wp-block-heading section__heading reveal">An approach built on simplicity.</h2>
+			<!-- wp:heading {"className":"section__heading reveal","style":{"color":{"text":"#ffffff"}}} -->
+			<h2 class="wp-block-heading section__heading reveal" style="color:#ffffff">An approach built on simplicity.</h2>
 			<!-- /wp:heading -->
 
-			<!-- wp:paragraph {"className":"section__text reveal"} -->
-			<p class="section__text reveal">We believe in stripping away the unnecessary to reveal what matters most. Every pixel serves a purpose. Every interaction is intentional.</p>
+			<!-- wp:paragraph {"className":"section__text reveal","style":{"color":{"text":"#999999"}}} -->
+			<p class="section__text reveal" style="color:#999999">We believe in stripping away the unnecessary to reveal what matters most. Every pixel serves a purpose. Every interaction is intentional.</p>
 			<!-- /wp:paragraph -->
 
-			<!-- wp:paragraph {"className":"section__text reveal"} -->
-			<p class="section__text reveal">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+			<!-- wp:paragraph {"className":"section__text reveal","style":{"color":{"text":"#999999"}}} -->
+			<p class="section__text reveal" style="color:#999999">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
 			<!-- /wp:paragraph -->
 		</div>
 		<!-- /wp:group -->
