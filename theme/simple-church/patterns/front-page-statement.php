@@ -7,8 +7,8 @@
  * Keywords: statement, mission, dark, intro, about
  */
 ?>
-<!-- wp:group {"className":"section section--dark section--full","layout":{"type":"default"}} -->
-<div class="wp-block-group section section--dark section--full">
+<!-- wp:group {"className":"section section--dark section--full","style":{"color":{"background":"#0a0a0a","text":"#ffffff"}},"layout":{"type":"default"}} -->
+<div class="wp-block-group section section--dark section--full" style="background-color:#0a0a0a;color:#ffffff">
 	<!-- wp:group {"className":"section__inner","layout":{"type":"default"}} -->
 	<div class="wp-block-group section__inner">
 		<!-- wp:group {"className":"reveal-group","layout":{"type":"default"}} -->

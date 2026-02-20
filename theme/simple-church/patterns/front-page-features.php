@@ -7,8 +7,8 @@
  * Keywords: features, modules, grid, dark, pco
  */
 ?>
-<!-- wp:group {"className":"section section--dark","layout":{"type":"default"}} -->
-<div class="wp-block-group section section--dark">
+<!-- wp:group {"className":"section section--dark","style":{"color":{"background":"#0a0a0a","text":"#ffffff"}},"layout":{"type":"default"}} -->
+<div class="wp-block-group section section--dark" style="background-color:#0a0a0a;color:#ffffff">
 	<!-- wp:group {"className":"section__inner","layout":{"type":"default"}} -->
 	<div class="wp-block-group section__inner">
 		<!-- wp:group {"className":"reveal-group","layout":{"type":"default"}} -->

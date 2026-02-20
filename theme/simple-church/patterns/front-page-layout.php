@@ -8,8 +8,8 @@
  */
 ?>
 <!-- Statement Section (dark, full-height) -->
-<!-- wp:group {"className":"section section--dark section--full","layout":{"type":"default"}} -->
-<div class="wp-block-group section section--dark section--full">
+<!-- wp:group {"className":"section section--dark section--full","style":{"color":{"background":"#0a0a0a","text":"#ffffff"}},"layout":{"type":"default"}} -->
+<div class="wp-block-group section section--dark section--full" style="background-color:#0a0a0a;color:#ffffff">
 	<!-- wp:group {"className":"section__inner","layout":{"type":"default"}} -->
 	<div class="wp-block-group section__inner">
 		<!-- wp:group {"className":"reveal-group","layout":{"type":"default"}} -->
@@ -122,8 +122,8 @@
 <!-- /wp:group -->
 
 <!-- Parallax Quote Break -->
-<!-- wp:group {"className":"parallax-break","layout":{"type":"default"}} -->
-<div class="wp-block-group parallax-break">
+<!-- wp:group {"className":"parallax-break","style":{"color":{"background":"#1a1a1a","text":"#ffffff"}},"layout":{"type":"default"}} -->
+<div class="wp-block-group parallax-break" style="background-color:#1a1a1a;color:#ffffff">
 	<!-- wp:group {"className":"parallax-break__content reveal","layout":{"type":"default"}} -->
 	<div class="wp-block-group parallax-break__content reveal">
 		<!-- wp:quote {"className":"parallax-break__quote"} -->
@@ -174,8 +174,8 @@
 <!-- /wp:group -->
 
 <!-- Features Grid (dark, PCO-aware via shortcode) -->
-<!-- wp:group {"className":"section section--dark","layout":{"type":"default"}} -->
-<div class="wp-block-group section section--dark">
+<!-- wp:group {"className":"section section--dark","style":{"color":{"background":"#0a0a0a","text":"#ffffff"}},"layout":{"type":"default"}} -->
+<div class="wp-block-group section section--dark" style="background-color:#0a0a0a;color:#ffffff">
 	<!-- wp:group {"className":"section__inner","layout":{"type":"default"}} -->
 	<div class="wp-block-group section__inner">
 		<!-- wp:group {"className":"reveal-group","layout":{"type":"default"}} -->
@@ -195,8 +195,8 @@
 <!-- /wp:group -->
 
 <!-- Call to Action -->
-<!-- wp:group {"className":"section section--cta","layout":{"type":"default"}} -->
-<div class="wp-block-group section section--cta">
+<!-- wp:group {"className":"section section--cta","style":{"color":{"background":"#f5f5f0","text":"#1a1a1a"}},"layout":{"type":"default"}} -->
+<div class="wp-block-group section section--cta" style="background-color:#f5f5f0;color:#1a1a1a">
 	<!-- wp:group {"className":"section__inner","layout":{"type":"default"}} -->
 	<div class="wp-block-group section__inner">
 		<!-- wp:group {"className":"cta reveal","layout":{"type":"default"}} -->
