@@ -493,8 +493,10 @@ function simple_church_features_shortcode() {
 				<h3 class="module-card__title"><?php esc_html_e( 'Events', 'simple-church' ); ?></h3>
 				<div class="module-card__text">
 					<?php
-					if ( shortcode_exists( 'mypco_calendar' ) ) {
-						echo do_shortcode( '[mypco_calendar count="3" view="list"]' );
+					if ( shortcode_exists( 'mypco_featured_event' ) ) {
+						echo do_shortcode( '[mypco_featured_event layout="minimal" show_map="no"]' );
+					} elseif ( shortcode_exists( 'mypco_calendar' ) ) {
+						echo do_shortcode( '[mypco_calendar count="1" view="list"]' );
 					} else {
 						echo '<p>' . esc_html__( 'Live events from Planning Center — activate the Calendar module to display.', 'simple-church' ) . '</p>';
 					}
@@ -509,7 +511,7 @@ function simple_church_features_shortcode() {
 				<div class="module-card__text">
 					<?php
 					if ( shortcode_exists( 'mypco_groups' ) ) {
-						echo do_shortcode( '[mypco_groups count="3"]' );
+						echo do_shortcode( '[mypco_groups count="1"]' );
 					} else {
 						echo '<p>' . esc_html__( 'Community groups from Planning Center — activate the Groups module to display.', 'simple-church' ) . '</p>';
 					}
@@ -524,7 +526,7 @@ function simple_church_features_shortcode() {
 				<div class="module-card__text">
 					<?php
 					if ( shortcode_exists( 'mypco_messages' ) ) {
-						echo do_shortcode( '[mypco_messages count="3" view="list"]' );
+						echo do_shortcode( '[mypco_messages count="1" view="list"]' );
 					} else {
 						echo '<p>' . esc_html__( 'Sermon archives from Planning Center — activate the Series module to display.', 'simple-church' ) . '</p>';
 					}
