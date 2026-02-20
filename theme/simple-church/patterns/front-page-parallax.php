@@ -11,9 +11,9 @@
 <div class="wp-block-group parallax-break" style="background-color:#1a1a1a;color:#ffffff">
 	<!-- wp:group {"className":"parallax-break__content reveal","layout":{"type":"default"}} -->
 	<div class="wp-block-group parallax-break__content reveal">
-		<!-- wp:quote {"className":"parallax-break__quote"} -->
-		<blockquote class="wp-block-quote parallax-break__quote"><!-- wp:paragraph -->
-		<p>&ldquo;Simplicity is the ultimate sophistication.&rdquo;</p>
+		<!-- wp:quote {"className":"parallax-break__quote","style":{"color":{"text":"#ffffff"}}} -->
+		<blockquote class="wp-block-quote parallax-break__quote" style="color:#ffffff"><!-- wp:paragraph {"style":{"color":{"text":"#ffffff"}}} -->
+		<p style="color:#ffffff">&ldquo;Simplicity is the ultimate sophistication.&rdquo;</p>
 		<!-- /wp:paragraph --></blockquote>
 		<!-- /wp:quote -->
 	</div>
