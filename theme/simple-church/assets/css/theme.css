@@ -1116,15 +1116,20 @@ h1, h2, h3, h4, h5, h6 {
 .wp-block-group.card,
 .wp-block-group.split__left,
 .wp-block-group.split__right,
-.wp-block-group.cta,
 .wp-block-group.parallax-break__content {
 	padding: 0;
 	margin: 0;
 }
 
+/* CTA keeps auto-centering */
+.wp-block-group.cta {
+	padding: 0;
+	margin: 0 auto;
+}
+
 /* The card-grid class needs to win over wp-block-group layout */
 .wp-block-group.card-grid {
-	display: grid;
+	display: grid !important;
 	grid-template-columns: 1fr;
 	gap: 2rem;
 	margin-top: 3rem;
@@ -1133,6 +1138,19 @@ h1, h2, h3, h4, h5, h6 {
 @media (min-width: 640px) {
 	.wp-block-group.card-grid {
 		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+/* Contact grid needs to win over wp-block-group layout */
+.wp-block-group.contact-grid {
+	display: grid !important;
+	grid-template-columns: 1fr;
+	gap: 2rem;
+}
+
+@media (min-width: 640px) {
+	.wp-block-group.contact-grid {
+		grid-template-columns: repeat(3, 1fr);
 	}
 }
 
@@ -1175,7 +1193,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Ensure split layout works as wp-block-group */
 .wp-block-group.split {
-	display: grid;
+	display: grid !important;
 	grid-template-columns: 1fr;
 	gap: 3rem;
 }
