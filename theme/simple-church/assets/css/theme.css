@@ -935,6 +935,10 @@ h1, h2, h3, h4, h5, h6 {
 	transform: translateY(0);
 }
 
+/* Optional: Stagger the text lines if they are inside a reveal-group */
+.reveal-group .reveal:nth-child(2) { transition-delay: 0.2s; }
+.reveal-group .reveal:nth-child(3) { transition-delay: 0.4s; }
+
 /* --------------------------------------------------------------------------
    17. FOOTER
    -------------------------------------------------------------------------- */

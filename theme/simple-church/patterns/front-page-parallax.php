@@ -7,12 +7,12 @@
  * Keywords: parallax, quote, break, divider, dark
  */
 ?>
-<!-- wp:group {"className":"parallax-break","layout":{"type":"default"}} -->
-<div class="wp-block-group parallax-break">
+<!-- wp:group {"backgroundColor":"black","textColor":"white","className":"parallax-break","layout":{"type":"default"}} -->
+<div class="wp-block-group parallax-break has-white-color has-text-color has-black-background-color has-background">
 	<!-- wp:group {"className":"parallax-break__content reveal","layout":{"type":"default"}} -->
 	<div class="wp-block-group parallax-break__content reveal">
-		<!-- wp:quote {"className":"parallax-break__quote"} -->
-		<blockquote class="wp-block-quote parallax-break__quote"><!-- wp:paragraph -->
+		<!-- wp:quote {"textColor":"white","className":"parallax-break__quote"} -->
+		<blockquote class="wp-block-quote parallax-break__quote has-white-color has-text-color"><!-- wp:paragraph -->
 		<p>&ldquo;Simplicity is the ultimate sophistication.&rdquo;</p>
 		<!-- /wp:paragraph --></blockquote>
 		<!-- /wp:quote -->
