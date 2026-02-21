@@ -8,17 +8,17 @@
  */
 ?>
 <!-- wp:group {"className":"section section--cta","style":{"color":{"background":"#f5f5f0","text":"#1a1a1a"}},"layout":{"type":"default"}} -->
-<div class="wp-block-group section section--cta" style="background-color:#f5f5f0;color:#1a1a1a">
+<div class="wp-block-group section section--cta has-text-color has-background" style="background-color:#f5f5f0;color:#1a1a1a">
 	<!-- wp:group {"className":"section__inner","layout":{"type":"default"}} -->
 	<div class="wp-block-group section__inner">
 		<!-- wp:group {"className":"cta reveal","layout":{"type":"default"}} -->
 		<div class="wp-block-group cta reveal">
 			<!-- wp:heading {"className":"cta__heading","style":{"color":{"text":"#1a1a1a"}}} -->
-			<h2 class="wp-block-heading cta__heading" style="color:#1a1a1a">Ready to get started?</h2>
+			<h2 class="wp-block-heading cta__heading has-text-color" style="color:#1a1a1a">Ready to get started?</h2>
 			<!-- /wp:heading -->
 
 			<!-- wp:paragraph {"className":"cta__text","style":{"color":{"text":"#1a1a1a"}}} -->
-			<p class="cta__text" style="color:#1a1a1a">Let us help you build something meaningful for your community.</p>
+			<p class="cta__text has-text-color" style="color:#1a1a1a">Let us help you build something meaningful for your community.</p>
 			<!-- /wp:paragraph -->
 
 			<!-- wp:buttons {"layout":{"type":"flex","justifyContent":"center"}} -->
