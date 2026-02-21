@@ -1139,6 +1139,10 @@ h1, h2, h3, h4, h5, h6 {
 	padding: 0;
 }
 
+.section--full .wp-block-group.section__inner {
+	max-width: 720px;
+}
+
 /* Inner structural elements: strip wp-block-group defaults */
 .wp-block-group.reveal-group,
 .wp-block-group.card,
