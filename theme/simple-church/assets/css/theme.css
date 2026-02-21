@@ -1102,6 +1102,16 @@ h1, h2, h3, h4, h5, h6 {
    (.section, .card-grid, .split, etc.) control the layout.
    -------------------------------------------------------------------------- */
 
+/*
+ * The .reveal class sets opacity:0 for the scroll-reveal animation.
+ * The block editor does NOT run our IntersectionObserver JS, so .reveal--visible
+ * is never added — text stays invisible. Override this inside the editor.
+ */
+.editor-styles-wrapper .reveal {
+	opacity: 1;
+	transform: none;
+}
+
 /* Sections keep their own padding — just remove wp-block-group defaults */
 .wp-block-group.section {
 	box-sizing: border-box;
