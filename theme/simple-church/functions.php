@@ -83,7 +83,7 @@ function simple_church_scripts() {
 
 	wp_enqueue_style(
 		'simple-church-fonts',
-		'https://fonts.googleapis.com/css2?family=' . implode( '&family=', array_map( 'rawurlencode', $font_families ) ) . '&display=swap',
+		'https://fonts.googleapis.com/css2?family=' . implode( '&family=', $font_families ) . '&display=swap',
 		array(),
 		null
 	);
