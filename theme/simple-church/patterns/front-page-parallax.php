@@ -8,12 +8,12 @@
  */
 ?>
 <!-- wp:group {"className":"parallax-break","style":{"color":{"background":"#1a1a1a","text":"#ffffff"}},"layout":{"type":"default"}} -->
-<div class="wp-block-group parallax-break" style="background-color:#1a1a1a;color:#ffffff">
+<div class="wp-block-group parallax-break has-text-color has-background" style="background-color:#1a1a1a;color:#ffffff">
 	<!-- wp:group {"className":"parallax-break__content reveal","layout":{"type":"default"}} -->
 	<div class="wp-block-group parallax-break__content reveal">
 		<!-- wp:quote {"className":"parallax-break__quote","style":{"color":{"text":"#ffffff"}}} -->
-		<blockquote class="wp-block-quote parallax-break__quote" style="color:#ffffff"><!-- wp:paragraph {"style":{"color":{"text":"#ffffff"}}} -->
-		<p style="color:#ffffff">&ldquo;Simplicity is the ultimate sophistication.&rdquo;</p>
+		<blockquote class="wp-block-quote parallax-break__quote has-text-color" style="color:#ffffff"><!-- wp:paragraph {"style":{"color":{"text":"#ffffff"}}} -->
+		<p class="has-text-color" style="color:#ffffff">&ldquo;Simplicity is the ultimate sophistication.&rdquo;</p>
 		<!-- /wp:paragraph --></blockquote>
 		<!-- /wp:quote -->
 	</div>
