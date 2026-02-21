@@ -440,6 +440,16 @@ h1, h2, h3, h4, h5, h6 {
 	align-items: center;
 }
 
+.section--full .section__inner {
+	text-align: center;
+}
+
+.section--full .section__heading,
+.section--full .section__text {
+	margin-left: auto;
+	margin-right: auto;
+}
+
 .section__inner {
 	max-width: 1200px;
 	margin: 0 auto;
@@ -1110,6 +1120,16 @@ h1, h2, h3, h4, h5, h6 {
 .editor-styles-wrapper .reveal {
 	opacity: 1;
 	transform: none;
+}
+
+/* Force grid layouts to show as rows inside the editor even when the
+   content area is narrower than our responsive breakpoints. */
+.editor-styles-wrapper .wp-block-group.card-grid {
+	grid-template-columns: repeat(2, 1fr) !important;
+}
+
+.editor-styles-wrapper .wp-block-group.contact-grid {
+	grid-template-columns: repeat(3, 1fr) !important;
 }
 
 /* Sections keep their own padding — just remove wp-block-group defaults */
