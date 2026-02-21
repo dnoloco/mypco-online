@@ -7,17 +7,17 @@
  * Keywords: cta, call to action, button, contact
  */
 ?>
-<!-- wp:group {"className":"section section--cta","layout":{"type":"default"}} -->
-<div class="wp-block-group section section--cta">
+<!-- wp:group {"style":{"color":{"background":"#f5f5f0","text":"#1a1a1a"}},"className":"section section--cta","layout":{"type":"default"}} -->
+<div class="wp-block-group section section--cta has-text-color has-background" style="color:#1a1a1a;background-color:#f5f5f0">
 	<!-- wp:group {"className":"section__inner","layout":{"type":"default"}} -->
 	<div class="wp-block-group section__inner">
 		<!-- wp:group {"className":"cta","layout":{"type":"default"}} -->
 		<div class="wp-block-group cta">
-			<!-- wp:heading {"className":"cta__heading"} -->
-			<h2 class="wp-block-heading cta__heading">Ready to get started?</h2>
+			<!-- wp:heading {"style":{"color":{"text":"#1a1a1a"}},"className":"cta__heading"} -->
+			<h2 class="wp-block-heading cta__heading has-text-color" style="color:#1a1a1a">Ready to get started?</h2>
 			<!-- /wp:heading -->
-			<!-- wp:paragraph {"className":"cta__text"} -->
-			<p class="cta__text">Let us help you build something meaningful for your community.</p>
+			<!-- wp:paragraph {"style":{"color":{"text":"#666666"}},"className":"cta__text"} -->
+			<p class="cta__text has-text-color" style="color:#666666">Let us help you build something meaningful for your community.</p>
 			<!-- /wp:paragraph -->
 			<!-- wp:buttons {"layout":{"type":"flex","justifyContent":"center"}} -->
 			<div class="wp-block-buttons">

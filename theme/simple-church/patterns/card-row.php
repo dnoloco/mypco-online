@@ -7,67 +7,67 @@
  * Keywords: cards, grid, services, capabilities, icons
  */
 ?>
-<!-- wp:group {"className":"section section--light","layout":{"type":"default"}} -->
-<div class="wp-block-group section section--light">
+<!-- wp:group {"backgroundColor":"white","textColor":"black","className":"section section--light","layout":{"type":"default"}} -->
+<div class="wp-block-group section section--light has-black-color has-text-color has-white-background-color has-background">
 	<!-- wp:group {"className":"section__inner","layout":{"type":"default"}} -->
 	<div class="wp-block-group section__inner">
-		<!-- wp:paragraph {"className":"section__label"} -->
-		<p class="section__label">What we offer</p>
+		<!-- wp:paragraph {"style":{"color":{"text":"#888888"}},"className":"section__label"} -->
+		<p class="section__label has-text-color" style="color:#888888">What we offer</p>
 		<!-- /wp:paragraph -->
-		<!-- wp:heading {"className":"section__heading"} -->
-		<h2 class="wp-block-heading section__heading">Ways to get involved.</h2>
+		<!-- wp:heading {"textColor":"black","className":"section__heading"} -->
+		<h2 class="wp-block-heading section__heading has-black-color has-text-color">Ways to get involved.</h2>
 		<!-- /wp:heading -->
 		<!-- wp:group {"className":"card-grid","layout":{"type":"default"}} -->
 		<div class="wp-block-group card-grid">
 			<!-- wp:group {"className":"card"} -->
 			<div class="wp-block-group card">
-				<!-- wp:paragraph {"className":"card__number"} -->
-				<p class="card__number">01</p>
+				<!-- wp:paragraph {"style":{"color":{"text":"#bbbbbb"}},"className":"card__number"} -->
+				<p class="card__number has-text-color" style="color:#bbbbbb">01</p>
 				<!-- /wp:paragraph -->
-				<!-- wp:heading {"level":3,"className":"card__title"} -->
-				<h3 class="wp-block-heading card__title">Sunday Services</h3>
+				<!-- wp:heading {"level":3,"textColor":"black","className":"card__title"} -->
+				<h3 class="wp-block-heading card__title has-black-color has-text-color">Sunday Services</h3>
 				<!-- /wp:heading -->
-				<!-- wp:paragraph {"className":"card__text"} -->
-				<p class="card__text">Join us every Sunday for worship, teaching, and community. Services at 9:00 AM and 11:00 AM.</p>
+				<!-- wp:paragraph {"style":{"color":{"text":"#666666"}},"className":"card__text"} -->
+				<p class="card__text has-text-color" style="color:#666666">Join us every Sunday for worship, teaching, and community. Services at 9:00 AM and 11:00 AM.</p>
 				<!-- /wp:paragraph -->
 			</div>
 			<!-- /wp:group -->
 			<!-- wp:group {"className":"card"} -->
 			<div class="wp-block-group card">
-				<!-- wp:paragraph {"className":"card__number"} -->
-				<p class="card__number">02</p>
+				<!-- wp:paragraph {"style":{"color":{"text":"#bbbbbb"}},"className":"card__number"} -->
+				<p class="card__number has-text-color" style="color:#bbbbbb">02</p>
 				<!-- /wp:paragraph -->
-				<!-- wp:heading {"level":3,"className":"card__title"} -->
-				<h3 class="wp-block-heading card__title">Small Groups</h3>
+				<!-- wp:heading {"level":3,"textColor":"black","className":"card__title"} -->
+				<h3 class="wp-block-heading card__title has-black-color has-text-color">Small Groups</h3>
 				<!-- /wp:heading -->
-				<!-- wp:paragraph {"className":"card__text"} -->
-				<p class="card__text">Find deeper connection in a small group. We have groups for every stage of life meeting throughout the week.</p>
+				<!-- wp:paragraph {"style":{"color":{"text":"#666666"}},"className":"card__text"} -->
+				<p class="card__text has-text-color" style="color:#666666">Find deeper connection in a small group. We have groups for every stage of life meeting throughout the week.</p>
 				<!-- /wp:paragraph -->
 			</div>
 			<!-- /wp:group -->
 			<!-- wp:group {"className":"card"} -->
 			<div class="wp-block-group card">
-				<!-- wp:paragraph {"className":"card__number"} -->
-				<p class="card__number">03</p>
+				<!-- wp:paragraph {"style":{"color":{"text":"#bbbbbb"}},"className":"card__number"} -->
+				<p class="card__number has-text-color" style="color:#bbbbbb">03</p>
 				<!-- /wp:paragraph -->
-				<!-- wp:heading {"level":3,"className":"card__title"} -->
-				<h3 class="wp-block-heading card__title">Youth Ministry</h3>
+				<!-- wp:heading {"level":3,"textColor":"black","className":"card__title"} -->
+				<h3 class="wp-block-heading card__title has-black-color has-text-color">Youth Ministry</h3>
 				<!-- /wp:heading -->
-				<!-- wp:paragraph {"className":"card__text"} -->
-				<p class="card__text">A vibrant programme for teens to grow in faith, build friendships, and discover their purpose.</p>
+				<!-- wp:paragraph {"style":{"color":{"text":"#666666"}},"className":"card__text"} -->
+				<p class="card__text has-text-color" style="color:#666666">A vibrant programme for teens to grow in faith, build friendships, and discover their purpose.</p>
 				<!-- /wp:paragraph -->
 			</div>
 			<!-- /wp:group -->
 			<!-- wp:group {"className":"card"} -->
 			<div class="wp-block-group card">
-				<!-- wp:paragraph {"className":"card__number"} -->
-				<p class="card__number">04</p>
+				<!-- wp:paragraph {"style":{"color":{"text":"#bbbbbb"}},"className":"card__number"} -->
+				<p class="card__number has-text-color" style="color:#bbbbbb">04</p>
 				<!-- /wp:paragraph -->
-				<!-- wp:heading {"level":3,"className":"card__title"} -->
-				<h3 class="wp-block-heading card__title">Community Outreach</h3>
+				<!-- wp:heading {"level":3,"textColor":"black","className":"card__title"} -->
+				<h3 class="wp-block-heading card__title has-black-color has-text-color">Community Outreach</h3>
 				<!-- /wp:heading -->
-				<!-- wp:paragraph {"className":"card__text"} -->
-				<p class="card__text">Serve our neighbours through food drives, mentoring programmes, and local partnerships.</p>
+				<!-- wp:paragraph {"style":{"color":{"text":"#666666"}},"className":"card__text"} -->
+				<p class="card__text has-text-color" style="color:#666666">Serve our neighbours through food drives, mentoring programmes, and local partnerships.</p>
 				<!-- /wp:paragraph -->
 			</div>
 			<!-- /wp:group -->
