@@ -445,6 +445,12 @@ h1, h2, h3, h4, h5, h6 {
 	max-width: 720px;
 }
 
+@media (min-width: 960px) {
+	.card-grid {
+		grid-template-columns: repeat(4, 1fr);
+	}
+}
+
 .section__inner {
 	max-width: 1200px;
 	margin: 0 auto;
@@ -1171,6 +1177,12 @@ h1, h2, h3, h4, h5, h6 {
 @media (min-width: 640px) {
 	.wp-block-group.card-grid {
 		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (min-width: 960px) {
+	.wp-block-group.card-grid {
+		grid-template-columns: repeat(4, 1fr);
 	}
 }
 
