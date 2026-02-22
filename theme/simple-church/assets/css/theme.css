@@ -1174,6 +1174,11 @@ h1, h2, h3, h4, h5, h6 {
 	margin-top: 3rem;
 }
 
+/* WordPress may wrap children in a layout container — make it transparent to the grid */
+.wp-block-group.card-grid > :only-child:not(.card) {
+	display: contents;
+}
+
 @media (min-width: 640px) {
 	.wp-block-group.card-grid {
 		grid-template-columns: repeat(2, 1fr);
