@@ -1114,6 +1114,22 @@ h1, h2, h3, h4, h5, h6 {
    -------------------------------------------------------------------------- */
 
 /*
+ * WordPress wraps block children in a layout container (is-layout-flow etc.)
+ * which breaks CSS Grid because the grid only sees one child. Use
+ * display:contents to make the wrapper transparent so the actual items
+ * participate in grid/flex column placement.
+ */
+.wp-block-group.card-grid > :only-child:not(.card),
+.wp-block-group.contact-grid > :only-child:not(.contact-card),
+.wp-block-group.testimonial-grid > :only-child:not(.testimonial-card),
+.wp-block-group.stat-grid > :only-child:not(.stat-card),
+.wp-block-group.team-grid > :only-child:not(.team-card),
+.wp-block-group.module-grid > :only-child:not(.module-card),
+.wp-block-group.split > :only-child:not([class*="split__"]) {
+	display: contents;
+}
+
+/*
  * The .reveal class sets opacity:0 for the scroll-reveal animation.
  * The block editor does NOT run our IntersectionObserver JS, so .reveal--visible
  * is never added — text stays invisible. Override this inside the editor.
@@ -1174,10 +1190,6 @@ h1, h2, h3, h4, h5, h6 {
 	margin-top: 3rem;
 }
 
-/* WordPress may wrap children in a layout container — make it transparent to the grid */
-.wp-block-group.card-grid > :only-child:not(.card) {
-	display: contents;
-}
 
 @media (min-width: 640px) {
 	.wp-block-group.card-grid {
@@ -1197,6 +1209,7 @@ h1, h2, h3, h4, h5, h6 {
 	grid-template-columns: 1fr;
 	gap: 2rem;
 }
+
 
 @media (min-width: 640px) {
 	.wp-block-group.contact-grid {
