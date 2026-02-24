@@ -33,6 +33,11 @@ class MyPCO_Calendar_Public {
         add_shortcode('mypco_calendar', [$this, 'render_calendar_shortcode']);
         add_shortcode('pco_calendar', [$this, 'render_calendar_shortcode']); // Backward compat
 
+        // Register standalone view shortcodes
+        add_shortcode('mypco_calendar_list', [$this, 'render_calendar_list_shortcode']);
+        add_shortcode('mypco_calendar_month', [$this, 'render_calendar_month_shortcode']);
+        add_shortcode('mypco_calendar_gallery', [$this, 'render_calendar_gallery_shortcode']);
+
         // Enqueue public assets
         $this->loader->add_action('wp_enqueue_scripts', $this, 'enqueue_public_assets');
     }
@@ -48,7 +53,10 @@ class MyPCO_Calendar_Public {
         }
 
         $has_calendar = has_shortcode($post->post_content, 'mypco_calendar') ||
-                        has_shortcode($post->post_content, 'pco_calendar');
+                        has_shortcode($post->post_content, 'pco_calendar') ||
+                        has_shortcode($post->post_content, 'mypco_calendar_list') ||
+                        has_shortcode($post->post_content, 'mypco_calendar_month') ||
+                        has_shortcode($post->post_content, 'mypco_calendar_gallery');
 
         if (!$has_calendar) {
             return;
@@ -142,6 +150,103 @@ class MyPCO_Calendar_Public {
         // Pass to template and return output
         return $this->load_template('calendar-main', array_merge($processed_data, [
             'default_view' => $atts['view'],
+            'tags' => $tags,
+        ]));
+    }
+
+    /**
+     * Render a standalone calendar list shortcode.
+     *
+     * @param array $atts Shortcode attributes
+     * @return string HTML output
+     */
+    public function render_calendar_list_shortcode($atts) {
+        return $this->render_single_view_shortcode('list', $atts, 'mypco_calendar_list');
+    }
+
+    /**
+     * Render a standalone calendar month shortcode.
+     *
+     * @param array $atts Shortcode attributes
+     * @return string HTML output
+     */
+    public function render_calendar_month_shortcode($atts) {
+        return $this->render_single_view_shortcode('month', $atts, 'mypco_calendar_month');
+    }
+
+    /**
+     * Render a standalone calendar gallery shortcode.
+     *
+     * @param array $atts Shortcode attributes
+     * @return string HTML output
+     */
+    public function render_calendar_gallery_shortcode($atts) {
+        return $this->render_single_view_shortcode('gallery', $atts, 'mypco_calendar_gallery');
+    }
+
+    /**
+     * Render a standalone single-view calendar shortcode.
+     *
+     * Shares data fetching and processing with the main calendar shortcode,
+     * but renders only the specified view without the view switcher.
+     *
+     * @param string $view View name: 'list', 'month', or 'gallery'
+     * @param array  $atts Shortcode attributes
+     * @param string $tag  Shortcode tag for attribute parsing
+     * @return string HTML output
+     */
+    private function render_single_view_shortcode($view, $atts, $tag) {
+        $atts = shortcode_atts([
+            'id'    => 0,
+            'count' => '',
+        ], $atts, $tag);
+
+        // Load centralized shortcode settings when id is provided
+        $id = absint($atts['id']);
+        if ($id > 0) {
+            require_once MYPCO_PLUGIN_DIR . 'admin/class-mypco-shortcodes-admin.php';
+            $settings = MyPCO_Shortcodes_Admin::get_shortcode_settings($id, 'mypco_calendar_' . $view);
+        } else {
+            $settings = [];
+        }
+
+        // Allow shortcode attributes to override stored settings, then fall back to defaults
+        $atts['count'] = !empty($atts['count']) ? (int) $atts['count'] : ($settings['count'] ?? 100);
+        $atts['view'] = $view;
+
+        // Featured event settings (only relevant for list view)
+        $show_featured = ($view === 'list') ? ($settings['show_featured'] ?? true) : false;
+        $featured_settings = [
+            'show_featured'  => $show_featured,
+            'featured_count' => $show_featured ? (isset($settings['featured_count']) ? (int) $settings['featured_count'] : 1) : 0,
+            'featured_mode'  => $settings['featured_mode'] ?? 'upcoming',
+        ];
+
+        // Fetch data from API
+        $events_data = $this->fetch_calendar_data($atts);
+
+        if (isset($events_data['error'])) {
+            return $this->render_error($events_data['error']);
+        }
+
+        // Fetch tags/categories
+        $tags = $this->fetch_tags();
+
+        // Process the data
+        $processed_data = $this->process_calendar_data($events_data, $featured_settings);
+
+        // Month view needs JS data
+        if ($view === 'month') {
+            wp_localize_script('mypco-calendar-public', 'mypcoCalendarData', [
+                'expandedEvents' => $processed_data['expanded_events'],
+                'currentMonth' => date('n'),
+                'currentYear' => date('Y'),
+                'tags' => $tags,
+            ]);
+        }
+
+        // Render the standalone template
+        return $this->load_template('calendar-' . $view, array_merge($processed_data, [
             'tags' => $tags,
         ]));
     }
