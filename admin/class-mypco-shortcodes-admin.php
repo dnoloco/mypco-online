@@ -91,8 +91,8 @@ class MyPCO_Shortcodes_Admin {
                 'module'      => 'calendar',
                 'module_name' => 'Calendar',
                 'name'        => 'PCO Event List',
-                'description' => 'Chronological list of upcoming events.',
-                'tag'         => 'mypco_calendar',
+                'description' => 'Standalone chronological list of upcoming events.',
+                'tag'         => 'mypco_calendar_list',
                 'defaults'    => [
                     'description'      => '',
                     'count'            => 100,
@@ -118,8 +118,8 @@ class MyPCO_Shortcodes_Admin {
                 'module'      => 'calendar',
                 'module_name' => 'Calendar',
                 'name'        => 'PCO Monthly Calendar',
-                'description' => 'Calendar grid view of events by month.',
-                'tag'         => 'mypco_calendar',
+                'description' => 'Standalone calendar grid view of events by month.',
+                'tag'         => 'mypco_calendar_month',
                 'defaults'    => [
                     'description'      => '',
                     'count'            => 100,
@@ -145,8 +145,8 @@ class MyPCO_Shortcodes_Admin {
                 'module'      => 'calendar',
                 'module_name' => 'Calendar',
                 'name'        => 'PCO Event Gallery',
-                'description' => 'Card-based image layout of events.',
-                'tag'         => 'mypco_calendar',
+                'description' => 'Standalone card-based image layout of events.',
+                'tag'         => 'mypco_calendar_gallery',
                 'defaults'    => [
                     'description'      => '',
                     'count'            => 100,
