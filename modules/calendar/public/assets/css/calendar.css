@@ -1452,3 +1452,305 @@ button.pco-badge-signup:active {
         gap: 10px;
     }
 }
+
+/* ============================================
+   ACCORDION LIST VIEW (Standalone)
+   ============================================ */
+
+.pco-accordion-wrapper {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Month navigation header */
+.pco-accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eee;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.pco-accordion-nav-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pco-accordion-month-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+    color: #333;
+    min-width: 180px;
+    text-align: center;
+}
+
+.pco-accordion-nav-btn {
+    padding: 6px 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 24px;
+    color: #333;
+    line-height: 1;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.pco-accordion-nav-btn:hover {
+    background-color: #f0f0f0;
+}
+
+/* Category filter */
+.pco-accordion-filter select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Month groups - only active is visible */
+.pco-accordion-month {
+    display: none;
+}
+
+.pco-accordion-month.active {
+    display: block;
+}
+
+/* Day headers */
+.pco-accordion-day {
+    margin-bottom: 8px;
+}
+
+.pco-accordion-day-header {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #999;
+    margin: 20px 0 8px 0;
+    letter-spacing: 0.5px;
+}
+
+.pco-accordion-day:first-child .pco-accordion-day-header {
+    margin-top: 0;
+}
+
+/* Accordion items */
+.pco-accordion-item {
+    border-bottom: 1px solid #f0f0f0;
+    transition: opacity 0.25s ease;
+}
+
+.pco-accordion-item:last-child {
+    border-bottom: none;
+}
+
+/* Collapsed row: event name + time */
+.pco-accordion-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 14px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    transition: color 0.2s;
+}
+
+.pco-accordion-row:hover .pco-accordion-name {
+    color: #000;
+}
+
+.pco-accordion-row:focus {
+    outline: none;
+}
+
+.pco-accordion-name {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #333;
+    transition: color 0.2s;
+}
+
+.pco-accordion-time {
+    font-size: 0.9rem;
+    color: #666;
+    flex-shrink: 0;
+    margin-left: 16px;
+}
+
+/* Expanded detail panel - hidden by default */
+.pco-accordion-detail {
+    display: none;
+    padding: 0 0 24px 0;
+    position: relative;
+}
+
+.pco-accordion-item.expanded .pco-accordion-detail {
+    display: block;
+}
+
+/* Hide the collapsed row when expanded */
+.pco-accordion-item.expanded .pco-accordion-row {
+    display: none;
+}
+
+/* When an item is expanded, hide all other items */
+.pco-accordion-wrapper.has-expanded .pco-accordion-item:not(.expanded) {
+    display: none;
+}
+
+/* Also hide day headers for non-expanded items */
+.pco-accordion-wrapper.has-expanded .pco-accordion-day-header {
+    display: none;
+}
+
+/* But show the day header of the expanded item's parent */
+.pco-accordion-wrapper.has-expanded .pco-accordion-item.expanded {
+    display: block;
+    border-bottom: none;
+}
+
+/* Close button */
+.pco-accordion-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: none;
+    border: none;
+    font-size: 28px;
+    line-height: 1;
+    color: #999;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: color 0.2s;
+}
+
+.pco-accordion-close:hover {
+    color: #333;
+}
+
+/* Detail title */
+.pco-accordion-detail-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0 40px 8px 0;
+    color: #333;
+}
+
+/* Detail meta (date + time) */
+.pco-accordion-detail-meta {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+/* Detail image */
+.pco-accordion-detail-image {
+    margin-bottom: 16px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.pco-accordion-detail-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Detail description */
+.pco-accordion-detail-desc {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #333;
+    margin-bottom: 16px;
+}
+
+.pco-accordion-detail-desc p {
+    margin: 0 0 10px 0;
+}
+
+/* Detail location */
+.pco-accordion-detail-location {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.pco-accordion-detail-location strong {
+    color: #333;
+}
+
+/* Register button */
+.pco-accordion-register-btn {
+    display: inline-block;
+    padding: 10px 24px;
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.pco-accordion-register-btn:hover {
+    background: #333;
+    color: #fff;
+}
+
+/* Empty state */
+.pco-accordion-empty,
+.pco-accordion-no-events {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .pco-accordion-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .pco-accordion-nav-row {
+        justify-content: center;
+    }
+
+    .pco-accordion-filter select {
+        width: 100%;
+    }
+
+    .pco-accordion-month-title {
+        font-size: 1.2rem;
+        min-width: auto;
+    }
+
+    .pco-accordion-name {
+        font-size: 0.95rem;
+    }
+
+    .pco-accordion-detail-title {
+        font-size: 1.2rem;
+    }
+}
