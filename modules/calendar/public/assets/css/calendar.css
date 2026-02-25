@@ -1459,7 +1459,8 @@ button.pco-badge-signup:active {
 
 .pco-accordion-wrapper {
     font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    max-width: 800px;
+    width: 780px;
+    max-width: 100%;
     margin: 0 auto;
 }
 
