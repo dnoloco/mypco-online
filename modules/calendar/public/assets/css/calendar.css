@@ -1625,6 +1625,11 @@ button.pco-badge-signup:active {
 .pco-accordion-date-badge--light {
     background: #c8c8c8;
     color: #fff;
+    transition: background-color 0.2s;
+}
+
+.pco-accordion-row:hover .pco-accordion-date-badge--light {
+    background: #888;
 }
 
 /* Meta row (time + location on one line) */
