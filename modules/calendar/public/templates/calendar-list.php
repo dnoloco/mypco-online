@@ -139,11 +139,6 @@ $initial_month_display = isset($events_by_month[$initial_month])
                         $time_display = __('ALL DAY', 'mypco-online');
                     } else {
                         $time_display = strtoupper($start_dt->format('gA'));
-                        if (!empty($event['ends_at'])) {
-                            $end_dt = new DateTime($event['ends_at'], new DateTimeZone('UTC'));
-                            $end_dt->setTimezone($tz);
-                            $time_display = strtoupper($start_dt->format('g') . '–' . $end_dt->format('gA'));
-                        }
                     }
                 } catch (Exception $e) {
                     $time_display = '';
@@ -192,13 +187,6 @@ $initial_month_display = isset($events_by_month[$initial_month])
                     </div>
 
                     <div class="pco-accordion-detail-body">
-                        <?php if (!empty($event['image_url'])): ?>
-                        <div class="pco-accordion-detail-image">
-                            <img src="<?php echo esc_url($event['image_url']); ?>"
-                                 alt="<?php echo esc_attr($event['name']); ?>">
-                        </div>
-                        <?php endif; ?>
-
                         <?php if (!empty($event['description']) || !empty($event['summary'])): ?>
                         <div class="pco-accordion-detail-desc">
                             <?php echo wp_kses_post($event['description'] ?: $event['summary']); ?>
