@@ -1652,19 +1652,7 @@ button.pco-badge-signup:active {
     padding: 24px;
     border-radius: 12px;
     background: rgba(0, 0, 0, 0.03);
-}
-
-/* Detail image */
-.pco-accordion-detail-image {
-    margin-bottom: 16px;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.pco-accordion-detail-image img {
-    width: 100%;
-    height: auto;
-    display: block;
+    box-sizing: border-box;
 }
 
 /* Detail description */
