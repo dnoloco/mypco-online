@@ -1624,8 +1624,7 @@ button.pco-badge-signup:active {
 /* Light date badge variant (non-nearest events) */
 .pco-accordion-date-badge--light {
     background: #c8c8c8;
-    color: #fff;
-    transition: background-color 0.2s;
+    color: #444;
 }
 
 .pco-accordion-row:hover .pco-accordion-date-badge--light {
