@@ -70,6 +70,9 @@ if (!empty($regular_events)) {
             $end_of_week->modify('+6 days');
             $event['_this_week'] = ($start >= $today && $start <= $end_of_week);
 
+            // Track position for nearest-event highlighting
+            $event['_event_index'] = count($events_by_month[$month_key]['events']);
+
             $events_by_month[$month_key]['events'][] = $event;
         } catch (Exception $e) {
             continue;
@@ -135,45 +138,27 @@ $initial_month_display = isset($events_by_month[$initial_month])
 
                 $tag_ids_json = json_encode($event['tag_ids'] ?? []);
                 $event_name_upper = strtoupper($event['name']);
+                $is_nearest = ($event['_event_index'] === 0);
+                $badge_class = $is_nearest ? 'pco-accordion-date-badge' : 'pco-accordion-date-badge pco-accordion-date-badge--light';
+
+                // Build Google Maps search URL from location
+                $maps_query = $location_name;
+                if ($address) {
+                    $maps_query .= ', ' . $address;
+                }
+                $maps_url = 'https://www.google.com/maps/search/' . rawurlencode($maps_query);
             ?>
-            <div class="pco-accordion-item" data-tag-ids='<?php echo esc_attr($tag_ids_json); ?>'>
+            <div class="pco-accordion-item<?php echo $is_nearest ? ' pco-accordion-item--nearest' : ''; ?>" data-tag-ids='<?php echo esc_attr($tag_ids_json); ?>'>
                 <!-- Collapsed card -->
                 <button class="pco-accordion-row" type="button">
-                    <span class="pco-accordion-date-badge">
+                    <span class="<?php echo esc_attr($badge_class); ?>">
                         <span class="pco-accordion-day-abbr"><?php echo esc_html($event['_day_abbr']); ?></span>
                         <span class="pco-accordion-day-num"><?php echo esc_html($event['_day_num']); ?></span>
                         <span class="pco-accordion-month-abbr"><?php echo esc_html($event['_month_abbr']); ?></span>
                     </span>
                     <span class="pco-accordion-event-info">
                         <span class="pco-accordion-event-name"><?php echo esc_html($event_name_upper); ?></span>
-                        <?php if ($time_display): ?>
-                        <span class="pco-accordion-event-meta">
-                            <svg class="pco-accordion-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                            <?php echo esc_html($time_display); ?>
-                        </span>
-                        <?php endif; ?>
-                        <?php if ($location_name): ?>
-                        <span class="pco-accordion-event-meta">
-                            <svg class="pco-accordion-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                            <?php echo esc_html($location_name); ?>
-                        </span>
-                        <?php endif; ?>
-                    </span>
-                    <?php if (!empty($event['_this_week'])): ?>
-                    <span class="pco-accordion-badge-this-week"><?php _e('THIS WEEK', 'mypco-online'); ?></span>
-                    <?php endif; ?>
-                </button>
-
-                <!-- Expanded detail panel -->
-                <div class="pco-accordion-detail">
-                    <div class="pco-accordion-detail-header">
-                        <span class="pco-accordion-date-badge">
-                            <span class="pco-accordion-day-abbr"><?php echo esc_html($event['_day_abbr']); ?></span>
-                            <span class="pco-accordion-day-num"><?php echo esc_html($event['_day_num']); ?></span>
-                            <span class="pco-accordion-month-abbr"><?php echo esc_html($event['_month_abbr']); ?></span>
-                        </span>
-                        <span class="pco-accordion-event-info">
-                            <span class="pco-accordion-event-name"><?php echo esc_html($event_name_upper); ?></span>
+                        <span class="pco-accordion-event-meta-row">
                             <?php if ($time_display): ?>
                             <span class="pco-accordion-event-meta">
                                 <svg class="pco-accordion-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -187,9 +172,34 @@ $initial_month_display = isset($events_by_month[$initial_month])
                             </span>
                             <?php endif; ?>
                         </span>
-                        <?php if (!empty($event['_this_week'])): ?>
-                        <span class="pco-accordion-badge-this-week"><?php _e('THIS WEEK', 'mypco-online'); ?></span>
-                        <?php endif; ?>
+                    </span>
+                </button>
+
+                <!-- Expanded detail panel -->
+                <div class="pco-accordion-detail">
+                    <div class="pco-accordion-detail-header">
+                        <span class="<?php echo esc_attr($badge_class); ?>">
+                            <span class="pco-accordion-day-abbr"><?php echo esc_html($event['_day_abbr']); ?></span>
+                            <span class="pco-accordion-day-num"><?php echo esc_html($event['_day_num']); ?></span>
+                            <span class="pco-accordion-month-abbr"><?php echo esc_html($event['_month_abbr']); ?></span>
+                        </span>
+                        <span class="pco-accordion-event-info">
+                            <span class="pco-accordion-event-name"><?php echo esc_html($event_name_upper); ?></span>
+                            <span class="pco-accordion-event-meta-row">
+                                <?php if ($time_display): ?>
+                                <span class="pco-accordion-event-meta">
+                                    <svg class="pco-accordion-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                    <?php echo esc_html($time_display); ?>
+                                </span>
+                                <?php endif; ?>
+                                <?php if ($location_name): ?>
+                                <span class="pco-accordion-event-meta">
+                                    <svg class="pco-accordion-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    <?php echo esc_html($location_name); ?>
+                                </span>
+                                <?php endif; ?>
+                            </span>
+                        </span>
                         <button class="pco-accordion-close" type="button" aria-label="<?php esc_attr_e('Close', 'mypco-online'); ?>">&times;</button>
                     </div>
 
@@ -204,7 +214,7 @@ $initial_month_display = isset($events_by_month[$initial_month])
                         <div class="pco-accordion-detail-location">
                             <svg class="pco-accordion-pin-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                             <div>
-                                <strong><?php echo esc_html($location_name); ?></strong>
+                                <a href="<?php echo esc_url($maps_url); ?>" class="pco-accordion-location-link" target="_blank" rel="noopener"><strong><?php echo esc_html($location_name); ?></strong></a>
                                 <?php if ($address): ?>
                                     <span><?php echo esc_html($address); ?></span>
                                 <?php endif; ?>
