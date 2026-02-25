@@ -88,29 +88,6 @@ $initial_month_display = isset($events_by_month[$initial_month])
             <button class="pco-accordion-nav-btn" data-dir="next" aria-label="<?php esc_attr_e('Next month', 'mypco-online'); ?>">&#8250;</button>
         </div>
 
-        <?php if (!empty($tags)): ?>
-        <div class="pco-accordion-filter">
-            <select class="pco-accordion-category-filter">
-                <option value=""><?php _e('All Categories', 'mypco-online'); ?></option>
-                <?php
-                $current_group = '';
-                foreach ($tags as $tag):
-                    if ($tag['group_name'] !== $current_group):
-                        if ($current_group !== '') echo '</optgroup>';
-                        if (!empty($tag['group_name'])):
-                            $current_group = $tag['group_name'];
-                            echo '<optgroup label="' . esc_attr($current_group) . '">';
-                        endif;
-                    endif;
-                ?>
-                    <option value="<?php echo esc_attr($tag['id']); ?>">
-                        <?php echo esc_html($tag['name']); ?>
-                    </option>
-                <?php endforeach; ?>
-                <?php if ($current_group !== '') echo '</optgroup>'; ?>
-            </select>
-        </div>
-        <?php endif; ?>
     </div>
 
     <!-- Event months -->
@@ -260,7 +237,6 @@ $initial_month_display = isset($events_by_month[$initial_month])
 
         // Close any expanded event when switching months
         closeExpanded();
-        applyFilter();
     }
 
     wrapper.querySelectorAll('.pco-accordion-nav-btn').forEach(function(btn) {
@@ -311,38 +287,5 @@ $initial_month_display = isset($events_by_month[$initial_month])
         wrapper.classList.remove('has-expanded');
     }
 
-    // Category filter
-    var filterSelect = wrapper.querySelector('.pco-accordion-category-filter');
-    if (filterSelect) {
-        filterSelect.addEventListener('change', function() {
-            closeExpanded();
-            applyFilter();
-        });
-    }
-
-    function applyFilter() {
-        var tagId = filterSelect ? filterSelect.value : '';
-        var activeMonth = wrapper.querySelector('.pco-accordion-month.active');
-        if (!activeMonth) return;
-
-        var hasVisible = false;
-
-        activeMonth.querySelectorAll('.pco-accordion-item').forEach(function(item) {
-            if (!tagId) {
-                item.style.display = '';
-                hasVisible = true;
-                return;
-            }
-            var tagIds = [];
-            try { tagIds = JSON.parse(item.dataset.tagIds || '[]'); } catch(e) {}
-            var match = tagIds.some(function(id) { return String(id) === String(tagId); });
-            item.style.display = match ? '' : 'none';
-            if (match) hasVisible = true;
-        });
-
-        if (noEventsEl) {
-            noEventsEl.style.display = hasVisible ? 'none' : 'block';
-        }
-    }
 })();
 </script>
