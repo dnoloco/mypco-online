@@ -1504,15 +1504,6 @@ button.pco-badge-signup:active {
     opacity: 0.6;
 }
 
-/* Category filter */
-.pco-accordion-filter select {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    font-family: inherit;
-}
-
 /* Month groups - only active is visible */
 .pco-accordion-month {
     display: none;
@@ -1559,7 +1550,6 @@ button.pco-badge-signup:active {
     padding: 16px 0;
     background: none;
     border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
     cursor: pointer;
     font-family: inherit;
     text-align: left;
@@ -1567,10 +1557,6 @@ button.pco-badge-signup:active {
     -moz-appearance: none;
     appearance: none;
     transition: opacity 0.2s;
-}
-
-.pco-accordion-item:last-child .pco-accordion-row {
-    border-bottom: none;
 }
 
 .pco-accordion-row:hover {
@@ -1623,7 +1609,6 @@ button.pco-badge-signup:active {
     align-items: center;
     gap: 20px;
     padding: 16px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .pco-accordion-detail-header .pco-accordion-event-label {
@@ -1736,10 +1721,6 @@ button.pco-badge-signup:active {
 
     .pco-accordion-nav-row {
         justify-content: center;
-    }
-
-    .pco-accordion-filter select {
-        width: 100%;
     }
 
     .pco-accordion-month-title {
