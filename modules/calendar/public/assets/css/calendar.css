@@ -1458,7 +1458,7 @@ button.pco-badge-signup:active {
    ============================================ */
 
 .pco-accordion-wrapper {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     max-width: 800px;
     margin: 0 auto;
 }
@@ -1468,9 +1468,7 @@ button.pco-badge-signup:active {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #eee;
+    margin-bottom: 32px;
     flex-wrap: wrap;
     gap: 12px;
 }
@@ -1478,32 +1476,31 @@ button.pco-badge-signup:active {
 .pco-accordion-nav-row {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
 }
 
 .pco-accordion-month-title {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 700;
     margin: 0;
-    color: #333;
-    min-width: 180px;
+    min-width: 200px;
     text-align: center;
 }
 
 .pco-accordion-nav-btn {
-    padding: 6px 12px;
+    padding: 4px 10px;
     border: none;
     background: transparent;
     cursor: pointer;
-    font-size: 24px;
-    color: #333;
+    font-size: 1.5rem;
+    font-weight: 300;
     line-height: 1;
     border-radius: 4px;
-    transition: background-color 0.2s;
+    transition: opacity 0.2s;
 }
 
 .pco-accordion-nav-btn:hover {
-    background-color: #f0f0f0;
+    opacity: 0.6;
 }
 
 /* Category filter */
@@ -1512,6 +1509,7 @@ button.pco-badge-signup:active {
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 14px;
+    font-family: inherit;
 }
 
 /* Month groups - only active is visible */
@@ -1523,78 +1521,80 @@ button.pco-badge-signup:active {
     display: block;
 }
 
-/* Day headers */
-.pco-accordion-day {
-    margin-bottom: 8px;
-}
-
-.pco-accordion-day-header {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    color: #999;
-    margin: 20px 0 8px 0;
-    letter-spacing: 0.5px;
-}
-
-.pco-accordion-day:first-child .pco-accordion-day-header {
-    margin-top: 0;
-}
-
 /* Accordion items */
 .pco-accordion-item {
-    border-bottom: 1px solid #f0f0f0;
     transition: opacity 0.25s ease;
 }
 
-.pco-accordion-item:last-child {
-    border-bottom: none;
+/* Date block (day abbrev + day number) */
+.pco-accordion-date-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    flex-shrink: 0;
 }
 
-/* Collapsed row: event name + time */
+.pco-accordion-day-abbr {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+}
+
+.pco-accordion-day-num {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+/* Collapsed row: date block + EVENT NAME || TIME */
 .pco-accordion-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 20px;
     width: 100%;
-    padding: 14px 0;
+    padding: 16px 0;
     background: none;
     border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
     cursor: pointer;
     font-family: inherit;
     text-align: left;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    transition: color 0.2s;
+    transition: opacity 0.2s;
 }
 
-.pco-accordion-row:hover .pco-accordion-name {
-    color: #000;
+.pco-accordion-item:last-child .pco-accordion-row {
+    border-bottom: none;
+}
+
+.pco-accordion-row:hover {
+    opacity: 0.7;
 }
 
 .pco-accordion-row:focus {
     outline: none;
 }
 
-.pco-accordion-name {
-    font-size: 1.05rem;
+.pco-accordion-event-label {
+    font-size: 0.95rem;
     font-weight: 600;
-    color: #333;
-    transition: color 0.2s;
+    letter-spacing: 0.03em;
 }
 
-.pco-accordion-time {
-    font-size: 0.9rem;
-    color: #666;
-    flex-shrink: 0;
-    margin-left: 16px;
+.pco-accordion-separator {
+    margin: 0 6px;
+    font-weight: 300;
+    opacity: 0.5;
 }
 
 /* Expanded detail panel - hidden by default */
 .pco-accordion-detail {
     display: none;
-    padding: 0 0 24px 0;
     position: relative;
 }
 
@@ -1612,51 +1612,46 @@ button.pco-badge-signup:active {
     display: none;
 }
 
-/* Also hide day headers for non-expanded items */
-.pco-accordion-wrapper.has-expanded .pco-accordion-day-header {
-    display: none;
-}
-
-/* But show the day header of the expanded item's parent */
 .pco-accordion-wrapper.has-expanded .pco-accordion-item.expanded {
     display: block;
-    border-bottom: none;
+}
+
+/* Expanded detail header (mirrors the collapsed row layout) */
+.pco-accordion-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.pco-accordion-detail-header .pco-accordion-event-label {
+    flex: 1;
 }
 
 /* Close button */
 .pco-accordion-close {
-    position: absolute;
-    top: 0;
-    right: 0;
     background: none;
     border: none;
-    font-size: 28px;
+    font-size: 24px;
     line-height: 1;
-    color: #999;
     cursor: pointer;
     padding: 4px 8px;
-    transition: color 0.2s;
+    flex-shrink: 0;
+    transition: opacity 0.2s;
+    opacity: 0.5;
 }
 
 .pco-accordion-close:hover {
-    color: #333;
+    opacity: 1;
 }
 
-/* Detail title */
-.pco-accordion-detail-title {
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin: 0 40px 8px 0;
-    color: #333;
-}
-
-/* Detail meta (date + time) */
-.pco-accordion-detail-meta {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 16px;
-    color: #666;
-    font-size: 0.95rem;
+/* Detail body - the expandable card */
+.pco-accordion-detail-body {
+    margin-top: 16px;
+    padding: 24px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.03);
 }
 
 /* Detail image */
@@ -1675,27 +1670,43 @@ button.pco-badge-signup:active {
 /* Detail description */
 .pco-accordion-detail-desc {
     font-size: 0.95rem;
-    line-height: 1.6;
-    color: #333;
-    margin-bottom: 16px;
+    line-height: 1.7;
+    margin-bottom: 20px;
 }
 
 .pco-accordion-detail-desc p {
     margin: 0 0 10px 0;
 }
 
-/* Detail location */
+/* Detail location with pin icon */
 .pco-accordion-detail-location {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+.pco-accordion-pin-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.pco-accordion-detail-location div {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    margin-bottom: 16px;
-    font-size: 0.9rem;
-    color: #666;
 }
 
 .pco-accordion-detail-location strong {
-    color: #333;
+    font-weight: 700;
+}
+
+.pco-accordion-detail-location span {
+    opacity: 0.7;
+    font-size: 0.85rem;
 }
 
 /* Register button */
@@ -1706,6 +1717,7 @@ button.pco-badge-signup:active {
     color: #fff;
     border: none;
     border-radius: 20px;
+    font-family: inherit;
     font-size: 0.9rem;
     font-weight: 500;
     text-decoration: none;
@@ -1723,7 +1735,7 @@ button.pco-badge-signup:active {
 .pco-accordion-no-events {
     text-align: center;
     padding: 40px 20px;
-    color: #666;
+    opacity: 0.6;
 }
 
 /* Responsive */
@@ -1746,11 +1758,11 @@ button.pco-badge-signup:active {
         min-width: auto;
     }
 
-    .pco-accordion-name {
-        font-size: 0.95rem;
+    .pco-accordion-event-label {
+        font-size: 0.85rem;
     }
 
-    .pco-accordion-detail-title {
-        font-size: 1.2rem;
+    .pco-accordion-day-num {
+        font-size: 1.3rem;
     }
 }

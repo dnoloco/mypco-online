@@ -31,7 +31,7 @@ if (!function_exists('mypco_get_location_name')) {
     }
 }
 
-// Group events by month and day, filtering out past events
+// Group events by month, filtering out past events
 $tz = new DateTimeZone('America/Chicago');
 $today = new DateTime('today', $tz);
 $current_month_key = $today->format('Y-m');
@@ -50,25 +50,21 @@ if (!empty($regular_events)) {
 
             $month_key = $start->format('Y-m');
             $month_display = $start->format('F Y');
-            $day_key = $start->format('Y-m-d');
-            $day_display = strtoupper($start->format('l, M j'));
 
             if (!isset($events_by_month[$month_key])) {
                 $events_by_month[$month_key] = [
                     'display' => $month_display,
-                    'days' => []
+                    'events' => []
                 ];
                 $available_months[] = $month_key;
             }
 
-            if (!isset($events_by_month[$month_key]['days'][$day_key])) {
-                $events_by_month[$month_key]['days'][$day_key] = [
-                    'display' => $day_display,
-                    'events' => []
-                ];
-            }
+            // Store parsed date info with each event for the template
+            $event['_day_abbr'] = strtoupper($start->format('D'));
+            $event['_day_num'] = $start->format('d');
+            $event['_day_key'] = $start->format('Y-m-d');
 
-            $events_by_month[$month_key]['days'][$day_key]['events'][] = $event;
+            $events_by_month[$month_key]['events'][] = $event;
         } catch (Exception $e) {
             continue;
         }
@@ -130,61 +126,72 @@ $initial_month_display = isset($events_by_month[$initial_month])
              data-month="<?php echo esc_attr($month_key); ?>"
              data-month-display="<?php echo esc_attr($month_data['display']); ?>">
 
-            <?php foreach ($month_data['days'] as $day_key => $day_data): ?>
-            <div class="pco-accordion-day" data-date="<?php echo esc_attr($day_key); ?>">
-                <h4 class="pco-accordion-day-header"><?php echo esc_html($day_data['display']); ?></h4>
+            <?php foreach ($month_data['events'] as $event):
+                $is_all_day = $event['is_all_day'] ?? false;
+                $location_name = mypco_get_location_name($event['location']);
 
-                <?php foreach ($day_data['events'] as $event):
-                    $is_all_day = $event['is_all_day'] ?? false;
-                    $location_name = mypco_get_location_name($event['location']);
+                // Format time
+                try {
+                    $start_dt = new DateTime($event['starts_at'], new DateTimeZone('UTC'));
+                    $start_dt->setTimezone($tz);
 
-                    // Format time
-                    try {
-                        $start_dt = new DateTime($event['starts_at'], new DateTimeZone('UTC'));
-                        $start_dt->setTimezone($tz);
-
-                        if ($is_all_day) {
-                            $time_display = __('All Day', 'mypco-online');
-                        } else {
-                            $time_display = $start_dt->format('g:ia');
-                            if (!empty($event['ends_at'])) {
-                                $end_dt = new DateTime($event['ends_at'], new DateTimeZone('UTC'));
-                                $end_dt->setTimezone($tz);
-                                $time_display = $start_dt->format('g') . '–' . $end_dt->format('g:ia');
-                            }
+                    if ($is_all_day) {
+                        $time_display = __('ALL DAY', 'mypco-online');
+                    } else {
+                        $time_display = strtoupper($start_dt->format('gA'));
+                        if (!empty($event['ends_at'])) {
+                            $end_dt = new DateTime($event['ends_at'], new DateTimeZone('UTC'));
+                            $end_dt->setTimezone($tz);
+                            $time_display = strtoupper($start_dt->format('g') . '–' . $end_dt->format('gA'));
                         }
-                    } catch (Exception $e) {
-                        $time_display = '';
                     }
+                } catch (Exception $e) {
+                    $time_display = '';
+                }
 
-                    // Parse address from location
-                    $address = '';
-                    if (!empty($event['location']) && strpos($event['location'], ' - ') !== false) {
-                        $address = substr($event['location'], strpos($event['location'], ' - ') + 3);
-                    }
+                // Parse address from location
+                $address = '';
+                if (!empty($event['location']) && strpos($event['location'], ' - ') !== false) {
+                    $address = substr($event['location'], strpos($event['location'], ' - ') + 3);
+                }
 
-                    $tag_ids_json = json_encode($event['tag_ids'] ?? []);
-                ?>
-                <div class="pco-accordion-item" data-tag-ids='<?php echo esc_attr($tag_ids_json); ?>'>
-                    <!-- Collapsed row: title + time -->
-                    <button class="pco-accordion-row" type="button">
-                        <span class="pco-accordion-name"><?php echo esc_html($event['name']); ?></span>
-                        <span class="pco-accordion-time"><?php echo esc_html($time_display); ?></span>
-                    </button>
+                $tag_ids_json = json_encode($event['tag_ids'] ?? []);
+                $event_name_upper = strtoupper($event['name']);
+            ?>
+            <div class="pco-accordion-item" data-tag-ids='<?php echo esc_attr($tag_ids_json); ?>'>
+                <!-- Collapsed row: date block + NAME || TIME -->
+                <button class="pco-accordion-row" type="button">
+                    <span class="pco-accordion-date-block">
+                        <span class="pco-accordion-day-abbr"><?php echo esc_html($event['_day_abbr']); ?></span>
+                        <span class="pco-accordion-day-num"><?php echo esc_html($event['_day_num']); ?></span>
+                    </span>
+                    <span class="pco-accordion-event-label">
+                        <?php echo esc_html($event_name_upper); ?>
+                        <?php if ($time_display): ?>
+                            <span class="pco-accordion-separator">||</span>
+                            <?php echo esc_html($time_display); ?>
+                        <?php endif; ?>
+                    </span>
+                </button>
 
-                    <!-- Expanded detail panel -->
-                    <div class="pco-accordion-detail">
-                        <button class="pco-accordion-close" type="button" aria-label="<?php esc_attr_e('Close', 'mypco-online'); ?>">&times;</button>
-
-                        <h3 class="pco-accordion-detail-title"><?php echo esc_html($event['name']); ?></h3>
-
-                        <div class="pco-accordion-detail-meta">
-                            <span class="pco-accordion-detail-date"><?php echo esc_html($event['date_display'] ?? ''); ?></span>
+                <!-- Expanded detail panel -->
+                <div class="pco-accordion-detail">
+                    <div class="pco-accordion-detail-header">
+                        <span class="pco-accordion-date-block">
+                            <span class="pco-accordion-day-abbr"><?php echo esc_html($event['_day_abbr']); ?></span>
+                            <span class="pco-accordion-day-num"><?php echo esc_html($event['_day_num']); ?></span>
+                        </span>
+                        <span class="pco-accordion-event-label">
+                            <?php echo esc_html($event_name_upper); ?>
                             <?php if ($time_display): ?>
-                                <span class="pco-accordion-detail-time"><?php echo esc_html($time_display); ?></span>
+                                <span class="pco-accordion-separator">||</span>
+                                <?php echo esc_html($time_display); ?>
                             <?php endif; ?>
-                        </div>
+                        </span>
+                        <button class="pco-accordion-close" type="button" aria-label="<?php esc_attr_e('Close', 'mypco-online'); ?>">&times;</button>
+                    </div>
 
+                    <div class="pco-accordion-detail-body">
                         <?php if (!empty($event['image_url'])): ?>
                         <div class="pco-accordion-detail-image">
                             <img src="<?php echo esc_url($event['image_url']); ?>"
@@ -200,10 +207,13 @@ $initial_month_display = isset($events_by_month[$initial_month])
 
                         <?php if ($location_name): ?>
                         <div class="pco-accordion-detail-location">
-                            <strong><?php echo esc_html($location_name); ?></strong>
-                            <?php if ($address): ?>
-                                <span><?php echo esc_html($address); ?></span>
-                            <?php endif; ?>
+                            <svg class="pco-accordion-pin-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            <div>
+                                <strong><?php echo esc_html($location_name); ?></strong>
+                                <?php if ($address): ?>
+                                    <span><?php echo esc_html($address); ?></span>
+                                <?php endif; ?>
+                            </div>
                         </div>
                         <?php endif; ?>
 
@@ -217,7 +227,6 @@ $initial_month_display = isset($events_by_month[$initial_month])
                         <?php endif; ?>
                     </div>
                 </div>
-                <?php endforeach; ?>
             </div>
             <?php endforeach; ?>
         </div>
@@ -341,12 +350,6 @@ $initial_month_display = isset($events_by_month[$initial_month])
             var match = tagIds.some(function(id) { return String(id) === String(tagId); });
             item.style.display = match ? '' : 'none';
             if (match) hasVisible = true;
-        });
-
-        // Show/hide day headers based on visible events
-        activeMonth.querySelectorAll('.pco-accordion-day').forEach(function(day) {
-            var visibleItems = day.querySelectorAll('.pco-accordion-item:not([style*="display: none"])');
-            day.style.display = visibleItems.length > 0 ? '' : 'none';
         });
 
         if (noEventsEl) {
