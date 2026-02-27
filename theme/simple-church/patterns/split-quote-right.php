@@ -9,8 +9,8 @@
 ?>
 <!-- wp:group {"backgroundColor":"white","textColor":"black","className":"section section--light","layout":{"type":"default"}} -->
 <div class="wp-block-group section section--light has-black-color has-text-color has-white-background-color has-background">
-	<!-- wp:group {"className":"section__inner","layout":{"type":"default"}} -->
-	<div class="wp-block-group section__inner">
+	<!-- wp:group {"className":"section__inner section__inner--640","layout":{"type":"default"}} -->
+	<div class="wp-block-group section__inner section__inner--640">
 		<!-- wp:group {"className":"split split--stretch","layout":{"type":"default"}} -->
 		<div class="wp-block-group split split--stretch">
 			<!-- wp:group {"className":"split__left","layout":{"type":"default"}} -->
