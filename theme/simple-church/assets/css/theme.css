@@ -445,12 +445,6 @@ h1, h2, h3, h4, h5, h6 {
 	max-width: 720px;
 }
 
-@media (min-width: 960px) {
-	.card-grid {
-		grid-template-columns: repeat(4, 1fr);
-	}
-}
-
 .section__inner {
 	max-width: 1200px;
 	margin: 0 auto;
@@ -520,6 +514,10 @@ h1, h2, h3, h4, h5, h6 {
 	grid-template-columns: 1fr;
 	gap: 2rem;
 	margin-top: 3rem;
+	max-width: 640px;
+	margin-left: auto;
+	margin-right: auto;
+	justify-content: center;
 }
 
 @media (min-width: 640px) {
@@ -529,7 +527,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .card {
-	padding: 2rem;
+	padding: 2.5rem;
 	border: 1px solid #e8e8e8;
 	border-radius: 2px;
 	transition: border-color 0.3s ease;
@@ -1099,7 +1097,7 @@ h1, h2, h3, h4, h5, h6 {
 	}
 
 	.card {
-		padding: 1.5rem;
+		padding: 2rem;
 	}
 
 	.module-card {
@@ -1217,11 +1215,15 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Inner structural elements: strip wp-block-group defaults */
 .wp-block-group.reveal-group,
-.wp-block-group.card,
 .wp-block-group.split__left,
 .wp-block-group.split__right,
 .wp-block-group.parallax-break__content {
 	padding: 0;
+	margin: 0;
+}
+
+.wp-block-group.card {
+	padding: 2.5rem;
 	margin: 0;
 }
 
@@ -1237,18 +1239,15 @@ h1, h2, h3, h4, h5, h6 {
 	grid-template-columns: 1fr;
 	gap: 2rem;
 	margin-top: 3rem;
+	max-width: 640px;
+	margin-left: auto;
+	margin-right: auto;
+	justify-content: center;
 }
-
 
 @media (min-width: 640px) {
 	.wp-block-group.card-grid {
 		grid-template-columns: repeat(2, 1fr);
-	}
-}
-
-@media (min-width: 960px) {
-	.wp-block-group.card-grid {
-		grid-template-columns: repeat(4, 1fr);
 	}
 }
 
