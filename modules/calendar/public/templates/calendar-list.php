@@ -327,5 +327,11 @@ $initial_month_display = isset($events_by_month[$initial_month])
         wrapper.classList.remove('has-expanded');
     }
 
+    // Open all links inside event descriptions in a new window
+    wrapper.querySelectorAll('.pco-accordion-detail-desc a').forEach(function(link) {
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener');
+    });
+
 })();
 </script>
