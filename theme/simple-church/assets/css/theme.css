@@ -461,6 +461,10 @@ h1, h2, h3, h4, h5, h6 {
 	max-width: 780px;
 }
 
+.section__inner--640 {
+	max-width: 640px;
+}
+
 .section__label {
 	display: block;
 	font-size: 0.75rem;
