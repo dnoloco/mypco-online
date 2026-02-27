@@ -614,6 +614,42 @@ h1, h2, h3, h4, h5, h6 {
 		gap: 4rem;
 		align-items: start;
 	}
+
+	.split--stretch {
+		align-items: stretch;
+	}
+}
+
+/* --------------------------------------------------------------------------
+   10b. SPLIT QUOTE BOX
+   -------------------------------------------------------------------------- */
+
+.split-quote-box {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 3rem;
+	min-height: 280px;
+}
+
+.split-quote-box__quote,
+.split-quote-box .wp-block-quote.split-quote-box__quote {
+	font-size: clamp(1.25rem, 3vw, 2rem);
+	font-weight: 300;
+	font-style: italic;
+	line-height: 1.5;
+	letter-spacing: -0.01em;
+	border: none;
+	padding: 0;
+	margin: 0;
+}
+
+.split-quote-box__quote p {
+	font-size: inherit;
+	font-weight: inherit;
+	font-style: inherit;
+	line-height: inherit;
+	color: inherit;
 }
 
 /* --------------------------------------------------------------------------
@@ -1265,6 +1301,19 @@ h1, h2, h3, h4, h5, h6 {
 	.wp-block-group.split {
 		grid-template-columns: 1fr 1fr;
 	}
+
+	.wp-block-group.split.split--stretch {
+		align-items: stretch;
+	}
+}
+
+/* Split quote box as wp-block-group */
+.wp-block-group.split-quote-box {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 3rem;
+	min-height: 280px;
 }
 
 /* CTA button as wp-block-button */
