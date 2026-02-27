@@ -1211,6 +1211,10 @@ h1, h2, h3, h4, h5, h6 {
 	max-width: 720px;
 }
 
+.wp-block-group.section__inner--640 {
+	max-width: 640px;
+}
+
 /* Inner structural elements: strip wp-block-group defaults */
 .wp-block-group.reveal-group,
 .wp-block-group.card,
