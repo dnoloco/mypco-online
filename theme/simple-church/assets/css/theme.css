@@ -455,8 +455,8 @@ h1, h2, h3, h4, h5, h6 {
 	max-width: 780px;
 }
 
-.section__inner--640 {
-	max-width: 640px;
+.section__inner--720 {
+	max-width: 720px;
 }
 
 .section__label {
@@ -483,7 +483,7 @@ h1, h2, h3, h4, h5, h6 {
 	line-height: 1.7;
 	color: #666666;
 	margin-bottom: 1rem;
-	max-width: 640px;
+	max-width: 720px;
 }
 
 .section--dark .section__text {
@@ -514,7 +514,7 @@ h1, h2, h3, h4, h5, h6 {
 	grid-template-columns: 1fr;
 	gap: 2rem;
 	margin-top: 3rem;
-	max-width: 640px;
+	max-width: 720px;
 	margin-left: auto;
 	margin-right: auto;
 	justify-content: center;
@@ -522,7 +522,7 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (min-width: 640px) {
 	.card-grid {
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: repeat(3, 1fr);
 	}
 }
 
@@ -1185,7 +1185,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Force grid layouts to show as rows inside the editor even when the
    content area is narrower than our responsive breakpoints. */
 .editor-styles-wrapper .wp-block-group.card-grid {
-	grid-template-columns: repeat(2, 1fr) !important;
+	grid-template-columns: repeat(3, 1fr) !important;
 }
 
 .editor-styles-wrapper .wp-block-group.contact-grid {
@@ -1209,8 +1209,8 @@ h1, h2, h3, h4, h5, h6 {
 	max-width: 720px;
 }
 
-.wp-block-group.section__inner--640 {
-	max-width: 640px;
+.wp-block-group.section__inner--720 {
+	max-width: 720px;
 }
 
 /* Inner structural elements: strip wp-block-group defaults */
@@ -1239,7 +1239,7 @@ h1, h2, h3, h4, h5, h6 {
 	grid-template-columns: 1fr;
 	gap: 2rem;
 	margin-top: 3rem;
-	max-width: 640px;
+	max-width: 720px;
 	margin-left: auto;
 	margin-right: auto;
 	justify-content: center;
@@ -1247,7 +1247,7 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (min-width: 640px) {
 	.wp-block-group.card-grid {
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: repeat(3, 1fr);
 	}
 }
 
