@@ -621,6 +621,55 @@ function simple_church_register_pattern_categories() {
 add_action( 'init', 'simple_church_register_pattern_categories' );
 
 /**
+ * Manually register block patterns that may not be auto-discovered in classic themes.
+ */
+function simple_church_register_block_patterns() {
+	$pattern_dir = get_template_directory() . '/patterns/';
+	$patterns    = array(
+		'card-row-dark',
+	);
+
+	foreach ( $patterns as $pattern_file ) {
+		$file = $pattern_dir . $pattern_file . '.php';
+		if ( ! file_exists( $file ) ) {
+			continue;
+		}
+		$headers = get_file_data(
+			$file,
+			array(
+				'title'       => 'Title',
+				'slug'        => 'Slug',
+				'description' => 'Description',
+				'categories'  => 'Categories',
+				'keywords'    => 'Keywords',
+			)
+		);
+		if ( empty( $headers['slug'] ) || WP_Block_Patterns_Registry::get_instance()->is_registered( $headers['slug'] ) ) {
+			continue;
+		}
+		ob_start();
+		include $file;
+		$content = ob_get_clean();
+		if ( empty( $content ) ) {
+			continue;
+		}
+		$props = array(
+			'title'       => $headers['title'],
+			'content'     => $content,
+			'description' => $headers['description'],
+		);
+		if ( ! empty( $headers['categories'] ) ) {
+			$props['categories'] = array_map( 'trim', explode( ',', $headers['categories'] ) );
+		}
+		if ( ! empty( $headers['keywords'] ) ) {
+			$props['keywords'] = array_map( 'trim', explode( ',', $headers['keywords'] ) );
+		}
+		register_block_pattern( $headers['slug'], $props );
+	}
+}
+add_action( 'init', 'simple_church_register_block_patterns' );
+
+/**
  * Enqueue the patterns interactive JS (tabs, accordion, stat counters).
  */
 function simple_church_patterns_scripts() {
