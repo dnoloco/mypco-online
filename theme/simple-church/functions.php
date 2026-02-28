@@ -151,6 +151,22 @@ class Simple_Church_Overlay_Walker extends Walker_Nav_Menu {
 function simple_church_customize_register( $wp_customize ) {
 	$font_choices = simple_church_hero_font_choices();
 
+	// ── Header / Navigation ────────────────────────────────────────
+	$wp_customize->add_section( 'simple_church_header', array(
+		'title'    => __( 'Header / Navigation', 'simple-church' ),
+		'priority' => 25,
+	) );
+
+	$wp_customize->add_setting( 'simple_church_dark_logo', array(
+		'sanitize_callback' => 'absint',
+	) );
+	$wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'simple_church_dark_logo', array(
+		'label'       => __( 'Dark Navbar Logo (white version)', 'simple-church' ),
+		'description' => __( 'Upload a white/light version of your logo for use on the dark navbar variant.', 'simple-church' ),
+		'section'     => 'simple_church_header',
+		'mime_type'   => 'image',
+	) ) );
+
 	// ── Hero Panel ──────────────────────────────────────────────────
 	$wp_customize->add_panel( 'simple_church_hero_panel', array(
 		'title'    => __( 'Hero Section', 'simple-church' ),

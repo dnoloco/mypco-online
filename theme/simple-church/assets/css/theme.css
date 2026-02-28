@@ -88,6 +88,32 @@ h1, h2, h3, h4, h5, h6 {
 	color: #1a1a1a;
 }
 
+/* Dark navbar variant — black bar with white text/logo */
+.site-header--variant-dark {
+	background-color: #0a0a0a;
+	color: #ffffff;
+}
+
+.site-header--variant-dark.site-header--scrolled {
+	background-color: rgba(10, 10, 10, 0.95);
+	color: #ffffff;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Logo visibility: dark variant shows the dark (white) logo, hides the light one */
+.site-header--variant-dark .site-header__logo-light {
+	display: none !important;
+}
+
+/* When scrolled back to top area of a light section, swap logos on dark variant */
+.site-header--variant-dark.site-header--variant-light-swap .site-header__logo-dark {
+	display: none !important;
+}
+
+.site-header--variant-dark.site-header--variant-light-swap .site-header__logo-light {
+	display: inline-block !important;
+}
+
 .site-header__inner {
 	display: flex;
 	align-items: center;
