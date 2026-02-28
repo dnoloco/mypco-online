@@ -17,10 +17,10 @@
 		<!-- wp:heading {"textColor":"white","className":"section__heading"} -->
 		<h2 class="wp-block-heading section__heading has-white-color has-text-color">Ways to get involved.</h2>
 		<!-- /wp:heading -->
-		<!-- wp:group {"className":"card-grid","layout":{"type":"default"}} -->
-		<div class="wp-block-group card-grid">
-			<!-- wp:group {"className":"card"} -->
-			<div class="wp-block-group card">
+		<!-- wp:group {"style":{"color":{"background":"#0a0a0a"}},"className":"card-grid","layout":{"type":"default"}} -->
+		<div class="wp-block-group card-grid has-background" style="background-color:#0a0a0a">
+			<!-- wp:group {"style":{"color":{"background":"#0a0a0a"}},"className":"card","layout":{"type":"default"}} -->
+			<div class="wp-block-group card has-background" style="background-color:#0a0a0a">
 				<!-- wp:paragraph {"style":{"color":{"text":"#bbbbbb"}},"className":"card__number"} -->
 				<p class="card__number has-text-color" style="color:#bbbbbb">01</p>
 				<!-- /wp:paragraph -->
@@ -32,8 +32,8 @@
 				<!-- /wp:paragraph -->
 			</div>
 			<!-- /wp:group -->
-			<!-- wp:group {"className":"card"} -->
-			<div class="wp-block-group card">
+			<!-- wp:group {"style":{"color":{"background":"#0a0a0a"}},"className":"card","layout":{"type":"default"}} -->
+			<div class="wp-block-group card has-background" style="background-color:#0a0a0a">
 				<!-- wp:paragraph {"style":{"color":{"text":"#bbbbbb"}},"className":"card__number"} -->
 				<p class="card__number has-text-color" style="color:#bbbbbb">02</p>
 				<!-- /wp:paragraph -->
@@ -45,11 +45,11 @@
 				<!-- /wp:paragraph -->
 			</div>
 			<!-- /wp:group -->
-			<!-- wp:group {"className":"card"} -->
-			<div class="wp-block-group card">
+			<!-- wp:group {"style":{"color":{"background":"#0a0a0a"}},"className":"card","layout":{"type":"default"}} -->
+			<div class="wp-block-group card has-background" style="background-color:#0a0a0a">
 				<!-- wp:paragraph {"style":{"color":{"text":"#bbbbbb"}},"className":"card__number"} -->
 				<p class="card__number has-text-color" style="color:#bbbbbb">03</p>
-				<!-- /wp:paragraph -->
+				<!-- /wp:parameter -->
 				<!-- wp:heading {"level":3,"textColor":"white","className":"card__title"} -->
 				<h3 class="wp-block-heading card__title has-white-color has-text-color">Youth Ministry</h3>
 				<!-- /wp:heading -->
@@ -58,8 +58,8 @@
 				<!-- /wp:paragraph -->
 			</div>
 			<!-- /wp:group -->
-			<!-- wp:group {"className":"card"} -->
-			<div class="wp-block-group card">
+			<!-- wp:group {"style":{"color":{"background":"#0a0a0a"}},"className":"card","layout":{"type":"default"}} -->
+			<div class="wp-block-group card has-background" style="background-color:#0a0a0a">
 				<!-- wp:paragraph {"style":{"color":{"text":"#bbbbbb"}},"className":"card__number"} -->
 				<p class="card__number has-text-color" style="color:#bbbbbb">04</p>
 				<!-- /wp:paragraph -->
