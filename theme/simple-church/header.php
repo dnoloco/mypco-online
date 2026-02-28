@@ -2,8 +2,21 @@
 /**
  * Theme header.
  *
+ * Templates can set $simple_church_navbar_variant to 'dark' before calling
+ * get_header() to use the dark navbar (black background, white logo/text).
+ * Defaults to the light variant (transparent/white background, dark logo/text).
+ *
  * @package Simple_Church
  */
+
+$navbar_variant = isset( $simple_church_navbar_variant ) ? $simple_church_navbar_variant : 'light';
+$header_classes = 'site-header';
+if ( 'dark' === $navbar_variant ) {
+	$header_classes .= ' site-header--variant-dark';
+}
+
+// Determine which logo to show based on variant.
+$dark_logo_id = get_theme_mod( 'simple_church_dark_logo' );
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -15,10 +28,19 @@
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 
-<header class="site-header" id="site-header">
+<header class="<?php echo esc_attr( $header_classes ); ?>" id="site-header" data-variant="<?php echo esc_attr( $navbar_variant ); ?>">
 	<div class="site-header__inner">
 		<div class="site-header__logo">
-			<?php if ( has_custom_logo() ) : ?>
+			<?php if ( 'dark' === $navbar_variant && $dark_logo_id ) : ?>
+				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="custom-logo-link site-header__logo-dark" rel="home">
+					<?php echo wp_get_attachment_image( $dark_logo_id, 'full', false, array( 'class' => 'custom-logo' ) ); ?>
+				</a>
+				<?php if ( has_custom_logo() ) : ?>
+					<span class="site-header__logo-light" style="display:none;">
+						<?php the_custom_logo(); ?>
+					</span>
+				<?php endif; ?>
+			<?php elseif ( has_custom_logo() ) : ?>
 				<?php the_custom_logo(); ?>
 			<?php else : ?>
 				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="site-header__title">

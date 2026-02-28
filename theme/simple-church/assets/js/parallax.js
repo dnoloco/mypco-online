@@ -69,6 +69,9 @@
 		}
 	}
 
+	// Check if this is a dark variant header
+	const isDarkVariant = header.getAttribute( 'data-variant' ) === 'dark';
+
 	function updateHeader() {
 		ticking = false;
 
@@ -98,7 +101,7 @@
 
 		if ( ! el ) return;
 
-		const section = el.closest( '.section--dark, .hero, .page-hero, .parallax-break' );
+		const section = el.closest( '.section--dark, .hero, .page-hero, .parallax-break, .section--light' );
 
 		if ( section ) {
 			const isDark = section.classList.contains( 'section--dark' )
@@ -113,8 +116,32 @@
 			} else {
 				header.classList.remove( 'site-header--dark' );
 			}
+
+			// For dark variant: when over light sections after scroll,
+			// swap to light appearance so it doesn't clash
+			if ( isDarkVariant ) {
+				const isOverLight = section.classList.contains( 'section--light' )
+					|| section.classList.contains( 'hero' );
+
+				if ( isOverLight && lastScrollY > 80 ) {
+					header.classList.remove( 'site-header--variant-dark' );
+					header.classList.add( 'site-header--variant-light-swap' );
+				} else {
+					header.classList.add( 'site-header--variant-dark' );
+					header.classList.remove( 'site-header--variant-light-swap' );
+				}
+			}
 		} else {
 			header.classList.remove( 'site-header--dark' );
+
+			// Over generic content (likely light bg), swap dark variant
+			if ( isDarkVariant && lastScrollY > 80 ) {
+				header.classList.remove( 'site-header--variant-dark' );
+				header.classList.add( 'site-header--variant-light-swap' );
+			} else if ( isDarkVariant ) {
+				header.classList.add( 'site-header--variant-dark' );
+				header.classList.remove( 'site-header--variant-light-swap' );
+			}
 		}
 	}
 
