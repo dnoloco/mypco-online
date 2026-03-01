@@ -2,14 +2,14 @@
 /**
  * Theme header.
  *
- * Templates can set $simple_church_navbar_variant to 'dark' before calling
- * get_header() to use the dark navbar (black background, white logo/text).
+ * Templates pass the navbar variant via get_header()'s $args parameter:
+ *   get_header( null, array( 'simple_church_navbar_variant' => 'dark' ) );
  * Defaults to the light variant (transparent/white background, dark logo/text).
  *
  * @package Simple_Church
  */
 
-$navbar_variant = isset( $simple_church_navbar_variant ) ? $simple_church_navbar_variant : 'light';
+$navbar_variant = ! empty( $simple_church_navbar_variant ) ? $simple_church_navbar_variant : 'light';
 $header_classes = 'site-header';
 if ( 'dark' === $navbar_variant ) {
 	$header_classes .= ' site-header--variant-dark';
