@@ -5,8 +5,7 @@
  * @package Simple_Church
  */
 
-$simple_church_navbar_variant = 'dark';
-get_header();
+get_header( null, array( 'simple_church_navbar_variant' => 'dark' ) );
 ?>
 
 <section class="page-hero">
