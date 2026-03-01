@@ -5,7 +5,8 @@
  * @package Simple_Church
  */
 
-get_header( null, array( 'simple_church_navbar_variant' => 'dark' ) );
+add_filter( 'simple_church_navbar_variant', function () { return 'dark'; } );
+get_header();
 ?>
 
 <section class="page-hero page-hero--compact">
