@@ -107,7 +107,15 @@ h1, h2, h3, h4, h5, h6 {
 	display: none !important;
 }
 
-/* When scrolled back to top area of a light section, swap logos on dark variant */
+/* When over a light section after scrolling, swap back to light appearance */
+.site-header--variant-dark.site-header--variant-light-swap {
+	background-color: rgba(255, 255, 255, 0.95);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	color: #1a1a1a;
+	box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+}
+
 .site-header--variant-dark.site-header--variant-light-swap .site-header__logo-dark {
 	display: none !important;
 }
@@ -203,6 +211,7 @@ h1, h2, h3, h4, h5, h6 {
 	border: none;
 	cursor: pointer;
 	padding: 0;
+	color: inherit;
 }
 
 .menu-toggle__line {
