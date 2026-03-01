@@ -117,29 +117,24 @@
 				header.classList.remove( 'site-header--dark' );
 			}
 
-			// For dark variant: when over light sections after scroll,
-			// swap to light appearance so it doesn't clash
+			// For dark variant: toggle light-swap modifier over light sections
 			if ( isDarkVariant ) {
 				const isOverLight = section.classList.contains( 'section--light' )
 					|| section.classList.contains( 'hero' );
 
 				if ( isOverLight && lastScrollY > 80 ) {
-					header.classList.remove( 'site-header--variant-dark' );
 					header.classList.add( 'site-header--variant-light-swap' );
 				} else {
-					header.classList.add( 'site-header--variant-dark' );
 					header.classList.remove( 'site-header--variant-light-swap' );
 				}
 			}
 		} else {
 			header.classList.remove( 'site-header--dark' );
 
-			// Over generic content (likely light bg), swap dark variant
+			// Over generic content (likely light bg), toggle light-swap
 			if ( isDarkVariant && lastScrollY > 80 ) {
-				header.classList.remove( 'site-header--variant-dark' );
 				header.classList.add( 'site-header--variant-light-swap' );
 			} else if ( isDarkVariant ) {
-				header.classList.add( 'site-header--variant-dark' );
 				header.classList.remove( 'site-header--variant-light-swap' );
 			}
 		}
