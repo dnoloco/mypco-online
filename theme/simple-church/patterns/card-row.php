@@ -30,6 +30,9 @@
 				<!-- wp:paragraph {"style":{"color":{"text":"#666666"}},"className":"card__text"} -->
 				<p class="card__text has-text-color" style="color:#666666">Join us every Sunday for worship, teaching, and community. Services at 9:00 AM and 11:00 AM.</p>
 				<!-- /wp:paragraph -->
+				<!-- wp:paragraph {"style":{"color":{"text":"#1a1a1a"}},"className":"card__link"} -->
+				<p class="card__link has-text-color" style="color:#1a1a1a"><a href="#">Learn More →</a></p>
+				<!-- /wp:paragraph -->
 			</div>
 			<!-- /wp:group -->
 			<!-- wp:group {"className":"card"} -->
@@ -42,6 +45,9 @@
 				<!-- /wp:heading -->
 				<!-- wp:paragraph {"style":{"color":{"text":"#666666"}},"className":"card__text"} -->
 				<p class="card__text has-text-color" style="color:#666666">Find deeper connection in a small group. We have groups for every stage of life meeting throughout the week.</p>
+				<!-- /wp:paragraph -->
+				<!-- wp:paragraph {"style":{"color":{"text":"#1a1a1a"}},"className":"card__link"} -->
+				<p class="card__link has-text-color" style="color:#1a1a1a"><a href="#">Learn More →</a></p>
 				<!-- /wp:paragraph -->
 			</div>
 			<!-- /wp:group -->
@@ -56,6 +62,9 @@
 				<!-- wp:paragraph {"style":{"color":{"text":"#666666"}},"className":"card__text"} -->
 				<p class="card__text has-text-color" style="color:#666666">A vibrant programme for teens to grow in faith, build friendships, and discover their purpose.</p>
 				<!-- /wp:paragraph -->
+				<!-- wp:paragraph {"style":{"color":{"text":"#1a1a1a"}},"className":"card__link"} -->
+				<p class="card__link has-text-color" style="color:#1a1a1a"><a href="#">Learn More →</a></p>
+				<!-- /wp:paragraph -->
 			</div>
 			<!-- /wp:group -->
 			<!-- wp:group {"className":"card"} -->
@@ -68,6 +77,9 @@
 				<!-- /wp:heading -->
 				<!-- wp:paragraph {"style":{"color":{"text":"#666666"}},"className":"card__text"} -->
 				<p class="card__text has-text-color" style="color:#666666">Serve our neighbours through food drives, mentoring programmes, and local partnerships.</p>
+				<!-- /wp:paragraph -->
+				<!-- wp:paragraph {"style":{"color":{"text":"#1a1a1a"}},"className":"card__link"} -->
+				<p class="card__link has-text-color" style="color:#1a1a1a"><a href="#">Learn More →</a></p>
 				<!-- /wp:paragraph -->
 			</div>
 			<!-- /wp:group -->
