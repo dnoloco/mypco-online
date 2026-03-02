@@ -396,6 +396,101 @@ function simple_church_customize_register( $wp_customize ) {
 		'description' => __( 'How long the completed word stays visible. Default 2000.', 'simple-church' ),
 	) );
 
+	// ── Special Banner (replaces parallax section) ─────────────
+	$wp_customize->add_section( 'simple_church_special_banner', array(
+		'title'       => __( 'Special Banner', 'simple-church' ),
+		'description' => __( 'Replace the parallax quote section on the home page with an image or video for special occasions. Set dates to schedule it automatically.', 'simple-church' ),
+		'priority'    => 35,
+	) );
+
+	$wp_customize->add_setting( 'simple_church_banner_enabled', array(
+		'default'           => false,
+		'sanitize_callback' => 'wp_validate_boolean',
+	) );
+	$wp_customize->add_control( 'simple_church_banner_enabled', array(
+		'label'   => __( 'Enable Special Banner', 'simple-church' ),
+		'section' => 'simple_church_special_banner',
+		'type'    => 'checkbox',
+	) );
+
+	$wp_customize->add_setting( 'simple_church_banner_type', array(
+		'default'           => 'image',
+		'sanitize_callback' => 'sanitize_text_field',
+	) );
+	$wp_customize->add_control( 'simple_church_banner_type', array(
+		'label'   => __( 'Media Type', 'simple-church' ),
+		'section' => 'simple_church_special_banner',
+		'type'    => 'select',
+		'choices' => array(
+			'image' => __( 'Image', 'simple-church' ),
+			'video' => __( 'Video (YouTube / Vimeo URL)', 'simple-church' ),
+		),
+	) );
+
+	$wp_customize->add_setting( 'simple_church_banner_image', array(
+		'sanitize_callback' => 'absint',
+	) );
+	$wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'simple_church_banner_image', array(
+		'label'       => __( 'Banner Image', 'simple-church' ),
+		'description' => __( 'Used when Media Type is "Image".', 'simple-church' ),
+		'section'     => 'simple_church_special_banner',
+		'mime_type'   => 'image',
+	) ) );
+
+	$wp_customize->add_setting( 'simple_church_banner_video_url', array(
+		'default'           => '',
+		'sanitize_callback' => 'esc_url_raw',
+	) );
+	$wp_customize->add_control( 'simple_church_banner_video_url', array(
+		'label'       => __( 'Video URL', 'simple-church' ),
+		'description' => __( 'YouTube or Vimeo URL. Used when Media Type is "Video".', 'simple-church' ),
+		'section'     => 'simple_church_special_banner',
+		'type'        => 'url',
+	) );
+
+	$wp_customize->add_setting( 'simple_church_banner_heading', array(
+		'default'           => '',
+		'sanitize_callback' => 'sanitize_text_field',
+	) );
+	$wp_customize->add_control( 'simple_church_banner_heading', array(
+		'label'       => __( 'Overlay Heading (optional)', 'simple-church' ),
+		'section'     => 'simple_church_special_banner',
+		'type'        => 'text',
+	) );
+
+	$wp_customize->add_setting( 'simple_church_banner_link', array(
+		'default'           => '',
+		'sanitize_callback' => 'esc_url_raw',
+	) );
+	$wp_customize->add_control( 'simple_church_banner_link', array(
+		'label'       => __( 'Link URL (optional)', 'simple-church' ),
+		'description' => __( 'Makes the banner clickable.', 'simple-church' ),
+		'section'     => 'simple_church_special_banner',
+		'type'        => 'url',
+	) );
+
+	$wp_customize->add_setting( 'simple_church_banner_start', array(
+		'default'           => '',
+		'sanitize_callback' => 'sanitize_text_field',
+	) );
+	$wp_customize->add_control( 'simple_church_banner_start', array(
+		'label'       => __( 'Start Date (optional)', 'simple-church' ),
+		'description' => __( 'YYYY-MM-DD — leave empty to start immediately.', 'simple-church' ),
+		'section'     => 'simple_church_special_banner',
+		'type'        => 'date',
+	) );
+
+	$wp_customize->add_setting( 'simple_church_banner_end', array(
+		'default'           => '',
+		'sanitize_callback' => 'sanitize_text_field',
+	) );
+	$wp_customize->add_control( 'simple_church_banner_end', array(
+		'label'       => __( 'End Date (optional)', 'simple-church' ),
+		'description' => __( 'YYYY-MM-DD — leave empty to run indefinitely.', 'simple-church' ),
+		'section'     => 'simple_church_special_banner',
+		'type'        => 'date',
+	) );
+
 	// ── 7. Variations ───────────────────────────────────────────────
 	$wp_customize->add_section( 'simple_church_hero_variations', array(
 		'title' => __( 'Variations', 'simple-church' ),
@@ -698,6 +793,125 @@ function simple_church_patterns_scripts() {
 	);
 }
 add_action( 'wp_enqueue_scripts', 'simple_church_patterns_scripts' );
+
+/**
+ * Check whether the special banner should display right now.
+ */
+function simple_church_is_banner_active() {
+	if ( ! get_theme_mod( 'simple_church_banner_enabled', false ) ) {
+		return false;
+	}
+
+	$today = current_time( 'Y-m-d' );
+	$start = get_theme_mod( 'simple_church_banner_start', '' );
+	$end   = get_theme_mod( 'simple_church_banner_end', '' );
+
+	if ( $start && $today < $start ) {
+		return false;
+	}
+	if ( $end && $today > $end ) {
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Build the special banner HTML.
+ */
+function simple_church_banner_html() {
+	$type      = get_theme_mod( 'simple_church_banner_type', 'image' );
+	$heading   = get_theme_mod( 'simple_church_banner_heading', '' );
+	$link      = get_theme_mod( 'simple_church_banner_link', '' );
+
+	$inner = '';
+
+	if ( 'video' === $type ) {
+		$video_url = get_theme_mod( 'simple_church_banner_video_url', '' );
+		$embed_url = simple_church_get_embed_url( $video_url );
+		if ( $embed_url ) {
+			$inner = '<iframe class="special-banner__iframe" src="' . esc_url( $embed_url ) . '" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+		}
+	} else {
+		$image_id = get_theme_mod( 'simple_church_banner_image', 0 );
+		if ( $image_id ) {
+			$image_url = wp_get_attachment_url( $image_id );
+			if ( $image_url ) {
+				$inner = '<img class="special-banner__img" src="' . esc_url( $image_url ) . '" alt="' . esc_attr( $heading ) . '">';
+			}
+		}
+	}
+
+	if ( ! $inner ) {
+		return '';
+	}
+
+	$has_overlay = $heading || $link;
+
+	$html  = '<section class="special-banner">';
+	$html .= '<div class="special-banner__media">' . $inner . '</div>';
+
+	if ( $has_overlay ) {
+		$html .= '<div class="special-banner__overlay">';
+		if ( $heading ) {
+			$html .= '<h2 class="special-banner__heading">' . esc_html( $heading ) . '</h2>';
+		}
+		if ( $link ) {
+			$html .= '<a class="special-banner__link" href="' . esc_url( $link ) . '">Learn More &rarr;</a>';
+		}
+		$html .= '</div>';
+	}
+
+	$html .= '</section>';
+
+	return $html;
+}
+
+/**
+ * Convert a YouTube or Vimeo URL to an embeddable URL.
+ */
+function simple_church_get_embed_url( $url ) {
+	if ( empty( $url ) ) {
+		return '';
+	}
+
+	// YouTube
+	if ( preg_match( '/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $url, $m ) ) {
+		return 'https://www.youtube.com/embed/' . $m[1] . '?autoplay=1&mute=1&loop=1&playlist=' . $m[1] . '&controls=0&showinfo=0&rel=0';
+	}
+
+	// Vimeo
+	if ( preg_match( '/vimeo\.com\/(\d+)/', $url, $m ) ) {
+		return 'https://player.vimeo.com/video/' . $m[1] . '?autoplay=1&muted=1&loop=1&background=1';
+	}
+
+	return '';
+}
+
+/**
+ * On the front page, replace the parallax-break section with the special banner.
+ */
+function simple_church_replace_parallax_with_banner( $content ) {
+	if ( ! is_front_page() ) {
+		return $content;
+	}
+
+	if ( ! simple_church_is_banner_active() ) {
+		return $content;
+	}
+
+	$banner = simple_church_banner_html();
+	if ( ! $banner ) {
+		return $content;
+	}
+
+	// Replace the parallax-break block (wp-block-group with parallax-break class).
+	$pattern = '/<div[^>]*class="[^"]*parallax-break[^"]*"[^>]*>.*?<\/div>\s*<!--\s*\/wp:group\s*-->/s';
+	$replaced = preg_replace( $pattern, $banner, $content, 1 );
+
+	return ( null !== $replaced ) ? $replaced : $content;
+}
+add_filter( 'the_content', 'simple_church_replace_parallax_with_banner' );
 
 /**
  * Disable the admin bar on the front-end for cleaner parallax experience.
