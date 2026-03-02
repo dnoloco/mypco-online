@@ -905,11 +905,50 @@ function simple_church_replace_parallax_with_banner( $content ) {
 		return $content;
 	}
 
-	// Replace the parallax-break block (wp-block-group with parallax-break class).
-	$pattern = '/<div[^>]*class="[^"]*parallax-break[^"]*"[^>]*>.*?<\/div>\s*<!--\s*\/wp:group\s*-->/s';
-	$replaced = preg_replace( $pattern, $banner, $content, 1 );
+	// Find the opening div with class containing "parallax-break".
+	$needle = 'parallax-break';
+	$pos    = strpos( $content, $needle );
+	if ( false === $pos ) {
+		return $content;
+	}
 
-	return ( null !== $replaced ) ? $replaced : $content;
+	// Walk backwards to find the start of this <div>.
+	$start = strrpos( substr( $content, 0, $pos ), '<div' );
+	if ( false === $start ) {
+		return $content;
+	}
+
+	// Walk forward from $start, counting nested <div> tags to find the matching </div>.
+	$depth  = 0;
+	$len    = strlen( $content );
+	$i      = $start;
+	$end    = false;
+
+	while ( $i < $len ) {
+		// Opening <div
+		if ( substr( $content, $i, 4 ) === '<div' ) {
+			$depth++;
+			$i += 4;
+			continue;
+		}
+		// Closing </div>
+		if ( substr( $content, $i, 6 ) === '</div>' ) {
+			$depth--;
+			if ( 0 === $depth ) {
+				$end = $i + 6;
+				break;
+			}
+			$i += 6;
+			continue;
+		}
+		$i++;
+	}
+
+	if ( false === $end ) {
+		return $content;
+	}
+
+	return substr( $content, 0, $start ) . $banner . substr( $content, $end );
 }
 add_filter( 'the_content', 'simple_church_replace_parallax_with_banner' );
 
