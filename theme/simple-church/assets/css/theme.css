@@ -1878,3 +1878,73 @@ h1, h2, h3, h4, h5, h6 {
 		font-size: 0.875rem;
 	}
 }
+
+/* --------------------------------------------------------------------------
+   20k. SPECIAL BANNER (replaces parallax section)
+   -------------------------------------------------------------------------- */
+
+.special-banner {
+	position: relative;
+	width: 100%;
+	min-height: 60vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	background-color: #0a0a0a;
+}
+
+.special-banner__media {
+	position: absolute;
+	inset: 0;
+}
+
+.special-banner__img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.special-banner__iframe {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	min-width: 100%;
+	min-height: 100%;
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}
+
+.special-banner__overlay {
+	position: relative;
+	z-index: 1;
+	text-align: center;
+	padding: 2rem;
+}
+
+.special-banner__heading {
+	font-size: clamp(1.5rem, 4vw, 3rem);
+	font-weight: 700;
+	color: #ffffff;
+	letter-spacing: -0.02em;
+	text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+	margin-bottom: 1rem;
+}
+
+.special-banner__link {
+	display: inline-block;
+	padding: 0.75rem 2rem;
+	background: #ffffff;
+	color: #0a0a0a;
+	font-size: 0.875rem;
+	font-weight: 600;
+	text-decoration: none;
+	transition: background 0.3s ease, color 0.3s ease;
+}
+
+.special-banner__link:hover {
+	background: #1a1a1a;
+	color: #ffffff;
+}
