@@ -817,22 +817,16 @@ h1, h2, h3, h4, h5, h6 {
 
 .cta__button {
 	display: inline-block;
-	padding: 0.875rem 2.5rem;
-	background-color: #0a0a0a;
-	color: #ffffff;
-	font-size: 0.875rem;
-	font-weight: 600;
-	letter-spacing: 0.03em;
+	padding: 0;
+	background-color: transparent;
 	border: none;
 	border-radius: 0;
 	cursor: pointer;
-	transition: background-color 0.3s ease, transform 0.2s ease;
-	text-decoration: none;
 }
 
 .cta__button:hover {
-	background-color: #333333;
-	transform: translateY(-1px);
+	background-color: transparent;
+	transform: none;
 }
 
 /* --------------------------------------------------------------------------
@@ -1411,7 +1405,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .section--cta .wp-block-button__link:hover {
-	background: transparent;
+	background: #ffffff;
 	color: #1a1a1a;
 }
 
