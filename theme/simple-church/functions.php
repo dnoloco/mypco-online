@@ -889,68 +889,34 @@ function simple_church_get_embed_url( $url ) {
 }
 
 /**
- * On the front page, replace the parallax-break section with the special banner.
+ * On the front page, replace the parallax-break block with the special banner.
+ *
+ * Uses the render_block filter to intercept the specific block by its
+ * className attribute — no fragile HTML regex needed.
  */
-function simple_church_replace_parallax_with_banner( $content ) {
+function simple_church_replace_parallax_with_banner( $block_content, $block ) {
 	if ( ! is_front_page() ) {
-		return $content;
+		return $block_content;
+	}
+
+	if ( 'core/group' !== $block['blockName'] ) {
+		return $block_content;
+	}
+
+	$classes = isset( $block['attrs']['className'] ) ? $block['attrs']['className'] : '';
+	if ( false === strpos( ' ' . $classes . ' ', ' parallax-break ' ) ) {
+		return $block_content;
 	}
 
 	if ( ! simple_church_is_banner_active() ) {
-		return $content;
+		return $block_content;
 	}
 
 	$banner = simple_church_banner_html();
-	if ( ! $banner ) {
-		return $content;
-	}
 
-	// Find the opening div with class containing "parallax-break".
-	$needle = 'parallax-break';
-	$pos    = strpos( $content, $needle );
-	if ( false === $pos ) {
-		return $content;
-	}
-
-	// Walk backwards to find the start of this <div>.
-	$start = strrpos( substr( $content, 0, $pos ), '<div' );
-	if ( false === $start ) {
-		return $content;
-	}
-
-	// Walk forward from $start, counting nested <div> tags to find the matching </div>.
-	$depth  = 0;
-	$len    = strlen( $content );
-	$i      = $start;
-	$end    = false;
-
-	while ( $i < $len ) {
-		// Opening <div
-		if ( substr( $content, $i, 4 ) === '<div' ) {
-			$depth++;
-			$i += 4;
-			continue;
-		}
-		// Closing </div>
-		if ( substr( $content, $i, 6 ) === '</div>' ) {
-			$depth--;
-			if ( 0 === $depth ) {
-				$end = $i + 6;
-				break;
-			}
-			$i += 6;
-			continue;
-		}
-		$i++;
-	}
-
-	if ( false === $end ) {
-		return $content;
-	}
-
-	return substr( $content, 0, $start ) . $banner . substr( $content, $end );
+	return $banner ? $banner : $block_content;
 }
-add_filter( 'the_content', 'simple_church_replace_parallax_with_banner' );
+add_filter( 'render_block', 'simple_church_replace_parallax_with_banner', 10, 2 );
 
 /**
  * Disable the admin bar on the front-end for cleaner parallax experience.
