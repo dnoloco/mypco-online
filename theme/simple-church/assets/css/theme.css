@@ -593,10 +593,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .card__link {
-	margin-top: 1.5rem;
+	margin-top: 0.75rem;
 	font-size: 0.875rem;
 	font-weight: 600;
 	letter-spacing: 0.02em;
+	text-align: right;
 }
 
 .card__link a {
