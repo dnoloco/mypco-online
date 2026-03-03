@@ -85,23 +85,100 @@ $tagline_color    = get_theme_mod( 'simple_church_hero_tagline_color', '#1a1a1a'
 </section>
 
 <?php
-// ─── Special Banner (replaces parallax section for events) ──────────
-if ( function_exists( 'simple_church_is_banner_active' ) && simple_church_is_banner_active() ) {
-	$banner_html = simple_church_banner_html();
-	if ( $banner_html ) {
-		echo $banner_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	}
-}
-?>
-
-<?php
 // ─── Editable page content ──────────────────────────────────────────
 // Everything below the hero comes from the block editor.
 // Go to Pages → (your front page) to add, edit, or rearrange sections.
 if ( have_posts() ) :
 	while ( have_posts() ) :
 		the_post();
+
+		// Capture rendered content so we can swap the parallax section
+		// with the special banner when one is active.
+		ob_start();
 		the_content();
+		$front_page_content = ob_get_clean();
+
+		if ( function_exists( 'simple_church_is_banner_active' )
+			&& simple_church_is_banner_active() ) {
+
+			$banner_html = simple_church_banner_html();
+
+			if ( $banner_html ) {
+				$replaced = false;
+
+				// Search for the parallax section in the rendered HTML.
+				// Try several markers — the class may differ from the pattern default.
+				$markers = array( 'parallax-break', 'parallax-break__content', 'parallax-break__quote' );
+				foreach ( $markers as $marker ) {
+					$pos = strpos( $front_page_content, $marker );
+					if ( false === $pos ) {
+						continue;
+					}
+
+					// Walk backwards to the outermost opening <div.
+					// For inner markers we may need to go up several levels.
+					$search_from = $pos;
+					$start       = false;
+					$attempts    = 0;
+					while ( $attempts < 3 && false !== $search_from ) {
+						$s = strrpos( substr( $front_page_content, 0, $search_from ), '<div' );
+						if ( false === $s ) {
+							break;
+						}
+						// Check if this div's class contains 'parallax'.
+						$tag_end = strpos( $front_page_content, '>', $s );
+						$tag     = substr( $front_page_content, $s, $tag_end - $s );
+						if ( false !== stripos( $tag, 'parallax' ) ) {
+							$start = $s;
+							break;
+						}
+						$search_from = $s;
+						$attempts++;
+					}
+
+					if ( false === $start ) {
+						continue;
+					}
+
+					// Count div depth to find matching </div>.
+					$depth = 0;
+					$len   = strlen( $front_page_content );
+					$i     = $start;
+					$end   = false;
+					while ( $i < $len ) {
+						if ( '<div' === substr( $front_page_content, $i, 4 ) ) {
+							$depth++;
+							$i += 4;
+						} elseif ( '</div>' === substr( $front_page_content, $i, 6 ) ) {
+							$depth--;
+							if ( 0 === $depth ) {
+								$end = $i + 6;
+								break;
+							}
+							$i += 6;
+						} else {
+							$i++;
+						}
+					}
+
+					if ( false !== $end ) {
+						$front_page_content = substr( $front_page_content, 0, $start )
+							. $banner_html
+							. substr( $front_page_content, $end );
+						$replaced = true;
+					}
+					break;
+				}
+
+				// Fallback: place banner before all content.
+				if ( ! $replaced ) {
+					$front_page_content = $banner_html . $front_page_content;
+				}
+			}
+		}
+
+		echo $front_page_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
 	endwhile;
 endif;
 
