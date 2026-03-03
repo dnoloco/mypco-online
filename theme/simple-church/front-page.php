@@ -106,6 +106,19 @@ if ( have_posts() ) :
 			if ( $banner_html ) {
 				$replaced = false;
 
+				// Debug: log what markers exist in the content.
+				$debug_found = array();
+				foreach ( array( 'parallax-break', 'parallax', 'blockquote', 'wp-block-quote' ) as $dbg ) {
+					if ( false !== strpos( $front_page_content, $dbg ) ) {
+						$debug_found[] = $dbg;
+					}
+				}
+				$front_page_content .= "\n<!-- BANNER_DEBUG: content_length="
+					. strlen( $front_page_content )
+					. ' markers_found=' . implode( ',', $debug_found )
+					. ' banner_active=yes'
+					. ' -->';
+
 				// Search for the parallax section in the rendered HTML.
 				// Try several markers — the class may differ from the pattern default.
 				$markers = array( 'parallax-break', 'parallax-break__content', 'parallax-break__quote' );
