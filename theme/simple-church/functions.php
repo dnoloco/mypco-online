@@ -14,6 +14,9 @@ define( 'SIMPLE_CHURCH_VERSION', '1.0.0' );
 define( 'SIMPLE_CHURCH_DIR', get_template_directory() );
 define( 'SIMPLE_CHURCH_URI', get_template_directory_uri() );
 
+// Feature modules.
+require SIMPLE_CHURCH_DIR . '/inc/seasonal-styles.php';
+
 /**
  * Check whether the MyPCO Online plugin is active.
  *
