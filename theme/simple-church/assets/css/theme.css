@@ -370,7 +370,7 @@ h1, h2, h3, h4, h5, h6 {
 	min-height: 100vh;
 	min-height: 100dvh;
 	padding: 8rem 2.5rem 4rem;
-	background-color: #edebe6;
+	background-color: #edebe6; /* overridden by inline style from Customizer */
 }
 
 .hero__content {
