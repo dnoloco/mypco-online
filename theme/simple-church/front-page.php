@@ -85,6 +85,16 @@ $tagline_color    = get_theme_mod( 'simple_church_hero_tagline_color', '#1a1a1a'
 </section>
 
 <?php
+// ─── Special Banner (replaces parallax section for events) ──────────
+if ( function_exists( 'simple_church_is_banner_active' ) && simple_church_is_banner_active() ) {
+	$banner_html = simple_church_banner_html();
+	if ( $banner_html ) {
+		echo $banner_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
+}
+?>
+
+<?php
 // ─── Editable page content ──────────────────────────────────────────
 // Everything below the hero comes from the block editor.
 // Go to Pages → (your front page) to add, edit, or rearrange sections.
