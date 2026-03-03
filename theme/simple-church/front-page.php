@@ -106,16 +106,15 @@ if ( have_posts() ) :
 			if ( $banner_html ) {
 				$replaced = false;
 
-				// The parallax section is a TOP-LEVEL dark block (the
-				// only one whose <div> with has-black-background-color
-				// sits at div-depth 0). Nested dark elements like the
-				// split-quote-box are inside other divs and ignored.
+				// The parallax section is the only TOP-LEVEL dark block
+				// that contains a <blockquote>. Scan through the content
+				// at div-depth 0, find each dark div, extract its inner
+				// HTML, and check for a blockquote before replacing.
 				$len   = strlen( $front_page_content );
 				$depth = 0;
 				$i     = 0;
 				while ( $i < $len ) {
 					if ( '<div' === substr( $front_page_content, $i, 4 ) ) {
-						// At depth 0 this is a top-level div.
 						if ( 0 === $depth ) {
 							$tag_end = strpos( $front_page_content, '>', $i );
 							$tag     = substr( $front_page_content, $i, $tag_end - $i );
@@ -123,8 +122,7 @@ if ( have_posts() ) :
 							if ( false !== strpos( $tag, 'has-black-background-color' ) ) {
 								$start = $i;
 
-								// Find the matching </div> for this
-								// top-level div.
+								// Find matching </div>.
 								$d = 0;
 								$j = $start;
 								while ( $j < $len ) {
@@ -134,17 +132,30 @@ if ( have_posts() ) :
 									} elseif ( '</div>' === substr( $front_page_content, $j, 6 ) ) {
 										$d--;
 										if ( 0 === $d ) {
-											$end = $j + 6;
-											$front_page_content = substr( $front_page_content, 0, $start )
-												. $banner_html
-												. substr( $front_page_content, $end );
-											$replaced = true;
-											break 2; // Exit both loops.
+											$end     = $j + 6;
+											$section = substr( $front_page_content, $start, $end - $start );
+
+											// Only replace if this section
+											// contains a blockquote.
+											if ( false !== strpos( $section, '<blockquote' ) ) {
+												$front_page_content = substr( $front_page_content, 0, $start )
+													. $banner_html
+													. substr( $front_page_content, $end );
+												$replaced = true;
+												break 2;
+											}
+											break; // Not this section, continue outer scan.
 										}
 										$j += 6;
 									} else {
 										$j++;
 									}
+								}
+
+								// Skip past this section in the outer loop.
+								if ( ! $replaced && isset( $end ) ) {
+									$i = $end;
+									continue;
 								}
 							}
 						}
