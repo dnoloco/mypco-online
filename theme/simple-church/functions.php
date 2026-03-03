@@ -365,6 +365,32 @@ function simple_church_customize_register( $wp_customize ) {
 		'description' => __( 'Move the headline block upward by this many pixels. Default 100.', 'simple-church' ),
 	) );
 
+	// ── 5b. Background ──────────────────────────────────────────────
+	$wp_customize->add_section( 'simple_church_hero_background', array(
+		'title'    => __( 'Background', 'simple-church' ),
+		'panel'    => 'simple_church_hero_panel',
+		'priority' => 55,
+	) );
+
+	$wp_customize->add_setting( 'simple_church_hero_bg_color', array(
+		'default'           => '#edebe6',
+		'sanitize_callback' => 'sanitize_hex_color',
+	) );
+	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'simple_church_hero_bg_color', array(
+		'label'   => __( 'Background Color', 'simple-church' ),
+		'section' => 'simple_church_hero_background',
+	) ) );
+
+	$wp_customize->add_setting( 'simple_church_hero_bg_image', array(
+		'default'           => '',
+		'sanitize_callback' => 'absint',
+	) );
+	$wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'simple_church_hero_bg_image', array(
+		'label'     => __( 'Background Image', 'simple-church' ),
+		'section'   => 'simple_church_hero_background',
+		'mime_type' => 'image',
+	) ) );
+
 	// ── 6. Typing Animation ─────────────────────────────────────────
 	$wp_customize->add_section( 'simple_church_hero_typing', array(
 		'title' => __( 'Typing Animation', 'simple-church' ),

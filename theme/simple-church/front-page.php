@@ -55,13 +55,16 @@ $bottom_tagline   = get_theme_mod( 'simple_church_hero_bottom_tagline', 'Hope Be
 $tagline_font     = get_theme_mod( 'simple_church_hero_tagline_font', 'DM Sans' );
 $tagline_size     = floatval( get_theme_mod( 'simple_church_hero_tagline_size', '1' ) );
 $tagline_color    = get_theme_mod( 'simple_church_hero_tagline_color', '#1a1a1a' );
+$hero_bg_color    = get_theme_mod( 'simple_church_hero_bg_color', '#edebe6' );
+$hero_bg_image_id = get_theme_mod( 'simple_church_hero_bg_image', 0 );
+$hero_bg_image    = $hero_bg_image_id ? wp_get_attachment_url( $hero_bg_image_id ) : '';
 ?>
 
 <!-- ============================================
      SECTION 1 — Hero with typing headline
      ============================================ -->
 <section class="hero" id="hero"
-	style="--hero-headline-color: <?php echo esc_attr( $headline_color ); ?>; --hero-subtitle-color: <?php echo esc_attr( $subtitle_color ); ?>; --hero-headline-font: '<?php echo esc_attr( $headline_font ); ?>', sans-serif; --hero-subtitle-font: '<?php echo esc_attr( $subtitle_font ); ?>', sans-serif; --hero-headline-size: <?php echo esc_attr( $headline_size ); ?>vw; --hero-subtitle-size: <?php echo esc_attr( $subtitle_size ); ?>vw; --hero-offset: <?php echo esc_attr( $vertical_offset ); ?>px; --hero-tagline-font: '<?php echo esc_attr( $tagline_font ); ?>', sans-serif; --hero-tagline-size: <?php echo esc_attr( $tagline_size ); ?>vw; --hero-tagline-color: <?php echo esc_attr( $tagline_color ); ?>;">
+	style="--hero-headline-color: <?php echo esc_attr( $headline_color ); ?>; --hero-subtitle-color: <?php echo esc_attr( $subtitle_color ); ?>; --hero-headline-font: '<?php echo esc_attr( $headline_font ); ?>', sans-serif; --hero-subtitle-font: '<?php echo esc_attr( $subtitle_font ); ?>', sans-serif; --hero-headline-size: <?php echo esc_attr( $headline_size ); ?>vw; --hero-subtitle-size: <?php echo esc_attr( $subtitle_size ); ?>vw; --hero-offset: <?php echo esc_attr( $vertical_offset ); ?>px; --hero-tagline-font: '<?php echo esc_attr( $tagline_font ); ?>', sans-serif; --hero-tagline-size: <?php echo esc_attr( $tagline_size ); ?>vw; --hero-tagline-color: <?php echo esc_attr( $tagline_color ); ?>; background-color: <?php echo esc_attr( $hero_bg_color ); ?>;<?php if ( $hero_bg_image ) : ?> background-image: url('<?php echo esc_url( $hero_bg_image ); ?>'); background-size: cover; background-position: center;<?php endif; ?>">
 	<div class="hero__content">
 		<h1 class="hero__headline" id="typed-output"
 			data-words="<?php echo esc_attr( wp_json_encode( $active['words'] ) ); ?>"
