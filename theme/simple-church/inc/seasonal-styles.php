@@ -402,16 +402,35 @@ function simple_church_seasonal_inline_css() {
 		$css .= "body.seasonal-theme-active blockquote { font-family: " . $font_val . "; }\n";
 	}
 
-	// Background color.
+	// Background color — applied to the page body and light-coloured pattern
+	// sections (.section--light, .section--cta, white block groups). Dark
+	// sections are left untouched so the contrast banding is preserved.
 	if ( $season['bg_color'] ) {
-		$css .= "body.seasonal-theme-active { background-color: " . esc_attr( $season['bg_color'] ) . "; }\n";
+		$bg = esc_attr( $season['bg_color'] );
+
+		// Page body.
+		$css .= "body.seasonal-theme-active { background-color: " . $bg . "; }\n";
+
+		// Light pattern sections (CSS class backgrounds).
+		$css .= "body.seasonal-theme-active .section--light { background-color: " . $bg . "; }\n";
+		$css .= "body.seasonal-theme-active .split-quote-box--light { background-color: " . $bg . "; }\n";
+
+		// WordPress-generated white background class.
+		$css .= "body.seasonal-theme-active .has-white-background-color { background-color: " . $bg . " !important; }\n";
+
+		// CTA sections use inline styles so !important is needed.
+		$css .= "body.seasonal-theme-active .section--cta { background-color: " . $bg . " !important; }\n";
 	}
 
 	// Background image (overrides color when set).
 	if ( $season['bg_image'] ) {
 		$bg_url = wp_get_attachment_url( $season['bg_image'] );
 		if ( $bg_url ) {
-			$css .= "body.seasonal-theme-active { background-image: url('" . esc_url( $bg_url ) . "'); background-size: cover; background-position: center; background-attachment: fixed; }\n";
+			$bg_img = "url('" . esc_url( $bg_url ) . "')";
+			$css .= "body.seasonal-theme-active { background-image: " . $bg_img . "; background-size: cover; background-position: center; background-attachment: fixed; }\n";
+			$css .= "body.seasonal-theme-active .section--light,\n";
+			$css .= "body.seasonal-theme-active .section--cta,\n";
+			$css .= "body.seasonal-theme-active .has-white-background-color { background-image: " . $bg_img . " !important; background-size: cover; background-position: center; }\n";
 		}
 	}
 
