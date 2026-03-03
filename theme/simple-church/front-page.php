@@ -91,55 +91,7 @@ $tagline_color    = get_theme_mod( 'simple_church_hero_tagline_color', '#1a1a1a'
 if ( have_posts() ) :
 	while ( have_posts() ) :
 		the_post();
-
-		// Capture the rendered content so we can swap the parallax
-		// section with the special banner when one is active.
-		ob_start();
 		the_content();
-		$front_page_content = ob_get_clean();
-
-		if ( function_exists( 'simple_church_is_banner_active' ) && simple_church_is_banner_active() ) {
-			$banner = simple_church_banner_html();
-			if ( $banner ) {
-				// Find the parallax-break div and replace it.
-				$needle = 'parallax-break';
-				$pos    = strpos( $front_page_content, $needle );
-				if ( false !== $pos ) {
-					// Walk backwards to find the opening <div.
-					$start = strrpos( substr( $front_page_content, 0, $pos ), '<div' );
-					if ( false !== $start ) {
-						// Walk forward counting div depth to find matching </div>.
-						$depth = 0;
-						$len   = strlen( $front_page_content );
-						$i     = $start;
-						$end   = false;
-						while ( $i < $len ) {
-							if ( '<div' === substr( $front_page_content, $i, 4 ) ) {
-								$depth++;
-								$i += 4;
-							} elseif ( '</div>' === substr( $front_page_content, $i, 6 ) ) {
-								$depth--;
-								if ( 0 === $depth ) {
-									$end = $i + 6;
-									break;
-								}
-								$i += 6;
-							} else {
-								$i++;
-							}
-						}
-						if ( false !== $end ) {
-							$front_page_content = substr( $front_page_content, 0, $start )
-								. $banner
-								. substr( $front_page_content, $end );
-						}
-					}
-				}
-			}
-		}
-
-		echo $front_page_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-
 	endwhile;
 endif;
 
