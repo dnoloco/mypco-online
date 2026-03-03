@@ -38,45 +38,51 @@ define( 'SIMPLE_CHURCH_SEASONAL_SLOT_COUNT', 5 );
  */
 function simple_church_seasonal_defaults() {
 	$blank = array(
-		'name'        => '',
-		'enabled'     => false,
-		'start_month' => 1,
-		'start_day'   => 1,
-		'end_month'   => 1,
-		'end_day'     => 31,
-		'text_color'  => '#1a1a1a',
-		'font'        => 'Inter',
-		'bg_color'    => '#f3ebe2',
-		'bg_image'    => 0,
-		'link_color'  => '#1a1a1a',
+		'name'           => '',
+		'enabled'        => false,
+		'start_month'    => 1,
+		'start_day'      => 1,
+		'end_month'      => 1,
+		'end_day'        => 31,
+		'text_color'     => '#1a1a1a',
+		'font'           => 'Inter',
+		'bg_color'       => '#f3ebe2',
+		'bg_image'       => 0,
+		'link_color'     => '#1a1a1a',
+		'dark_bg_color'  => '#0a0a0a',
+		'dark_text_color' => '#ffffff',
 	);
 
 	return array(
 		1 => array(
-			'name'        => 'Easter',
-			'enabled'     => false,
-			'start_month' => 3,
-			'start_day'   => 15,
-			'end_month'   => 4,
-			'end_day'     => 30,
-			'text_color'  => '#3b2c20',
-			'font'        => 'Playfair Display',
-			'bg_color'    => '#faf6f0',
-			'bg_image'    => 0,
-			'link_color'  => '#7b5ea7',
+			'name'           => 'Easter',
+			'enabled'        => false,
+			'start_month'    => 3,
+			'start_day'      => 15,
+			'end_month'      => 4,
+			'end_day'        => 30,
+			'text_color'     => '#3b2c20',
+			'font'           => 'Playfair Display',
+			'bg_color'       => '#faf6f0',
+			'bg_image'       => 0,
+			'link_color'     => '#7b5ea7',
+			'dark_bg_color'  => '#2d1b4e',
+			'dark_text_color' => '#ffffff',
 		),
 		2 => array(
-			'name'        => 'Christmas',
-			'enabled'     => false,
-			'start_month' => 12,
-			'start_day'   => 1,
-			'end_month'   => 1,
-			'end_day'     => 6,
-			'text_color'  => '#2c1810',
-			'font'        => 'Playfair Display',
-			'bg_color'    => '#fdf8f0',
-			'bg_image'    => 0,
-			'link_color'  => '#b22222',
+			'name'           => 'Christmas',
+			'enabled'        => false,
+			'start_month'    => 12,
+			'start_day'      => 1,
+			'end_month'      => 1,
+			'end_day'        => 6,
+			'text_color'     => '#2c1810',
+			'font'           => 'Playfair Display',
+			'bg_color'       => '#fdf8f0',
+			'bg_image'       => 0,
+			'link_color'     => '#b22222',
+			'dark_bg_color'  => '#1a0a0a',
+			'dark_text_color' => '#ffffff',
 		),
 		3 => $blank,
 		4 => $blank,
@@ -271,6 +277,27 @@ function simple_church_seasonal_customize_register( $wp_customize ) {
 			'mime_type'   => 'image',
 		) ) );
 
+		// Dark Section Background Color ─────────────────────────────────
+		$wp_customize->add_setting( "simple_church_season_{$i}_dark_bg_color", array(
+			'default'           => $d['dark_bg_color'],
+			'sanitize_callback' => 'sanitize_hex_color',
+		) );
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_dark_bg_color", array(
+			'label'       => __( 'Dark Section Background', 'simple-church' ),
+			'description' => __( 'Background for dark contrast bands, parallax breaks, and footer.', 'simple-church' ),
+			'section'     => "simple_church_season_{$i}",
+		) ) );
+
+		// Dark Section Text Color ───────────────────────────────────────
+		$wp_customize->add_setting( "simple_church_season_{$i}_dark_text_color", array(
+			'default'           => $d['dark_text_color'],
+			'sanitize_callback' => 'sanitize_hex_color',
+		) );
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_dark_text_color", array(
+			'label'   => __( 'Dark Section Text Color', 'simple-church' ),
+			'section' => "simple_church_season_{$i}",
+		) ) );
+
 		// Link Color ───────────────────────────────────────────────────
 		$wp_customize->add_setting( "simple_church_season_{$i}_link_color", array(
 			'default'           => $d['link_color'],
@@ -333,13 +360,15 @@ function simple_church_get_active_season() {
 
 		if ( $is_active ) {
 			return array(
-				'slot'       => $i,
-				'name'       => get_theme_mod( "simple_church_season_{$i}_name", $d['name'] ),
-				'text_color' => get_theme_mod( "simple_church_season_{$i}_text_color", $d['text_color'] ),
-				'font'       => get_theme_mod( "simple_church_season_{$i}_font", $d['font'] ),
-				'bg_color'   => get_theme_mod( "simple_church_season_{$i}_bg_color", $d['bg_color'] ),
-				'bg_image'   => get_theme_mod( "simple_church_season_{$i}_bg_image", $d['bg_image'] ),
-				'link_color' => get_theme_mod( "simple_church_season_{$i}_link_color", $d['link_color'] ),
+				'slot'            => $i,
+				'name'            => get_theme_mod( "simple_church_season_{$i}_name", $d['name'] ),
+				'text_color'      => get_theme_mod( "simple_church_season_{$i}_text_color", $d['text_color'] ),
+				'font'            => get_theme_mod( "simple_church_season_{$i}_font", $d['font'] ),
+				'bg_color'        => get_theme_mod( "simple_church_season_{$i}_bg_color", $d['bg_color'] ),
+				'bg_image'        => get_theme_mod( "simple_church_season_{$i}_bg_image", $d['bg_image'] ),
+				'link_color'      => get_theme_mod( "simple_church_season_{$i}_link_color", $d['link_color'] ),
+				'dark_bg_color'   => get_theme_mod( "simple_church_season_{$i}_dark_bg_color", $d['dark_bg_color'] ),
+				'dark_text_color' => get_theme_mod( "simple_church_season_{$i}_dark_text_color", $d['dark_text_color'] ),
 			);
 		}
 	}
@@ -402,9 +431,8 @@ function simple_church_seasonal_inline_css() {
 		$css .= "body.seasonal-theme-active blockquote { font-family: " . $font_val . "; }\n";
 	}
 
-	// Background color — applied to the page body and light-coloured pattern
-	// sections (.section--light, .section--cta, white block groups). Dark
-	// sections are left untouched so the contrast banding is preserved.
+	// Light section background — applied to the page body and light-coloured
+	// pattern sections (.section--light, .section--cta, white block groups).
 	if ( $season['bg_color'] ) {
 		$bg = esc_attr( $season['bg_color'] );
 
@@ -432,6 +460,44 @@ function simple_church_seasonal_inline_css() {
 			$css .= "body.seasonal-theme-active .section--cta,\n";
 			$css .= "body.seasonal-theme-active .has-white-background-color { background-image: " . $bg_img . " !important; background-size: cover; background-position: center; }\n";
 		}
+	}
+
+	// Dark section background — applied to dark contrast bands, parallax
+	// breaks, dark cards, and the site footer.
+	if ( $season['dark_bg_color'] ) {
+		$dark_bg = esc_attr( $season['dark_bg_color'] );
+
+		// Theme CSS class sections.
+		$css .= "body.seasonal-theme-active .section--dark { background-color: " . $dark_bg . "; }\n";
+		$css .= "body.seasonal-theme-active .parallax-break { background-color: " . $dark_bg . "; }\n";
+		$css .= "body.seasonal-theme-active .site-footer { background-color: " . $dark_bg . "; }\n";
+
+		// Cards and nested groups inside dark sections (some use inline styles).
+		$css .= "body.seasonal-theme-active .section--dark .card { background-color: " . $dark_bg . "; }\n";
+		$css .= "body.seasonal-theme-active .section--dark .card-grid { background-color: " . $dark_bg . " !important; }\n";
+		$css .= "body.seasonal-theme-active .section--dark .card { background-color: " . $dark_bg . " !important; }\n";
+
+		// WordPress-generated black background class.
+		$css .= "body.seasonal-theme-active .has-black-background-color { background-color: " . $dark_bg . " !important; }\n";
+
+		// Split quote dark boxes.
+		$css .= "body.seasonal-theme-active .split-quote-box.has-black-background-color { background-color: " . $dark_bg . " !important; }\n";
+	}
+
+	// Dark section text color.
+	if ( $season['dark_text_color'] ) {
+		$dark_text = esc_attr( $season['dark_text_color'] );
+
+		$css .= "body.seasonal-theme-active .section--dark { color: " . $dark_text . "; }\n";
+		$css .= "body.seasonal-theme-active .parallax-break { color: " . $dark_text . "; }\n";
+		$css .= "body.seasonal-theme-active .site-footer { color: " . $dark_text . "; }\n";
+
+		// WordPress-generated white text class used inside dark sections.
+		$css .= "body.seasonal-theme-active .has-white-color { color: " . $dark_text . " !important; }\n";
+
+		// Dark section links and card links.
+		$css .= "body.seasonal-theme-active .section--dark a,\n";
+		$css .= "body.seasonal-theme-active .site-footer a { color: " . $dark_text . "; }\n";
 	}
 
 	// Link color.
