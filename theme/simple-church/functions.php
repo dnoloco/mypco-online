@@ -889,36 +889,6 @@ function simple_church_get_embed_url( $url ) {
 }
 
 /**
- * On the front page, replace the parallax-break block with the special banner.
- *
- * Uses the render_block filter to intercept the specific block by its
- * className attribute — no fragile HTML regex needed.
- */
-function simple_church_replace_parallax_with_banner( $block_content, $block ) {
-	if ( ! is_front_page() ) {
-		return $block_content;
-	}
-
-	if ( 'core/group' !== $block['blockName'] ) {
-		return $block_content;
-	}
-
-	$classes = isset( $block['attrs']['className'] ) ? $block['attrs']['className'] : '';
-	if ( false === strpos( ' ' . $classes . ' ', ' parallax-break ' ) ) {
-		return $block_content;
-	}
-
-	if ( ! simple_church_is_banner_active() ) {
-		return $block_content;
-	}
-
-	$banner = simple_church_banner_html();
-
-	return $banner ? $banner : $block_content;
-}
-add_filter( 'render_block', 'simple_church_replace_parallax_with_banner', 10, 2 );
-
-/**
  * Disable the admin bar on the front-end for cleaner parallax experience.
  */
 function simple_church_disable_admin_bar_styles() {
