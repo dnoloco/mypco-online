@@ -106,81 +106,61 @@ if ( have_posts() ) :
 			if ( $banner_html ) {
 				$replaced = false;
 
-				// Debug: log what markers exist in the content.
-				$debug_found = array();
-				foreach ( array( 'parallax-break', 'parallax', 'blockquote', 'wp-block-quote' ) as $dbg ) {
-					if ( false !== strpos( $front_page_content, $dbg ) ) {
-						$debug_found[] = $dbg;
-					}
-				}
-				$front_page_content .= "\n<!-- BANNER_DEBUG: content_length="
-					. strlen( $front_page_content )
-					. ' markers_found=' . implode( ',', $debug_found )
-					. ' banner_active=yes'
-					. ' -->';
+				// The parallax section is the only dark-background block
+				// that contains a <blockquote>. Find the blockquote, then
+				// walk backwards to its dark-background parent div.
+				$bq_pos = strpos( $front_page_content, '<blockquote' );
 
-				// Search for the parallax section in the rendered HTML.
-				// Try several markers — the class may differ from the pattern default.
-				$markers = array( 'parallax-break', 'parallax-break__content', 'parallax-break__quote' );
-				foreach ( $markers as $marker ) {
-					$pos = strpos( $front_page_content, $marker );
-					if ( false === $pos ) {
-						continue;
-					}
-
-					// Walk backwards to the outermost opening <div.
-					// For inner markers we may need to go up several levels.
-					$search_from = $pos;
+				if ( false !== $bq_pos ) {
+					// Walk backwards through <div tags to find the
+					// outermost dark-background wrapper.
 					$start       = false;
-					$attempts    = 0;
-					while ( $attempts < 3 && false !== $search_from ) {
+					$search_from = $bq_pos;
+					while ( $search_from > 0 ) {
 						$s = strrpos( substr( $front_page_content, 0, $search_from ), '<div' );
 						if ( false === $s ) {
 							break;
 						}
-						// Check if this div's class contains 'parallax'.
 						$tag_end = strpos( $front_page_content, '>', $s );
 						$tag     = substr( $front_page_content, $s, $tag_end - $s );
-						if ( false !== stripos( $tag, 'parallax' ) ) {
+
+						// The section wrapper has the dark background class.
+						if ( false !== strpos( $tag, 'has-black-background-color' ) ) {
 							$start = $s;
 							break;
 						}
 						$search_from = $s;
-						$attempts++;
 					}
 
-					if ( false === $start ) {
-						continue;
-					}
-
-					// Count div depth to find matching </div>.
-					$depth = 0;
-					$len   = strlen( $front_page_content );
-					$i     = $start;
-					$end   = false;
-					while ( $i < $len ) {
-						if ( '<div' === substr( $front_page_content, $i, 4 ) ) {
-							$depth++;
-							$i += 4;
-						} elseif ( '</div>' === substr( $front_page_content, $i, 6 ) ) {
-							$depth--;
-							if ( 0 === $depth ) {
-								$end = $i + 6;
-								break;
+					if ( false !== $start ) {
+						// Count div depth to find matching </div>.
+						$depth = 0;
+						$len   = strlen( $front_page_content );
+						$i     = $start;
+						$end   = false;
+						while ( $i < $len ) {
+							if ( '<div' === substr( $front_page_content, $i, 4 ) ) {
+								$depth++;
+								$i += 4;
+							} elseif ( '</div>' === substr( $front_page_content, $i, 6 ) ) {
+								$depth--;
+								if ( 0 === $depth ) {
+									$end = $i + 6;
+									break;
+								}
+								$i += 6;
+							} else {
+								$i++;
 							}
-							$i += 6;
-						} else {
-							$i++;
+						}
+
+						if ( false !== $end ) {
+							$front_page_content = substr( $front_page_content, 0, $start )
+								. $banner_html
+								. substr( $front_page_content, $end );
+							$replaced = true;
 						}
 					}
-
-					if ( false !== $end ) {
-						$front_page_content = substr( $front_page_content, 0, $start )
-							. $banner_html
-							. substr( $front_page_content, $end );
-						$replaced = true;
-					}
-					break;
 				}
 
 				// Fallback: place banner before all content.
