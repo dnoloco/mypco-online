@@ -106,60 +106,55 @@ if ( have_posts() ) :
 			if ( $banner_html ) {
 				$replaced = false;
 
-				// The parallax section is the only dark-background block
-				// that contains a <blockquote>. Find the blockquote, then
-				// walk backwards to its dark-background parent div.
-				$bq_pos = strpos( $front_page_content, '<blockquote' );
+				// The parallax section is a TOP-LEVEL dark block (the
+				// only one whose <div> with has-black-background-color
+				// sits at div-depth 0). Nested dark elements like the
+				// split-quote-box are inside other divs and ignored.
+				$len   = strlen( $front_page_content );
+				$depth = 0;
+				$i     = 0;
+				while ( $i < $len ) {
+					if ( '<div' === substr( $front_page_content, $i, 4 ) ) {
+						// At depth 0 this is a top-level div.
+						if ( 0 === $depth ) {
+							$tag_end = strpos( $front_page_content, '>', $i );
+							$tag     = substr( $front_page_content, $i, $tag_end - $i );
 
-				if ( false !== $bq_pos ) {
-					// Walk backwards through <div tags to find the
-					// outermost dark-background wrapper.
-					$start       = false;
-					$search_from = $bq_pos;
-					while ( $search_from > 0 ) {
-						$s = strrpos( substr( $front_page_content, 0, $search_from ), '<div' );
-						if ( false === $s ) {
-							break;
-						}
-						$tag_end = strpos( $front_page_content, '>', $s );
-						$tag     = substr( $front_page_content, $s, $tag_end - $s );
+							if ( false !== strpos( $tag, 'has-black-background-color' ) ) {
+								$start = $i;
 
-						// The section wrapper has the dark background class.
-						if ( false !== strpos( $tag, 'has-black-background-color' ) ) {
-							$start = $s;
-							break;
-						}
-						$search_from = $s;
-					}
-
-					if ( false !== $start ) {
-						// Count div depth to find matching </div>.
-						$depth = 0;
-						$len   = strlen( $front_page_content );
-						$i     = $start;
-						$end   = false;
-						while ( $i < $len ) {
-							if ( '<div' === substr( $front_page_content, $i, 4 ) ) {
-								$depth++;
-								$i += 4;
-							} elseif ( '</div>' === substr( $front_page_content, $i, 6 ) ) {
-								$depth--;
-								if ( 0 === $depth ) {
-									$end = $i + 6;
-									break;
+								// Find the matching </div> for this
+								// top-level div.
+								$d = 0;
+								$j = $start;
+								while ( $j < $len ) {
+									if ( '<div' === substr( $front_page_content, $j, 4 ) ) {
+										$d++;
+										$j += 4;
+									} elseif ( '</div>' === substr( $front_page_content, $j, 6 ) ) {
+										$d--;
+										if ( 0 === $d ) {
+											$end = $j + 6;
+											$front_page_content = substr( $front_page_content, 0, $start )
+												. $banner_html
+												. substr( $front_page_content, $end );
+											$replaced = true;
+											break 2; // Exit both loops.
+										}
+										$j += 6;
+									} else {
+										$j++;
+									}
 								}
-								$i += 6;
-							} else {
-								$i++;
 							}
 						}
-
-						if ( false !== $end ) {
-							$front_page_content = substr( $front_page_content, 0, $start )
-								. $banner_html
-								. substr( $front_page_content, $end );
-							$replaced = true;
-						}
+						$depth++;
+						$i += 4;
+					} elseif ( '</div>' === substr( $front_page_content, $i, 6 ) ) {
+						$depth--;
+						$i += 6;
+					} else {
+						$i++;
 					}
 				}
 
