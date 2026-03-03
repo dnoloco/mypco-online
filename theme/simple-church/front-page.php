@@ -92,86 +92,20 @@ if ( have_posts() ) :
 	while ( have_posts() ) :
 		the_post();
 
-		// Capture rendered content so we can swap the parallax section
-		// with the special banner when one is active.
-		ob_start();
-		the_content();
-		$front_page_content = ob_get_clean();
-
+		// When the special banner is active, output it before the page
+		// content. CSS handles hiding the parallax section:
+		// body.special-banner-active .parallax-break { display: none; }
 		if ( function_exists( 'simple_church_is_banner_active' )
 			&& simple_church_is_banner_active() ) {
 
 			$banner_html = simple_church_banner_html();
 
 			if ( $banner_html ) {
-				$replaced = false;
-
-				// Find the parallax section: a <div> with
-				// has-black-background-color that contains a
-				// <blockquote> but is NOT a split-quote-box or a
-				// named section (section--). This avoids the
-				// Statement section and Split Layout quote boxes.
-				$len    = strlen( $front_page_content );
-				$offset = 0;
-				while ( false !== ( $pos = strpos( $front_page_content, 'has-black-background-color', $offset ) ) ) {
-					// Walk back to the opening <div of this tag.
-					$div_start = strrpos( substr( $front_page_content, 0, $pos ), '<div' );
-					if ( false === $div_start ) {
-						$offset = $pos + 1;
-						continue;
-					}
-
-					$tag_end = strpos( $front_page_content, '>', $div_start );
-					$tag     = substr( $front_page_content, $div_start, $tag_end - $div_start );
-
-					// Skip known non-parallax dark sections.
-					if ( false !== strpos( $tag, 'section--' )
-						|| false !== strpos( $tag, 'split' ) ) {
-						$offset = $pos + 1;
-						continue;
-					}
-
-					// Find the matching </div>.
-					$d = 0;
-					$j = $div_start;
-					while ( $j < $len ) {
-						if ( '<div' === substr( $front_page_content, $j, 4 ) ) {
-							$d++;
-							$j += 4;
-						} elseif ( '</div>' === substr( $front_page_content, $j, 6 ) ) {
-							$d--;
-							if ( 0 === $d ) {
-								$end     = $j + 6;
-								$section = substr( $front_page_content, $div_start, $end - $div_start );
-
-								if ( false !== strpos( $section, '<blockquote' ) ) {
-									$front_page_content = substr( $front_page_content, 0, $div_start )
-										. $banner_html
-										. substr( $front_page_content, $end );
-									$replaced = true;
-								}
-								break;
-							}
-							$j += 6;
-						} else {
-							$j++;
-						}
-					}
-
-					if ( $replaced ) {
-						break;
-					}
-					$offset = $pos + 1;
-				}
-
-				// Fallback: place banner before all content.
-				if ( ! $replaced ) {
-					$front_page_content = $banner_html . $front_page_content;
-				}
+				echo $banner_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 		}
 
-		echo $front_page_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		the_content();
 
 	endwhile;
 endif;
