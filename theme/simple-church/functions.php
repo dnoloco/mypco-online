@@ -889,6 +889,51 @@ function simple_church_get_embed_url( $url ) {
 }
 
 /**
+ * Add body class when the special banner is active.
+ */
+function simple_church_banner_body_class( $classes ) {
+	if ( is_front_page() && simple_church_is_banner_active() ) {
+		$classes[] = 'special-banner-active';
+	}
+	return $classes;
+}
+add_filter( 'body_class', 'simple_church_banner_body_class' );
+
+/**
+ * Output the special banner markup in the footer so it exists in the DOM,
+ * then a small script moves it into the correct position (replacing the
+ * parallax section) and makes it visible.
+ */
+function simple_church_output_banner() {
+	if ( ! is_front_page() || ! simple_church_is_banner_active() ) {
+		return;
+	}
+
+	$banner = simple_church_banner_html();
+	if ( ! $banner ) {
+		return;
+	}
+
+	// Output the banner hidden; the inline script below will position it.
+	echo '<div id="sc-special-banner" style="display:none">' . $banner . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	?>
+	<script>
+	(function(){
+		var banner = document.getElementById('sc-special-banner');
+		if (!banner) return;
+		var parallax = document.querySelector('.parallax-break');
+		if (parallax) {
+			parallax.parentNode.insertBefore(banner, parallax);
+			parallax.style.display = 'none';
+		}
+		banner.style.display = '';
+	})();
+	</script>
+	<?php
+}
+add_action( 'wp_footer', 'simple_church_output_banner' );
+
+/**
  * Disable the admin bar on the front-end for cleaner parallax experience.
  */
 function simple_church_disable_admin_bar_styles() {
