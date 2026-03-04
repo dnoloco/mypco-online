@@ -576,6 +576,14 @@ function simple_church_seasonal_inline_css() {
 		// Section labels and body text inside dark sections.
 		$css .= "body.seasonal-theme-active .section--dark .section__label { color: " . $dark_text . "; }\n";
 
+		// Dark split-quote boxes nested inside light sections — these are
+		// dark-background boxes that the light-section text rules would
+		// otherwise overwrite. Higher specificity wins over the light rules.
+		$css .= "body.seasonal-theme-active .split-quote-box.has-black-background-color,\n";
+		$css .= "body.seasonal-theme-active .split-quote-box.has-black-background-color .has-white-color,\n";
+		$css .= "body.seasonal-theme-active .split-quote-box.has-black-background-color .has-text-color,\n";
+		$css .= "body.seasonal-theme-active .split-quote-box.has-black-background-color p { color: " . $dark_text . " !important; }\n";
+
 		// Dark section links and footer links.
 		$css .= "body.seasonal-theme-active .section--dark a,\n";
 		$css .= "body.seasonal-theme-active .site-footer a { color: " . $dark_text . "; }\n";
