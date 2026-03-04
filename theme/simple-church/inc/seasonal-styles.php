@@ -248,14 +248,17 @@ function simple_church_seasonal_customize_register( $wp_customize ) {
 			'choices' => $day_choices,
 		) );
 
-		// Text Color ───────────────────────────────────────────────────
+		// ── Light Sections ────────────────────────────────────────────
+
+		// Light Section Text Color ─────────────────────────────────────
 		$wp_customize->add_setting( "simple_church_season_{$i}_text_color", array(
 			'default'           => $d['text_color'],
 			'sanitize_callback' => 'sanitize_hex_color',
 		) );
 		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_text_color", array(
-			'label'   => __( 'Text Color', 'simple-church' ),
-			'section' => "simple_church_season_{$i}",
+			'label'       => __( 'Light Section — Text Color', 'simple-church' ),
+			'description' => __( 'Text color for body, white, and cream-coloured sections.', 'simple-church' ),
+			'section'     => "simple_church_season_{$i}",
 		) ) );
 
 		// Font ─────────────────────────────────────────────────────────
@@ -270,48 +273,52 @@ function simple_church_seasonal_customize_register( $wp_customize ) {
 			'choices' => $font_choices,
 		) );
 
-		// Background Color ─────────────────────────────────────────────
+		// Light Section Background Color ───────────────────────────────
 		$wp_customize->add_setting( "simple_church_season_{$i}_bg_color", array(
 			'default'           => $d['bg_color'],
 			'sanitize_callback' => 'sanitize_hex_color',
 		) );
 		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_bg_color", array(
-			'label'   => __( 'Background Color', 'simple-church' ),
+			'label'   => __( 'Light Section — Background Color', 'simple-church' ),
 			'section' => "simple_church_season_{$i}",
 		) ) );
 
-		// Background Image ─────────────────────────────────────────────
+		// Light Section Background Image ───────────────────────────────
 		$wp_customize->add_setting( "simple_church_season_{$i}_bg_image", array(
 			'default'           => $d['bg_image'],
 			'sanitize_callback' => 'absint',
 		) );
 		$wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, "simple_church_season_{$i}_bg_image", array(
-			'label'       => __( 'Background Image', 'simple-church' ),
+			'label'       => __( 'Light Section — Background Image', 'simple-church' ),
 			'description' => __( 'Overrides the background color when set.', 'simple-church' ),
 			'section'     => "simple_church_season_{$i}",
 			'mime_type'   => 'image',
 		) ) );
 
-		// Dark Section Background Color ─────────────────────────────────
-		$wp_customize->add_setting( "simple_church_season_{$i}_dark_bg_color", array(
-			'default'           => $d['dark_bg_color'],
-			'sanitize_callback' => 'sanitize_hex_color',
-		) );
-		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_dark_bg_color", array(
-			'label'       => __( 'Dark Section Background', 'simple-church' ),
-			'description' => __( 'Background for dark contrast bands, parallax breaks, and footer.', 'simple-church' ),
-			'section'     => "simple_church_season_{$i}",
-		) ) );
+		// ── Dark Sections ─────────────────────────────────────────────
 
-		// Dark Section Text Color ───────────────────────────────────────
+		// Dark Section Text Color ──────────────────────────────────────
 		$wp_customize->add_setting( "simple_church_season_{$i}_dark_text_color", array(
 			'default'           => $d['dark_text_color'],
 			'sanitize_callback' => 'sanitize_hex_color',
 		) );
 		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_dark_text_color", array(
-			'label'   => __( 'Dark Section Text Color', 'simple-church' ),
+			'label'       => __( 'Dark Section — Text Color', 'simple-church' ),
+			'description' => __( 'Text color for dark contrast bands, parallax breaks, and footer.', 'simple-church' ),
+			'section'     => "simple_church_season_{$i}",
+		) ) );
+
+		// Dark Section Background Color ────────────────────────────────
+		$wp_customize->add_setting( "simple_church_season_{$i}_dark_bg_color", array(
+			'default'           => $d['dark_bg_color'],
+			'sanitize_callback' => 'sanitize_hex_color',
+		) );
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_dark_bg_color", array(
+			'label'   => __( 'Dark Section — Background Color', 'simple-church' ),
 			'section' => "simple_church_season_{$i}",
 		) ) );
+
+		// ── Links ─────────────────────────────────────────────────────
 
 		// Link Color ───────────────────────────────────────────────────
 		$wp_customize->add_setting( "simple_church_season_{$i}_link_color", array(
@@ -445,20 +452,20 @@ function simple_church_seasonal_inline_css() {
 
 	$css = '';
 
-	// Text color — override body, WordPress-generated black text class, and
-	// elements with explicit inline color in light sections.
+	// Light section text color — scoped to light sections, CTA bands, and
+	// light split-quote boxes so dark section text is never affected.
 	if ( $season['text_color'] ) {
 		$tc = esc_attr( $season['text_color'] );
 
-		// Body default.
+		// Body default (inherited by un-classed areas).
 		$css .= "body.seasonal-theme-active { color: " . $tc . "; }\n";
 
-		// WordPress-generated .has-black-color used in light pattern sections.
+		// WordPress-generated .has-black-color inside light sections only.
 		$css .= "body.seasonal-theme-active .section--light .has-black-color,\n";
-		$css .= "body.seasonal-theme-active .section--cta .has-text-color,\n";
-		$css .= "body.seasonal-theme-active .has-black-color.has-text-color { color: " . $tc . " !important; }\n";
+		$css .= "body.seasonal-theme-active .section--light .has-text-color,\n";
+		$css .= "body.seasonal-theme-active .section--cta .has-text-color { color: " . $tc . " !important; }\n";
 
-		// Headings and text elements inside light sections that use inline color.
+		// Headings and text inside light / CTA sections with inline color.
 		$css .= "body.seasonal-theme-active .section--light h2,\n";
 		$css .= "body.seasonal-theme-active .section--light h3,\n";
 		$css .= "body.seasonal-theme-active .section--light p,\n";
@@ -469,12 +476,13 @@ function simple_church_seasonal_inline_css() {
 		$css .= "body.seasonal-theme-active .section--light .card__title,\n";
 		$css .= "body.seasonal-theme-active .section--light .card__link { color: " . $tc . " !important; }\n";
 
-		// Section labels (small caps text like "ABOUT", "COMMUNITY").
+		// Section labels and body text inside light sections.
 		$css .= "body.seasonal-theme-active .section--light .section__label,\n";
 		$css .= "body.seasonal-theme-active .section--light .section__text { color: " . $tc . "; }\n";
 
-		// Split-quote light boxes.
-		$css .= "body.seasonal-theme-active .split-quote-box--light .has-black-color { color: " . $tc . " !important; }\n";
+		// Light split-quote boxes (nested inside dark sections).
+		$css .= "body.seasonal-theme-active .split-quote-box--light .has-black-color,\n";
+		$css .= "body.seasonal-theme-active .split-quote-box--light .has-text-color { color: " . $tc . " !important; }\n";
 	}
 
 	// Font family — applied to body and common text elements.
@@ -545,7 +553,8 @@ function simple_church_seasonal_inline_css() {
 		$css .= "body.seasonal-theme-active .split-quote-box.has-black-background-color { background-color: " . $dark_bg . " !important; }\n";
 	}
 
-	// Dark section text color.
+	// Dark section text color — scoped to dark sections, parallax breaks,
+	// and footer only so light section text is never affected.
 	if ( $season['dark_text_color'] ) {
 		$dark_text = esc_attr( $season['dark_text_color'] );
 
@@ -553,10 +562,21 @@ function simple_church_seasonal_inline_css() {
 		$css .= "body.seasonal-theme-active .parallax-break { color: " . $dark_text . "; }\n";
 		$css .= "body.seasonal-theme-active .site-footer { color: " . $dark_text . "; }\n";
 
-		// WordPress-generated white text class used inside dark sections.
-		$css .= "body.seasonal-theme-active .has-white-color { color: " . $dark_text . " !important; }\n";
+		// WordPress-generated .has-white-color — only inside dark contexts.
+		$css .= "body.seasonal-theme-active .section--dark .has-white-color,\n";
+		$css .= "body.seasonal-theme-active .parallax-break .has-white-color { color: " . $dark_text . " !important; }\n";
 
-		// Dark section links and card links.
+		// Headings and text inside dark sections with inline color.
+		$css .= "body.seasonal-theme-active .section--dark h2,\n";
+		$css .= "body.seasonal-theme-active .section--dark h3,\n";
+		$css .= "body.seasonal-theme-active .section--dark p,\n";
+		$css .= "body.seasonal-theme-active .section--dark .card__title,\n";
+		$css .= "body.seasonal-theme-active .section--dark .card__link { color: " . $dark_text . " !important; }\n";
+
+		// Section labels and body text inside dark sections.
+		$css .= "body.seasonal-theme-active .section--dark .section__label { color: " . $dark_text . "; }\n";
+
+		// Dark section links and footer links.
 		$css .= "body.seasonal-theme-active .section--dark a,\n";
 		$css .= "body.seasonal-theme-active .site-footer a { color: " . $dark_text . "; }\n";
 	}
