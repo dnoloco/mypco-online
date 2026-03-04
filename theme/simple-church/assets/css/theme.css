@@ -124,6 +124,24 @@ h1, h2, h3, h4, h5, h6 {
 	display: inline-block !important;
 }
 
+/* Non-dark variant with alt logo (e.g., seasonal theme on the front page).
+   Initially show the light-for-dark-bg logo; swap to the dark logo on scroll. */
+.site-header--has-alt-logo .site-header__logo-light {
+	display: none !important;
+}
+
+.site-header--has-alt-logo .site-header__logo-dark {
+	display: inline-block !important;
+}
+
+.site-header--has-alt-logo.site-header--scrolled .site-header__logo-dark {
+	display: none !important;
+}
+
+.site-header--has-alt-logo.site-header--scrolled .site-header__logo-light {
+	display: inline-block !important;
+}
+
 .site-header__inner {
 	display: flex;
 	align-items: center;

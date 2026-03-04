@@ -18,6 +18,12 @@ if ( 'dark' === $navbar_variant ) {
 
 // Determine which logo to show based on variant.
 $dark_logo_id = get_theme_mod( 'simple_church_dark_logo' );
+
+// When both logo variants exist on a non-dark-variant page (e.g., seasonal
+// theme on the front page), add a class so CSS can swap logos on scroll.
+if ( 'dark' !== $navbar_variant && $dark_logo_id && has_custom_logo() ) {
+	$header_classes .= ' site-header--has-alt-logo';
+}
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -32,15 +38,13 @@ $dark_logo_id = get_theme_mod( 'simple_church_dark_logo' );
 <header class="<?php echo esc_attr( $header_classes ); ?>" id="site-header" data-variant="<?php echo esc_attr( $navbar_variant ); ?>">
 	<div class="site-header__inner">
 		<div class="site-header__logo">
-			<?php if ( 'dark' === $navbar_variant && $dark_logo_id ) : ?>
+			<?php if ( $dark_logo_id && has_custom_logo() ) : ?>
 				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="custom-logo-link site-header__logo-dark" rel="home">
 					<?php echo wp_get_attachment_image( $dark_logo_id, 'full', false, array( 'class' => 'custom-logo' ) ); ?>
 				</a>
-				<?php if ( has_custom_logo() ) : ?>
-					<span class="site-header__logo-light" style="display:none;">
-						<?php the_custom_logo(); ?>
-					</span>
-				<?php endif; ?>
+				<span class="site-header__logo-light" style="display:none;">
+					<?php the_custom_logo(); ?>
+				</span>
 			<?php elseif ( has_custom_logo() ) : ?>
 				<?php the_custom_logo(); ?>
 			<?php else : ?>
