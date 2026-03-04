@@ -170,6 +170,21 @@ function simple_church_customize_register( $wp_customize ) {
 		'mime_type'   => 'image',
 	) ) );
 
+	// ── Footer ─────────────────────────────────────────────────────
+	$wp_customize->add_section( 'simple_church_footer', array(
+		'title'    => __( 'Footer', 'simple-church' ),
+		'priority' => 26,
+	) );
+
+	$wp_customize->add_setting( 'simple_church_footer_bg_color', array(
+		'default'           => '#0a0a0a',
+		'sanitize_callback' => 'sanitize_hex_color',
+	) );
+	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'simple_church_footer_bg_color', array(
+		'label'   => __( 'Background Color', 'simple-church' ),
+		'section' => 'simple_church_footer',
+	) ) );
+
 	// ── Hero Panel ──────────────────────────────────────────────────
 	$wp_customize->add_panel( 'simple_church_hero_panel', array(
 		'title'    => __( 'Hero Section', 'simple-church' ),

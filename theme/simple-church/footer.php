@@ -7,7 +7,8 @@
 ?>
 </main>
 
-<footer class="site-footer">
+<?php $footer_bg = get_theme_mod( 'simple_church_footer_bg_color', '#0a0a0a' ); ?>
+<footer class="site-footer" style="background-color: <?php echo esc_attr( $footer_bg ); ?>;">
 	<div class="site-footer__inner">
 		<div class="site-footer__top">
 			<div class="site-footer__brand">
