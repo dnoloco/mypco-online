@@ -445,9 +445,36 @@ function simple_church_seasonal_inline_css() {
 
 	$css = '';
 
-	// Text color.
+	// Text color — override body, WordPress-generated black text class, and
+	// elements with explicit inline color in light sections.
 	if ( $season['text_color'] ) {
-		$css .= "body.seasonal-theme-active { color: " . esc_attr( $season['text_color'] ) . "; }\n";
+		$tc = esc_attr( $season['text_color'] );
+
+		// Body default.
+		$css .= "body.seasonal-theme-active { color: " . $tc . "; }\n";
+
+		// WordPress-generated .has-black-color used in light pattern sections.
+		$css .= "body.seasonal-theme-active .section--light .has-black-color,\n";
+		$css .= "body.seasonal-theme-active .section--cta .has-text-color,\n";
+		$css .= "body.seasonal-theme-active .has-black-color.has-text-color { color: " . $tc . " !important; }\n";
+
+		// Headings and text elements inside light sections that use inline color.
+		$css .= "body.seasonal-theme-active .section--light h2,\n";
+		$css .= "body.seasonal-theme-active .section--light h3,\n";
+		$css .= "body.seasonal-theme-active .section--light p,\n";
+		$css .= "body.seasonal-theme-active .section--cta h2,\n";
+		$css .= "body.seasonal-theme-active .section--cta p { color: " . $tc . " !important; }\n";
+
+		// Card titles and links inside light sections.
+		$css .= "body.seasonal-theme-active .section--light .card__title,\n";
+		$css .= "body.seasonal-theme-active .section--light .card__link { color: " . $tc . " !important; }\n";
+
+		// Section labels (small caps text like "ABOUT", "COMMUNITY").
+		$css .= "body.seasonal-theme-active .section--light .section__label,\n";
+		$css .= "body.seasonal-theme-active .section--light .section__text { color: " . $tc . "; }\n";
+
+		// Split-quote light boxes.
+		$css .= "body.seasonal-theme-active .split-quote-box--light .has-black-color { color: " . $tc . " !important; }\n";
 	}
 
 	// Font family — applied to body and common text elements.
