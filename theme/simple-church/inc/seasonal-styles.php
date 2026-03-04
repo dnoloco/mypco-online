@@ -45,6 +45,7 @@ function simple_church_seasonal_defaults() {
 		'end_month'      => 1,
 		'end_day'        => 31,
 		'logo'           => 0,
+		'logo_dark'      => 0,
 		'text_color'     => '#1a1a1a',
 		'font'           => 'Inter',
 		'bg_color'       => '#f3ebe2',
@@ -63,6 +64,7 @@ function simple_church_seasonal_defaults() {
 			'end_month'      => 4,
 			'end_day'        => 30,
 			'logo'           => 0,
+			'logo_dark'      => 0,
 			'text_color'     => '#3b2c20',
 			'font'           => 'Playfair Display',
 			'bg_color'       => '#faf6f0',
@@ -79,6 +81,7 @@ function simple_church_seasonal_defaults() {
 			'end_month'      => 1,
 			'end_day'        => 6,
 			'logo'           => 0,
+			'logo_dark'      => 0,
 			'text_color'     => '#2c1810',
 			'font'           => 'Playfair Display',
 			'bg_color'       => '#fdf8f0',
@@ -194,8 +197,20 @@ function simple_church_seasonal_customize_register( $wp_customize ) {
 			'sanitize_callback' => 'absint',
 		) );
 		$wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, "simple_church_season_{$i}_logo", array(
-			'label'       => __( 'Site Logo', 'simple-church' ),
-			'description' => __( 'Replaces the site logo during this season. Leave empty to keep the default logo.', 'simple-church' ),
+			'label'       => __( 'Site Logo (Light)', 'simple-church' ),
+			'description' => __( 'Logo for dark backgrounds (e.g., hero). Leave empty to keep the default logo.', 'simple-church' ),
+			'section'     => "simple_church_season_{$i}",
+			'mime_type'   => 'image',
+		) ) );
+
+		// Logo (Dark) ──────────────────────────────────────────────────
+		$wp_customize->add_setting( "simple_church_season_{$i}_logo_dark", array(
+			'default'           => $d['logo_dark'],
+			'sanitize_callback' => 'absint',
+		) );
+		$wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, "simple_church_season_{$i}_logo_dark", array(
+			'label'       => __( 'Site Logo (Dark)', 'simple-church' ),
+			'description' => __( 'Logo for light backgrounds (e.g., scrolled nav). Leave empty to keep the default logo.', 'simple-church' ),
 			'section'     => "simple_church_season_{$i}",
 			'mime_type'   => 'image',
 		) ) );
@@ -385,6 +400,7 @@ function simple_church_get_active_season() {
 				'slot'            => $i,
 				'name'            => get_theme_mod( "simple_church_season_{$i}_name", $d['name'] ),
 				'logo'            => get_theme_mod( "simple_church_season_{$i}_logo", $d['logo'] ),
+				'logo_dark'       => get_theme_mod( "simple_church_season_{$i}_logo_dark", $d['logo_dark'] ),
 				'text_color'      => get_theme_mod( "simple_church_season_{$i}_text_color", $d['text_color'] ),
 				'font'            => get_theme_mod( "simple_church_season_{$i}_font", $d['font'] ),
 				'bg_color'        => get_theme_mod( "simple_church_season_{$i}_bg_color", $d['bg_color'] ),
@@ -422,22 +438,42 @@ function simple_church_seasonal_body_class( $classes ) {
 add_filter( 'body_class', 'simple_church_seasonal_body_class' );
 
 /**
- * Swap the site's custom logo when a seasonal style with a logo is active.
+ * Swap the site's custom logo (shown on light backgrounds) when a seasonal
+ * style with a dark logo variant is active.
  *
- * Filters the `custom_logo` theme mod so that the_custom_logo() and
- * has_custom_logo() transparently use the seasonal logo image.
+ * The "Site Logo (Dark)" setting provides a dark-colored logo designed for
+ * light backgrounds such as the scrolled navigation bar.
  *
  * @param int $logo_id Default custom logo attachment ID.
  * @return int Possibly replaced attachment ID.
  */
 function simple_church_seasonal_logo( $logo_id ) {
 	$season = simple_church_get_active_season();
+	if ( $season && ! empty( $season['logo_dark'] ) ) {
+		return (int) $season['logo_dark'];
+	}
+	return $logo_id;
+}
+add_filter( 'theme_mod_custom_logo', 'simple_church_seasonal_logo' );
+
+/**
+ * Swap the dark navbar logo (shown on dark backgrounds) when a seasonal
+ * style with a light logo variant is active.
+ *
+ * The "Site Logo (Light)" setting provides a light-colored logo designed for
+ * dark backgrounds such as the hero or dark navbar.
+ *
+ * @param int $logo_id Default dark logo attachment ID.
+ * @return int Possibly replaced attachment ID.
+ */
+function simple_church_seasonal_dark_logo( $logo_id ) {
+	$season = simple_church_get_active_season();
 	if ( $season && ! empty( $season['logo'] ) ) {
 		return (int) $season['logo'];
 	}
 	return $logo_id;
 }
-add_filter( 'theme_mod_custom_logo', 'simple_church_seasonal_logo' );
+add_filter( 'theme_mod_simple_church_dark_logo', 'simple_church_seasonal_dark_logo' );
 
 /**
  * Output inline CSS for the active seasonal style.
