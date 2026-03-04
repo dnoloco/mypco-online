@@ -553,6 +553,9 @@ function simple_church_seasonal_inline_css() {
 
 		// CTA sections use inline styles so !important is needed.
 		$css .= "body.seasonal-theme-active .section--cta { background-color: " . $bg . " !important; }\n";
+
+		// Scrolled header background — match the seasonal light bg.
+		$css .= "body.seasonal-theme-active .site-header--scrolled { background-color: " . $bg . "; }\n";
 	}
 
 	// Background image (overrides color when set).
