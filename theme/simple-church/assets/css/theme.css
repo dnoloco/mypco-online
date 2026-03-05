@@ -1078,7 +1078,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .site-footer {
 	background-color: #0a0a0a;
-	color: #ffffff;
+	color: var(--footer-text, #ffffff);
 	padding: 4rem 2.5rem 2rem;
 }
 
@@ -1106,7 +1106,7 @@ h1, h2, h3, h4, h5, h6 {
 .site-footer__title {
 	font-size: 1.125rem;
 	font-weight: 700;
-	color: #ffffff;
+	color: var(--footer-text, #ffffff);
 	text-decoration: none;
 }
 
@@ -1119,13 +1119,13 @@ h1, h2, h3, h4, h5, h6 {
 .footer-nav li a {
 	font-size: 0.875rem;
 	font-weight: 400;
-	color: #999999;
+	color: var(--footer-link, #999999);
 	text-decoration: none;
 	transition: color 0.3s ease;
 }
 
 .footer-nav li a:hover {
-	color: #ffffff;
+	color: var(--footer-text, #ffffff);
 }
 
 .site-footer__bottom {
@@ -1134,7 +1134,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .site-footer__copy {
 	font-size: 0.8125rem;
-	color: #666666;
+	color: var(--footer-link, #666666);
 }
 
 /* --------------------------------------------------------------------------
