@@ -7,8 +7,12 @@
 ?>
 </main>
 
-<?php $footer_bg = get_theme_mod( 'simple_church_footer_bg_color', '#0a0a0a' ); ?>
-<footer class="site-footer" style="background-color: <?php echo esc_attr( $footer_bg ); ?>;">
+<?php
+$footer_bg    = get_theme_mod( 'simple_church_footer_bg_color', '#0a0a0a' );
+$footer_text  = get_theme_mod( 'simple_church_footer_text_color', '#ffffff' );
+$footer_links = get_theme_mod( 'simple_church_footer_link_color', '#999999' );
+?>
+<footer class="site-footer" style="background-color: <?php echo esc_attr( $footer_bg ); ?>; --footer-text: <?php echo esc_attr( $footer_text ); ?>; --footer-link: <?php echo esc_attr( $footer_links ); ?>;">
 	<div class="site-footer__inner">
 		<div class="site-footer__top">
 			<div class="site-footer__brand">
