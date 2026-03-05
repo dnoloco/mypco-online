@@ -131,6 +131,27 @@ function simple_church_scripts() {
 add_action( 'wp_enqueue_scripts', 'simple_church_scripts' );
 
 /**
+ * Output footer color CSS from the Customizer settings.
+ *
+ * Runs at priority 15 so the seasonal inline CSS (priority 20) can
+ * override these values when a seasonal style is active.
+ */
+function simple_church_footer_inline_css() {
+	$bg        = get_theme_mod( 'simple_church_footer_bg_color', '#0a0a0a' );
+	$text      = get_theme_mod( 'simple_church_footer_text_color', '#ffffff' );
+	$link      = get_theme_mod( 'simple_church_footer_link_color', '#999999' );
+	$copyright = get_theme_mod( 'simple_church_footer_copyright_color', '#666666' );
+
+	$css  = ".site-footer { background-color: " . esc_attr( $bg ) . "; }\n";
+	$css .= ".site-footer { --footer-text: " . esc_attr( $text ) . "; }\n";
+	$css .= ".site-footer { --footer-link: " . esc_attr( $link ) . "; }\n";
+	$css .= ".site-footer { --footer-copyright: " . esc_attr( $copyright ) . "; }\n";
+
+	wp_add_inline_style( 'simple-church-style', $css );
+}
+add_action( 'wp_enqueue_scripts', 'simple_church_footer_inline_css', 15 );
+
+/**
  * Custom walker for the overlay menu — outputs clean markup.
  */
 class Simple_Church_Overlay_Walker extends Walker_Nav_Menu {
@@ -199,9 +220,17 @@ function simple_church_customize_register( $wp_customize ) {
 		'sanitize_callback' => 'sanitize_hex_color',
 	) );
 	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'simple_church_footer_link_color', array(
-		'label'       => __( 'Link Color', 'simple-church' ),
-		'description' => __( 'Color for footer navigation links and copyright text.', 'simple-church' ),
-		'section'     => 'simple_church_footer',
+		'label'   => __( 'Link Color', 'simple-church' ),
+		'section' => 'simple_church_footer',
+	) ) );
+
+	$wp_customize->add_setting( 'simple_church_footer_copyright_color', array(
+		'default'           => '#666666',
+		'sanitize_callback' => 'sanitize_hex_color',
+	) );
+	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'simple_church_footer_copyright_color', array(
+		'label'   => __( 'Copyright Color', 'simple-church' ),
+		'section' => 'simple_church_footer',
 	) ) );
 
 	// ── Hero Panel ──────────────────────────────────────────────────
