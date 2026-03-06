@@ -57,6 +57,9 @@ function simple_church_seasonal_defaults() {
 		'footer_text_color'      => '',
 		'footer_link_color'      => '',
 		'footer_copyright_color' => '',
+		'overlay_bg_color'       => '',
+		'overlay_link_color'     => '',
+		'overlay_hover_color'    => '',
 	);
 
 	return array(
@@ -80,6 +83,9 @@ function simple_church_seasonal_defaults() {
 			'footer_text_color'      => '',
 			'footer_link_color'      => '',
 			'footer_copyright_color' => '',
+			'overlay_bg_color'       => '',
+			'overlay_link_color'     => '',
+			'overlay_hover_color'    => '',
 		),
 		2 => array(
 			'name'              => 'Christmas',
@@ -101,6 +107,9 @@ function simple_church_seasonal_defaults() {
 			'footer_text_color'      => '',
 			'footer_link_color'      => '',
 			'footer_copyright_color' => '',
+			'overlay_bg_color'       => '',
+			'overlay_link_color'     => '',
+			'overlay_hover_color'    => '',
 		),
 		3 => $blank,
 		4 => $blank,
@@ -402,6 +411,41 @@ function simple_church_seasonal_customize_register( $wp_customize ) {
 			'label'   => __( 'Link Color', 'simple-church' ),
 			'section' => "simple_church_season_{$i}",
 		) ) );
+
+		// ── Overlay Menu ──────────────────────────────────────────────
+
+		// Overlay Menu Background Color ────────────────────────────────
+		$wp_customize->add_setting( "simple_church_season_{$i}_overlay_bg_color", array(
+			'default'           => $d['overlay_bg_color'],
+			'sanitize_callback' => 'sanitize_hex_color',
+		) );
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_overlay_bg_color", array(
+			'label'       => __( 'Overlay Menu — Background Color', 'simple-church' ),
+			'description' => __( 'Leave empty to use the default dark background.', 'simple-church' ),
+			'section'     => "simple_church_season_{$i}",
+		) ) );
+
+		// Overlay Menu Link Color ──────────────────────────────────────
+		$wp_customize->add_setting( "simple_church_season_{$i}_overlay_link_color", array(
+			'default'           => $d['overlay_link_color'],
+			'sanitize_callback' => 'sanitize_hex_color',
+		) );
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_overlay_link_color", array(
+			'label'       => __( 'Overlay Menu — Link Color', 'simple-church' ),
+			'description' => __( 'Leave empty to use the default white.', 'simple-church' ),
+			'section'     => "simple_church_season_{$i}",
+		) ) );
+
+		// Overlay Menu Link Hover Color ────────────────────────────────
+		$wp_customize->add_setting( "simple_church_season_{$i}_overlay_hover_color", array(
+			'default'           => $d['overlay_hover_color'],
+			'sanitize_callback' => 'sanitize_hex_color',
+		) );
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_overlay_hover_color", array(
+			'label'       => __( 'Overlay Menu — Link Hover Color', 'simple-church' ),
+			'description' => __( 'Leave empty to use the default grey.', 'simple-church' ),
+			'section'     => "simple_church_season_{$i}",
+		) ) );
 	}
 }
 add_action( 'customize_register', 'simple_church_seasonal_customize_register' );
@@ -470,6 +514,9 @@ function simple_church_get_active_season() {
 				'footer_text_color'      => get_theme_mod( "simple_church_season_{$i}_footer_text_color", $d['footer_text_color'] ),
 				'footer_link_color'      => get_theme_mod( "simple_church_season_{$i}_footer_link_color", $d['footer_link_color'] ),
 				'footer_copyright_color' => get_theme_mod( "simple_church_season_{$i}_footer_copyright_color", $d['footer_copyright_color'] ),
+				'overlay_bg_color'       => get_theme_mod( "simple_church_season_{$i}_overlay_bg_color", $d['overlay_bg_color'] ),
+				'overlay_link_color'     => get_theme_mod( "simple_church_season_{$i}_overlay_link_color", $d['overlay_link_color'] ),
+				'overlay_hover_color'    => get_theme_mod( "simple_church_season_{$i}_overlay_hover_color", $d['overlay_hover_color'] ),
 			);
 		}
 	}
@@ -720,6 +767,22 @@ function simple_church_seasonal_inline_css() {
 	// Override the border divider to match the text colour at low opacity.
 	if ( $footer_text ) {
 		$css .= "body.seasonal-theme-active .site-footer__top { border-bottom-color: " . esc_attr( $footer_text ) . "26; }\n";
+	}
+
+	// Overlay menu overrides.
+	if ( $season['overlay_bg_color'] ) {
+		$overlay_bg = esc_attr( $season['overlay_bg_color'] );
+		$css .= "body.seasonal-theme-active .overlay-menu { background-color: " . $overlay_bg . "; }\n";
+	}
+	if ( $season['overlay_link_color'] ) {
+		$overlay_link = esc_attr( $season['overlay_link_color'] );
+		$css .= "body.seasonal-theme-active .overlay-menu__link { color: " . $overlay_link . "; }\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__close { color: " . $overlay_link . "; border-color: " . $overlay_link . "40; }\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__close:hover { border-color: " . $overlay_link . "; }\n";
+	}
+	if ( $season['overlay_hover_color'] ) {
+		$overlay_hover = esc_attr( $season['overlay_hover_color'] );
+		$css .= "body.seasonal-theme-active .overlay-menu__link:hover { color: " . $overlay_hover . "; }\n";
 	}
 
 	if ( $css ) {
