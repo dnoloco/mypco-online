@@ -40,6 +40,7 @@ function simple_church_seasonal_defaults() {
 	$blank = array(
 		'name'              => '',
 		'enabled'           => false,
+		'apply_all'         => false,
 		'start_month'       => 1,
 		'start_day'         => 1,
 		'end_month'         => 1,
@@ -66,6 +67,7 @@ function simple_church_seasonal_defaults() {
 		1 => array(
 			'name'              => 'Easter',
 			'enabled'           => false,
+			'apply_all'         => false,
 			'start_month'       => 3,
 			'start_day'         => 15,
 			'end_month'         => 4,
@@ -90,6 +92,7 @@ function simple_church_seasonal_defaults() {
 		2 => array(
 			'name'              => 'Christmas',
 			'enabled'           => false,
+			'apply_all'         => false,
 			'start_month'       => 12,
 			'start_day'         => 1,
 			'end_month'         => 1,
@@ -198,6 +201,18 @@ function simple_church_seasonal_customize_register( $wp_customize ) {
 			'label'   => __( 'Enable This Season', 'simple-church' ),
 			'section' => "simple_church_season_{$i}",
 			'type'    => 'checkbox',
+		) );
+
+		// Apply to All Templates ───────────────────────────────────────
+		$wp_customize->add_setting( "simple_church_season_{$i}_apply_all", array(
+			'default'           => $d['apply_all'],
+			'sanitize_callback' => 'wp_validate_boolean',
+		) );
+		$wp_customize->add_control( "simple_church_season_{$i}_apply_all", array(
+			'label'       => __( 'Apply to All Templates', 'simple-church' ),
+			'description' => __( 'Extend seasonal colors to page headers, single posts, blog listings, and the navigation bar — not just the front page.', 'simple-church' ),
+			'section'     => "simple_church_season_{$i}",
+			'type'        => 'checkbox',
 		) );
 
 		// Name ─────────────────────────────────────────────────────────
@@ -501,6 +516,7 @@ function simple_church_get_active_season() {
 			return array(
 				'slot'            => $i,
 				'name'            => get_theme_mod( "simple_church_season_{$i}_name", $d['name'] ),
+				'apply_all'       => get_theme_mod( "simple_church_season_{$i}_apply_all", $d['apply_all'] ),
 				'logo'            => get_theme_mod( "simple_church_season_{$i}_logo", $d['logo'] ),
 				'logo_dark'       => get_theme_mod( "simple_church_season_{$i}_logo_dark", $d['logo_dark'] ),
 				'text_color'      => get_theme_mod( "simple_church_season_{$i}_text_color", $d['text_color'] ),
@@ -783,6 +799,82 @@ function simple_church_seasonal_inline_css() {
 	if ( $season['overlay_hover_color'] ) {
 		$overlay_hover = esc_attr( $season['overlay_hover_color'] );
 		$css .= "body.seasonal-theme-active .overlay-menu__link:hover { color: " . $overlay_hover . "; }\n";
+	}
+
+	// ── Apply to all templates ────────────────────────────────────
+	// When enabled, extend seasonal colors to page heroes, single
+	// posts, blog listings, post navigation, and the dark navbar.
+	if ( ! empty( $season['apply_all'] ) ) {
+
+		// Page hero banner (page.php, single.php, 404.php dark header).
+		if ( $season['dark_bg_color'] ) {
+			$css .= "body.seasonal-theme-active .page-hero { background-color: " . esc_attr( $season['dark_bg_color'] ) . "; }\n";
+		}
+		if ( $season['dark_text_color'] ) {
+			$dt = esc_attr( $season['dark_text_color'] );
+			$css .= "body.seasonal-theme-active .page-hero { color: " . $dt . "; }\n";
+			$css .= "body.seasonal-theme-active .page-hero__title { color: " . $dt . "; }\n";
+			$css .= "body.seasonal-theme-active .page-hero__date { color: " . $dt . "; opacity: 0.6; }\n";
+		}
+
+		// Page content prose (page.php, single.php body text).
+		if ( $season['text_color'] ) {
+			$tc = esc_attr( $season['text_color'] );
+			$css .= "body.seasonal-theme-active .page-content { color: " . $tc . "; }\n";
+			$css .= "body.seasonal-theme-active .page-content h2,\n";
+			$css .= "body.seasonal-theme-active .page-content h3 { color: " . $tc . "; }\n";
+			$css .= "body.seasonal-theme-active .page-content p { color: " . $tc . "; }\n";
+		}
+		if ( $season['link_color'] ) {
+			$lc = esc_attr( $season['link_color'] );
+			$css .= "body.seasonal-theme-active .page-content a { color: " . $lc . "; }\n";
+		}
+
+		// Blog listing cards (index.php).
+		if ( $season['text_color'] ) {
+			$tc = esc_attr( $season['text_color'] );
+			$css .= "body.seasonal-theme-active .post-card__title a { color: " . $tc . "; }\n";
+			$css .= "body.seasonal-theme-active .post-card__excerpt { color: " . $tc . "; }\n";
+			$css .= "body.seasonal-theme-active .post-card__date { color: " . $tc . "; opacity: 0.6; }\n";
+		}
+		if ( $season['link_color'] ) {
+			$lc = esc_attr( $season['link_color'] );
+			$css .= "body.seasonal-theme-active .post-card__link { color: " . $lc . "; }\n";
+			$css .= "body.seasonal-theme-active .post-card__title a:hover { color: " . $lc . "; }\n";
+		}
+
+		// Post navigation (single.php prev/next links).
+		if ( $season['link_color'] ) {
+			$lc = esc_attr( $season['link_color'] );
+			$css .= "body.seasonal-theme-active .post-navigation a { color: " . $lc . "; }\n";
+		}
+
+		// Pagination (index.php).
+		if ( $season['link_color'] ) {
+			$lc = esc_attr( $season['link_color'] );
+			$css .= "body.seasonal-theme-active .pagination a { color: " . $lc . "; border-color: " . $lc . "; }\n";
+			$css .= "body.seasonal-theme-active .pagination .current { background-color: " . $lc . "; border-color: " . $lc . "; }\n";
+		}
+
+		// Dark navbar variant (page.php, single.php, 404.php).
+		if ( $season['dark_bg_color'] ) {
+			$dark_bg = esc_attr( $season['dark_bg_color'] );
+			$css .= "body.seasonal-theme-active .site-header--variant-dark { background-color: " . $dark_bg . "; }\n";
+			$css .= "body.seasonal-theme-active .site-header--variant-dark.site-header--scrolled { background-color: " . $dark_bg . "; }\n";
+		}
+
+		// Front-page hero background.
+		if ( $season['bg_color'] ) {
+			$bg = esc_attr( $season['bg_color'] );
+			$css .= "body.seasonal-theme-active .hero { background-color: " . $bg . " !important; }\n";
+		}
+
+		// Front-page hero text colors.
+		if ( $season['text_color'] ) {
+			$tc = esc_attr( $season['text_color'] );
+			$css .= "body.seasonal-theme-active .hero { --hero-headline-color: " . $tc . "; --hero-subtitle-color: " . $tc . "; --hero-tagline-color: " . $tc . "; }\n";
+			$css .= "body.seasonal-theme-active .hero__divider { border-color: " . $tc . "; }\n";
+		}
 	}
 
 	if ( $css ) {
