@@ -375,6 +375,89 @@ h1, h2, h3, h4, h5, h6 {
 	color: #888888;
 }
 
+/* Divider and upcoming event inside overlay menu */
+.overlay-menu__divider {
+	border: none;
+	border-top: 1px solid rgba(255, 255, 255, 0.15);
+	margin: 2rem 0 1.5rem auto;
+	width: 60%;
+}
+
+.overlay-menu__event {
+	text-align: right;
+	font-size: 0.875rem;
+	color: rgba(255, 255, 255, 0.7);
+	opacity: 0;
+	transform: translateY(10px);
+	transition: opacity 0.5s ease 0.4s, transform 0.5s ease 0.4s;
+}
+
+.overlay-menu--open .overlay-menu__event {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* Override shortcode card styles inside the overlay */
+.overlay-menu__event .mypco-location-card {
+	background: transparent !important;
+	box-shadow: none !important;
+	padding: 0 !important;
+	border: none !important;
+	text-align: right;
+}
+
+.overlay-menu__event .mypco-location-content {
+	padding: 0 !important;
+}
+
+.overlay-menu__event .mypco-location-title {
+	font-size: clamp(1rem, 2.5vw, 1.25rem) !important;
+	font-weight: 600 !important;
+	color: #ffffff !important;
+	margin: 0 0 0.5rem !important;
+}
+
+.overlay-menu__event .mypco-location-info-row {
+	flex-direction: column !important;
+	align-items: flex-end !important;
+	gap: 0.25rem !important;
+}
+
+.overlay-menu__event .mypco-location-datetime {
+	justify-content: flex-end !important;
+}
+
+.overlay-menu__event .mypco-location-date,
+.overlay-menu__event .mypco-location-time {
+	color: rgba(255, 255, 255, 0.7) !important;
+	font-size: 0.8125rem !important;
+}
+
+.overlay-menu__event .mypco-location-icon {
+	width: 14px !important;
+	height: 14px !important;
+	color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.overlay-menu__event .mypco-location-details {
+	justify-content: flex-end !important;
+}
+
+.overlay-menu__event .mypco-location-name {
+	color: rgba(255, 255, 255, 0.7) !important;
+	font-size: 0.8125rem !important;
+}
+
+.overlay-menu__event .mypco-location-name a {
+	color: rgba(255, 255, 255, 0.7) !important;
+	text-decoration: underline !important;
+	text-underline-offset: 2px !important;
+}
+
+.overlay-menu__event .mypco-location-name a:hover {
+	color: #ffffff !important;
+}
+
 /* --------------------------------------------------------------------------
    6. HERO SECTION — Typed headline + subtitle
    -------------------------------------------------------------------------- */

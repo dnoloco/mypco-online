@@ -795,6 +795,13 @@ function simple_church_seasonal_inline_css() {
 		$css .= "body.seasonal-theme-active .overlay-menu__link { color: " . $overlay_link . "; }\n";
 		$css .= "body.seasonal-theme-active .overlay-menu__close { color: " . $overlay_link . "; border-color: " . $overlay_link . "40; }\n";
 		$css .= "body.seasonal-theme-active .overlay-menu__close:hover { border-color: " . $overlay_link . "; }\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__divider { border-top-color: " . $overlay_link . "26; }\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-title { color: " . $overlay_link . " !important; }\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-date,\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-time,\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-name,\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-name a { color: " . $overlay_link . "b3 !important; }\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-name a:hover { color: " . $overlay_link . " !important; }\n";
 	}
 	if ( $season['overlay_hover_color'] ) {
 		$overlay_hover = esc_attr( $season['overlay_hover_color'] );

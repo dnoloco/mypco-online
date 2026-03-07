@@ -125,6 +125,13 @@ if ( 'dark' !== $navbar_variant && $dark_logo_id && has_custom_logo() ) {
 				</p>
 			<?php } ?>
 		</nav>
+
+		<?php if ( shortcode_exists( 'mypco_next_sunday' ) ) : ?>
+			<hr class="overlay-menu__divider">
+			<div class="overlay-menu__event">
+				<?php echo do_shortcode( '[mypco_next_sunday layout_style="minimal" show_map="no" show_address="no" show_title="yes" show_time="yes" background_color="transparent" text_color="#ffffff" primary_color="#ffffff"]' ); ?>
+			</div>
+		<?php endif; ?>
 	</div>
 </div>
 
