@@ -885,6 +885,33 @@ function simple_church_seasonal_inline_css() {
 			$css .= "body.seasonal-theme-active .hero { --hero-headline-color: " . $tc . "; --hero-subtitle-color: " . $tc . "; --hero-tagline-color: " . $tc . "; }\n";
 			$css .= "body.seasonal-theme-active .hero__divider { border-color: " . $tc . "; }\n";
 		}
+
+		// Calendar accordion event cards.
+		if ( $season['text_color'] ) {
+			$tc = esc_attr( $season['text_color'] );
+			$css .= "body.seasonal-theme-active .pco-accordion-event-name { color: " . $tc . "; }\n";
+			$css .= "body.seasonal-theme-active .pco-accordion-event-meta { color: " . $tc . "; }\n";
+			$css .= "body.seasonal-theme-active .pco-accordion-detail-desc { color: " . $tc . "; }\n";
+			$css .= "body.seasonal-theme-active .pco-accordion-close { color: " . $tc . "; }\n";
+			$css .= "body.seasonal-theme-active .pco-accordion-item { border-color: " . $tc . "33; }\n";
+			$css .= "body.seasonal-theme-active .pco-accordion-detail-body { border-top-color: " . $tc . "26; }\n";
+			$css .= "body.seasonal-theme-active .pco-accordion-detail-location span { color: " . $tc . "; }\n";
+			$css .= "body.seasonal-theme-active .pco-accordion-pin-icon { color: " . $tc . "; }\n";
+		}
+		if ( $season['link_color'] ) {
+			$lc = esc_attr( $season['link_color'] );
+			$css .= "body.seasonal-theme-active .pco-accordion-location-link { color: " . $lc . "; }\n";
+			$css .= "body.seasonal-theme-active .pco-accordion-detail-location strong { color: " . $lc . "; }\n";
+			$css .= "body.seasonal-theme-active .pco-accordion-register-btn { background: " . $lc . "; }\n";
+		}
+		if ( $season['dark_bg_color'] ) {
+			$dark_bg = esc_attr( $season['dark_bg_color'] );
+			$css .= "body.seasonal-theme-active .pco-accordion-date-badge:not(.pco-accordion-date-badge--light) { background: " . $dark_bg . "; }\n";
+		}
+		if ( $season['dark_text_color'] ) {
+			$dtc = esc_attr( $season['dark_text_color'] );
+			$css .= "body.seasonal-theme-active .pco-accordion-date-badge:not(.pco-accordion-date-badge--light) { color: " . $dtc . "; }\n";
+		}
 	}
 
 	if ( $css ) {
