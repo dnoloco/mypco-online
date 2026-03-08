@@ -133,6 +133,7 @@ if ( 'dark' !== $navbar_variant && $dark_logo_id && has_custom_logo() ) {
 		if ( $overlay_event && ! empty( $overlay_event['date_obj'] ) ) :
 			$ev_date = $overlay_event['date_obj'];
 		?>
+			<div class="overlay-menu__event-wrap">
 			<hr class="overlay-menu__divider">
 			<div class="overlay-menu__event">
 				<h4 class="overlay-menu__event-heading"><?php esc_html_e( 'Upcoming Worship Location', 'simple-church' ); ?></h4>
@@ -159,6 +160,7 @@ if ( 'dark' !== $navbar_variant && $dark_logo_id && has_custom_logo() ) {
 						<?php endif; ?>
 					</div>
 				</div>
+			</div>
 			</div>
 		<?php endif; ?>
 	</div>
