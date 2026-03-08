@@ -797,7 +797,7 @@ function simple_church_seasonal_inline_css() {
 		$css .= "body.seasonal-theme-active .overlay-menu__close:hover { border-color: " . $overlay_link . "; }\n";
 		$css .= "body.seasonal-theme-active .overlay-menu__divider { border-top-color: " . $overlay_link . "26; }\n";
 		$css .= "body.seasonal-theme-active .overlay-menu__event-heading { color: " . $overlay_link . "; }\n";
-		$css .= "body.seasonal-theme-active .overlay-menu__event-card { border-color: " . $overlay_link . "33; }\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__event-card { border-color: " . $overlay_link . "; }\n";
 		$css .= "body.seasonal-theme-active .overlay-menu__event-badge { background: " . $overlay_link . "1a; }\n";
 		$css .= "body.seasonal-theme-active .overlay-menu__event-badge-num { color: " . $overlay_link . "; }\n";
 		$css .= "body.seasonal-theme-active .overlay-menu__event-badge-day,\n";
