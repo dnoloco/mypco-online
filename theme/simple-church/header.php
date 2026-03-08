@@ -126,10 +126,11 @@ if ( 'dark' !== $navbar_variant && $dark_logo_id && has_custom_logo() ) {
 			<?php } ?>
 		</nav>
 
-		<?php if ( shortcode_exists( 'mypco_next_sunday' ) ) : ?>
+		<?php if ( shortcode_exists( 'mypco_sunday_list' ) ) : ?>
 			<hr class="overlay-menu__divider">
 			<div class="overlay-menu__event">
-				<?php echo do_shortcode( '[mypco_next_sunday layout_style="minimal" show_map="no" show_address="no" show_title="yes" show_time="yes" background_color="transparent" text_color="#ffffff" primary_color="#ffffff"]' ); ?>
+				<h4 class="overlay-menu__event-heading"><?php esc_html_e( 'Upcoming Worship Location', 'simple-church' ); ?></h4>
+				<?php echo do_shortcode( '[mypco_sunday_list count="1"]' ); ?>
 			</div>
 		<?php endif; ?>
 	</div>

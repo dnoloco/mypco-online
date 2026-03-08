@@ -796,12 +796,16 @@ function simple_church_seasonal_inline_css() {
 		$css .= "body.seasonal-theme-active .overlay-menu__close { color: " . $overlay_link . "; border-color: " . $overlay_link . "40; }\n";
 		$css .= "body.seasonal-theme-active .overlay-menu__close:hover { border-color: " . $overlay_link . "; }\n";
 		$css .= "body.seasonal-theme-active .overlay-menu__divider { border-top-color: " . $overlay_link . "26; }\n";
-		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-title { color: " . $overlay_link . " !important; }\n";
-		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-date,\n";
-		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-time,\n";
-		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-name,\n";
-		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-name a { color: " . $overlay_link . "b3 !important; }\n";
-		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-name a:hover { color: " . $overlay_link . " !important; }\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__event-heading { color: " . $overlay_link . "80; }\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-list-item { border-color: " . $overlay_link . "33 !important; }\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-list-date-badge { background: " . $overlay_link . "1f !important; }\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-list-date-full { color: " . $overlay_link . " !important; }\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-list-number { color: " . $overlay_link . " !important; }\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-list-day,\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-list-month,\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-list-time,\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-list-link { color: " . $overlay_link . "99 !important; }\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__event .mypco-location-list-link:hover { color: " . $overlay_link . " !important; }\n";
 	}
 	if ( $season['overlay_hover_color'] ) {
 		$overlay_hover = esc_attr( $season['overlay_hover_color'] );
