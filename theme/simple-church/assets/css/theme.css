@@ -615,6 +615,10 @@ h1, h2, h3, h4, h5, h6 {
 	max-width: 780px;
 }
 
+.page-hero + .section {
+	padding-top: 3rem;
+}
+
 .section__inner--720 {
 	max-width: 720px;
 }
