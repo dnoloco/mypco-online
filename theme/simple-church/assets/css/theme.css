@@ -397,7 +397,7 @@ h1, h2, h3, h4, h5, h6 {
 	transform: translateY(0);
 }
 
-/* Heading — matches overlay link color */
+/* Heading — right-aligned, matches overlay link color */
 .overlay-menu__event-heading {
 	font-size: 0.7rem;
 	font-weight: 600;
@@ -405,29 +405,35 @@ h1, h2, h3, h4, h5, h6 {
 	letter-spacing: 0.08em;
 	color: #ffffff;
 	margin: 0 0 0.75rem;
+	text-align: right;
 }
 
-/* Bordered card */
+/* Bordered card — flex row: badge left, meta right */
 .overlay-menu__event-card {
+	display: flex;
+	align-items: center;
+	gap: 0.875rem;
 	border: 1px solid rgba(255, 255, 255, 0.2);
 	border-radius: 12px;
 	padding: 0.875rem 1rem;
 }
 
-/* Date badge — horizontal bar */
+/* Date badge — vertical, compact */
 .overlay-menu__event-badge {
 	display: flex;
-	align-items: baseline;
-	gap: 0.375rem;
+	flex-direction: column;
+	align-items: center;
+	width: fit-content;
+	flex-shrink: 0;
 	background: rgba(255, 255, 255, 0.1);
 	border-radius: 8px;
-	padding: 0.4rem 0.75rem;
-	margin-bottom: 0.625rem;
+	padding: 0.4rem 0.625rem;
+	line-height: 1.2;
 }
 
 .overlay-menu__event-badge-day,
 .overlay-menu__event-badge-month {
-	font-size: 0.7rem;
+	font-size: 0.65rem;
 	font-weight: 500;
 	text-transform: uppercase;
 	letter-spacing: 0.03em;
@@ -435,25 +441,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .overlay-menu__event-badge-num {
-	font-size: 1.125rem;
+	font-size: 1.25rem;
 	font-weight: 700;
 	color: #ffffff;
 }
 
-/* Full date */
-.overlay-menu__event-date {
-	font-size: 0.875rem;
-	font-weight: 600;
-	color: #ffffff;
-	margin-bottom: 0.25rem;
-}
-
-/* Time + location inline */
+/* Time + location stacked beside badge */
 .overlay-menu__event-meta {
 	display: flex;
-	align-items: center;
-	flex-wrap: wrap;
-	gap: 1rem;
+	flex-direction: column;
+	gap: 0.375rem;
 	font-size: 0.8125rem;
 }
 
