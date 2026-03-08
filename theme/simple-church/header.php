@@ -126,11 +126,40 @@ if ( 'dark' !== $navbar_variant && $dark_logo_id && has_custom_logo() ) {
 			<?php } ?>
 		</nav>
 
-		<?php if ( shortcode_exists( 'mypco_sunday_list' ) ) : ?>
+		<?php
+		$overlay_event = function_exists( 'simple_church_get_next_sunday_event' )
+			? simple_church_get_next_sunday_event()
+			: false;
+		if ( $overlay_event && ! empty( $overlay_event['date_obj'] ) ) :
+			$ev_date = $overlay_event['date_obj'];
+		?>
 			<hr class="overlay-menu__divider">
 			<div class="overlay-menu__event">
 				<h4 class="overlay-menu__event-heading"><?php esc_html_e( 'Upcoming Worship Location', 'simple-church' ); ?></h4>
-				<?php echo do_shortcode( '[mypco_sunday_list count="1"]' ); ?>
+				<div class="overlay-menu__event-card">
+					<div class="overlay-menu__event-badge">
+						<span class="overlay-menu__event-badge-day"><?php echo esc_html( $overlay_event['day_short'] ); ?></span>
+						<span class="overlay-menu__event-badge-num"><?php echo esc_html( $overlay_event['day_number'] ); ?></span>
+						<span class="overlay-menu__event-badge-month"><?php echo esc_html( $overlay_event['month_short'] ); ?></span>
+					</div>
+					<div class="overlay-menu__event-date"><?php echo esc_html( $ev_date->format( 'l, F j, Y' ) ); ?></div>
+					<div class="overlay-menu__event-meta">
+						<span class="overlay-menu__event-time">
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+							<?php echo esc_html( $ev_date->format( 'g:i a' ) ); ?>
+						</span>
+						<?php if ( $overlay_event['location_name'] ) : ?>
+							<span class="overlay-menu__event-location">
+								<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+								<?php if ( $overlay_event['maps_url'] ) : ?>
+									<a href="<?php echo esc_url( $overlay_event['maps_url'] ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $overlay_event['location_name'] ); ?></a>
+								<?php else : ?>
+									<?php echo esc_html( $overlay_event['location_name'] ); ?>
+								<?php endif; ?>
+							</span>
+						<?php endif; ?>
+					</div>
+				</div>
 			</div>
 		<?php endif; ?>
 	</div>

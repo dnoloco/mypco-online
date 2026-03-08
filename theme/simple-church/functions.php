@@ -1000,3 +1000,126 @@ function simple_church_disable_admin_bar_styles() {
 	}
 }
 add_action( 'init', 'simple_church_disable_admin_bar_styles' );
+
+/**
+ * Fetch the next upcoming Sunday event from Planning Center.
+ *
+ * Returns a single event array with keys: name, date_obj, day_short,
+ * day_number, month_short, location_name, maps_url — or false if
+ * unavailable.
+ *
+ * Cached for 1 hour via a WordPress transient.
+ *
+ * @return array|false
+ */
+function simple_church_get_next_sunday_event() {
+	if ( ! class_exists( 'MyPCO_API_Model' ) ) {
+		return false;
+	}
+
+	$transient_key = 'simple_church_next_sunday_event';
+	$cached = get_transient( $transient_key );
+	if ( false !== $cached ) {
+		// Re-hydrate the DateTime object.
+		if ( is_array( $cached ) && ! empty( $cached['_starts_at'] ) ) {
+			try {
+				$cached['date_obj'] = new DateTime( $cached['_starts_at'] );
+			} catch ( Exception $e ) {
+				return false;
+			}
+		}
+		return $cached;
+	}
+
+	$api = new MyPCO_API_Model();
+	$now = new DateTime( 'now', wp_timezone() );
+
+	$params = array(
+		'where[starts_at][gte]' => $now->format( 'Y-m-d\T00:00:00\Z' ),
+		'where[starts_at][lte]' => ( clone $now )->modify( '+6 weeks' )->format( 'Y-m-d\T23:59:59\Z' ),
+		'order'                 => 'starts_at',
+		'per_page'              => 50,
+		'include'               => 'event',
+	);
+
+	$response = $api->get_data_with_caching(
+		'calendar',
+		'/v2/event_instances',
+		$params,
+		'simple_church_overlay_events_' . md5( serialize( $params ) ),
+		HOUR_IN_SECONDS
+	);
+
+	if ( isset( $response['error'] ) || empty( $response['data'] ) ) {
+		set_transient( $transient_key, array(), HOUR_IN_SECONDS );
+		return false;
+	}
+
+	// Build parent event map.
+	$event_map = array();
+	if ( ! empty( $response['included'] ) ) {
+		foreach ( $response['included'] as $item ) {
+			if ( 'Event' === $item['type'] ) {
+				$event_map[ $item['id'] ] = $item['attributes'];
+			}
+		}
+	}
+
+	// Find the first Sunday event.
+	$seen_dates = array();
+	foreach ( $response['data'] as $instance ) {
+		$parent_id = $instance['relationships']['event']['data']['id'] ?? null;
+		$parent    = $event_map[ $parent_id ] ?? null;
+		if ( ! $parent ) {
+			continue;
+		}
+
+		$starts_at = $instance['attributes']['starts_at'] ?? '';
+		try {
+			$date = new DateTime( $starts_at, new DateTimeZone( 'UTC' ) );
+			$date->setTimezone( wp_timezone() );
+		} catch ( Exception $e ) {
+			continue;
+		}
+
+		// Sunday only.
+		if ( '0' !== $date->format( 'w' ) ) {
+			continue;
+		}
+
+		$date_key = $date->format( 'Y-m-d' );
+		if ( isset( $seen_dates[ $date_key ] ) ) {
+			continue;
+		}
+		$seen_dates[ $date_key ] = true;
+
+		$location_full = $instance['attributes']['location'] ?? '';
+		$location_name = $location_full;
+		if ( strpos( $location_full, ' - ' ) !== false ) {
+			$parts         = explode( ' - ', $location_full, 2 );
+			$location_name = trim( $parts[0] );
+		}
+
+		$maps_url = '';
+		if ( $location_full ) {
+			$maps_url = 'https://www.google.com/maps/dir/?api=1&destination=' . urlencode( $location_full );
+		}
+
+		$event = array(
+			'name'          => $parent['name'] ?? 'Event',
+			'date_obj'      => $date,
+			'_starts_at'    => $date->format( 'c' ),
+			'day_short'     => $date->format( 'D' ),
+			'day_number'    => $date->format( 'j' ),
+			'month_short'   => $date->format( 'M' ),
+			'location_name' => $location_name,
+			'maps_url'      => $maps_url,
+		);
+
+		set_transient( $transient_key, $event, HOUR_IN_SECONDS );
+		return $event;
+	}
+
+	set_transient( $transient_key, array(), HOUR_IN_SECONDS );
+	return false;
+}
