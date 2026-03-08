@@ -142,7 +142,6 @@ if ( 'dark' !== $navbar_variant && $dark_logo_id && has_custom_logo() ) {
 						<span class="overlay-menu__event-badge-num"><?php echo esc_html( $overlay_event['day_number'] ); ?></span>
 						<span class="overlay-menu__event-badge-month"><?php echo esc_html( $overlay_event['month_short'] ); ?></span>
 					</div>
-					<div class="overlay-menu__event-date"><?php echo esc_html( $ev_date->format( 'l, F j, Y' ) ); ?></div>
 					<div class="overlay-menu__event-meta">
 						<span class="overlay-menu__event-time">
 							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
