@@ -384,9 +384,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .overlay-menu__event {
-	text-align: right;
-	font-size: 0.875rem;
-	color: rgba(255, 255, 255, 0.7);
+	text-align: left;
 	opacity: 0;
 	transform: translateY(10px);
 	transition: opacity 0.5s ease 0.4s, transform 0.5s ease 0.4s;
@@ -397,69 +395,110 @@ h1, h2, h3, h4, h5, h6 {
 	transform: translateY(0);
 }
 
-/* Override shortcode card styles inside the overlay */
-.overlay-menu__event .mypco-location-card {
+/* Heading */
+.overlay-menu__event-heading {
+	font-size: 0.75rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: rgba(255, 255, 255, 0.5);
+	margin: 0 0 0.75rem;
+}
+
+/* Override shortcode list styles inside the overlay */
+.overlay-menu__event .mypco-location-list {
+	max-width: none !important;
+	margin: 0 !important;
+}
+
+.overlay-menu__event .mypco-location-list-items {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.overlay-menu__event .mypco-location-list-item {
+	border: 1px solid rgba(255, 255, 255, 0.2) !important;
+	border-radius: 12px !important;
 	background: transparent !important;
+	padding: 1rem !important;
+	margin-bottom: 0 !important;
+	gap: 1rem !important;
+	align-items: center !important;
+}
+
+.overlay-menu__event .mypco-location-list-item:hover {
 	box-shadow: none !important;
-	padding: 0 !important;
-	border: none !important;
-	text-align: right;
+	border-color: rgba(255, 255, 255, 0.35) !important;
 }
 
-.overlay-menu__event .mypco-location-content {
-	padding: 0 !important;
+/* Date badge — dark pill on overlay */
+.overlay-menu__event .mypco-location-list-date-badge {
+	background: rgba(255, 255, 255, 0.12) !important;
+	border-radius: 8px !important;
+	flex: 0 0 50px !important;
+	padding: 8px 6px !important;
 }
 
-.overlay-menu__event .mypco-location-title {
-	font-size: clamp(1rem, 2.5vw, 1.25rem) !important;
-	font-weight: 600 !important;
+.overlay-menu__event .mypco-location-list-day,
+.overlay-menu__event .mypco-location-list-month {
+	color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.overlay-menu__event .mypco-location-list-number {
 	color: #ffffff !important;
-	margin: 0 0 0.5rem !important;
+	font-size: 1.25rem !important;
 }
 
-.overlay-menu__event .mypco-location-info-row {
-	flex-direction: column !important;
-	align-items: flex-end !important;
-	gap: 0.25rem !important;
+/* Event details — left aligned */
+.overlay-menu__event .mypco-location-list-details {
+	text-align: left !important;
 }
 
-.overlay-menu__event .mypco-location-datetime {
-	justify-content: flex-end !important;
+.overlay-menu__event .mypco-location-list-date-full {
+	color: #ffffff !important;
+	font-size: 0.9rem !important;
+	font-weight: 600 !important;
+	margin-bottom: 4px !important;
 }
 
-.overlay-menu__event .mypco-location-date,
-.overlay-menu__event .mypco-location-time {
-	color: rgba(255, 255, 255, 0.7) !important;
+/* Time and location on the same line */
+.overlay-menu__event .mypco-location-list-time,
+.overlay-menu__event .mypco-location-list-location {
+	display: inline-flex !important;
 	font-size: 0.8125rem !important;
+	margin-bottom: 0 !important;
 }
 
-.overlay-menu__event .mypco-location-icon {
-	width: 14px !important;
-	height: 14px !important;
-	color: rgba(255, 255, 255, 0.5) !important;
+.overlay-menu__event .mypco-location-list-time {
+	color: rgba(255, 255, 255, 0.6) !important;
+	margin-right: 1rem !important;
 }
 
-.overlay-menu__event .mypco-location-details {
-	justify-content: flex-end !important;
+.overlay-menu__event .mypco-location-list-icon {
+	color: rgba(255, 255, 255, 0.4) !important;
 }
 
-.overlay-menu__event .mypco-location-name {
-	color: rgba(255, 255, 255, 0.7) !important;
-	font-size: 0.8125rem !important;
-}
-
-.overlay-menu__event .mypco-location-name a {
-	color: rgba(255, 255, 255, 0.7) !important;
+.overlay-menu__event .mypco-location-list-link {
+	color: rgba(255, 255, 255, 0.6) !important;
 	text-decoration: underline !important;
 	text-underline-offset: 2px !important;
 }
 
-.overlay-menu__event .mypco-location-name a:hover {
+.overlay-menu__event .mypco-location-list-link:hover {
 	color: #ffffff !important;
+	opacity: 1 !important;
 }
 
-/* Hide address text inside overlay — location name is already a maps link */
-.overlay-menu__event .mypco-location-address {
+/* Hide address, external icon, and "This Week" badge in overlay */
+.overlay-menu__event .mypco-location-list-address {
+	display: none !important;
+}
+
+.overlay-menu__event .mypco-location-list-external {
+	display: none !important;
+}
+
+.overlay-menu__event .mypco-location-list-badge {
 	display: none !important;
 }
 
