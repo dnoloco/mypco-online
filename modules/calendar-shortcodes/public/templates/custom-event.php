@@ -78,7 +78,7 @@ $time_display = $event['date_obj']->format($time_format);
                         </svg>
                         <div class="mypco-location-text">
                             <?php if (!empty($event['location_name'])): ?>
-                                <span class="mypco-location-name"><?php echo esc_html($event['location_name']); ?></span>
+                                <span class="mypco-location-name"><?php if (!empty($event['maps_url'])): ?><a href="<?php echo esc_url($event['maps_url']); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html($event['location_name']); ?></a><?php else: ?><?php echo esc_html($event['location_name']); ?><?php endif; ?></span>
                             <?php endif; ?>
                             <?php if ($show_address && !empty($event['location_address'])): ?>
                                 <span class="mypco-location-address"><?php echo esc_html($event['location_address']); ?></span>

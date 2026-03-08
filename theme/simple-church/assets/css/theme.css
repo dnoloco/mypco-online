@@ -380,7 +380,7 @@ h1, h2, h3, h4, h5, h6 {
 	border: none;
 	border-top: 1px solid rgba(255, 255, 255, 0.15);
 	margin: 2rem 0 1.5rem auto;
-	width: 60%;
+	width: 30%;
 }
 
 .overlay-menu__event {
@@ -456,6 +456,11 @@ h1, h2, h3, h4, h5, h6 {
 
 .overlay-menu__event .mypco-location-name a:hover {
 	color: #ffffff !important;
+}
+
+/* Hide address text inside overlay — location name is already a maps link */
+.overlay-menu__event .mypco-location-address {
+	display: none !important;
 }
 
 /* --------------------------------------------------------------------------
