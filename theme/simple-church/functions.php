@@ -1041,7 +1041,7 @@ function simple_church_get_next_sunday_event() {
 	$now = new DateTime( 'now', wp_timezone() );
 
 	$params = array(
-		'where[starts_at][gte]' => $now->format( 'Y-m-d\T00:00:00\Z' ),
+		'where[starts_at][gte]' => $now->format( 'Y-m-d\TH:i:s\Z' ),
 		'where[starts_at][lte]' => ( clone $now )->modify( '+6 weeks' )->format( 'Y-m-d\T23:59:59\Z' ),
 		'order'                 => 'starts_at',
 		'per_page'              => 50,

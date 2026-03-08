@@ -803,9 +803,8 @@ function simple_church_seasonal_inline_css() {
 		$css .= "body.seasonal-theme-active .overlay-menu__event-badge-day,\n";
 		$css .= "body.seasonal-theme-active .overlay-menu__event-badge-month { color: " . $overlay_link . "99; }\n";
 		$css .= "body.seasonal-theme-active .overlay-menu__event-time,\n";
-		$css .= "body.seasonal-theme-active .overlay-menu__event-location,\n";
-		$css .= "body.seasonal-theme-active .overlay-menu__event-location a { color: " . $overlay_link . "99; }\n";
-		$css .= "body.seasonal-theme-active .overlay-menu__event-location a:hover { color: " . $overlay_link . "; }\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__event-location { color: " . $overlay_link . "99; }\n";
+		$css .= "body.seasonal-theme-active .overlay-menu__event-location a { color: " . $overlay_link . "; }\n";
 	}
 	if ( $season['overlay_hover_color'] ) {
 		$overlay_hover = esc_attr( $season['overlay_hover_color'] );
