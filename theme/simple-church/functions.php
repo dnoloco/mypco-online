@@ -1013,7 +1013,7 @@ add_action( 'init', 'simple_church_disable_admin_bar_styles' );
  * @return array|false
  */
 function simple_church_get_next_sunday_event() {
-	if ( ! class_exists( 'MyPCO_API_Model' ) ) {
+	if ( ! class_exists( 'MyPCO_API_Model' ) || ! class_exists( 'MyPCO_Credentials_Manager' ) ) {
 		return false;
 	}
 
@@ -1031,7 +1031,13 @@ function simple_church_get_next_sunday_event() {
 		return $cached;
 	}
 
-	$api = new MyPCO_API_Model();
+	$credentials = MyPCO_Credentials_Manager::get_pco_credentials();
+	if ( empty( $credentials['client_id'] ) || empty( $credentials['secret_key'] ) ) {
+		return false;
+	}
+
+	$timezone = get_option( 'timezone_string' ) ?: 'America/Chicago';
+	$api = new MyPCO_API_Model( $credentials['client_id'], $credentials['secret_key'], $timezone );
 	$now = new DateTime( 'now', wp_timezone() );
 
 	$params = array(
