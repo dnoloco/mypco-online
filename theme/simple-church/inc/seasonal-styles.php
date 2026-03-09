@@ -80,6 +80,7 @@ function simple_church_seasonal_defaults() {
 		'footer_link_color'      => '',
 		'footer_copyright_color' => '',
 		'primary_color'          => '',
+		'secondary_color'        => '',
 		'overlay_bg_color'       => '',
 		'overlay_link_color'     => '',
 		'overlay_hover_color'    => '',
@@ -108,6 +109,7 @@ function simple_church_seasonal_defaults() {
 			'footer_link_color'      => '',
 			'footer_copyright_color' => '',
 			'primary_color'          => '',
+		'secondary_color'        => '',
 			'overlay_bg_color'       => '',
 			'overlay_link_color'     => '',
 			'overlay_hover_color'    => '',
@@ -134,6 +136,7 @@ function simple_church_seasonal_defaults() {
 			'footer_link_color'      => '',
 			'footer_copyright_color' => '',
 			'primary_color'          => '',
+		'secondary_color'        => '',
 			'overlay_bg_color'       => '',
 			'overlay_link_color'     => '',
 			'overlay_hover_color'    => '',
@@ -388,7 +391,18 @@ function simple_church_seasonal_customize_register( $wp_customize ) {
 		) );
 		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "{$sec}_primary_color", array(
 			'label'       => __( 'Primary Accent Color', 'simple-church' ),
-			'description' => __( 'Calendar date badges and primary accents. 75% for nearest event, 100% on hover, 35% for other events, 50% on hover. Leave empty to use the Dark background color.', 'simple-church' ),
+			'description' => __( 'Nearest event date badge. 60% muted at rest, full color on hover. Leave empty to use the Dark background color.', 'simple-church' ),
+			'section'     => $sec,
+		) ) );
+
+		// Secondary Accent Color.
+		$wp_customize->add_setting( "{$sec}_secondary_color", array(
+			'default'           => $d['secondary_color'],
+			'sanitize_callback' => 'sanitize_hex_color',
+		) );
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "{$sec}_secondary_color", array(
+			'label'       => __( 'Secondary Accent Color', 'simple-church' ),
+			'description' => __( 'Other event date badges. 60% muted at rest, full color on hover. Leave empty to use a lighter text color.', 'simple-church' ),
 			'section'     => $sec,
 		) ) );
 
@@ -604,6 +618,7 @@ function simple_church_get_active_season() {
 				'footer_link_color'      => get_theme_mod( "simple_church_season_{$i}_footer_link_color", $d['footer_link_color'] ),
 				'footer_copyright_color' => get_theme_mod( "simple_church_season_{$i}_footer_copyright_color", $d['footer_copyright_color'] ),
 				'primary_color'          => get_theme_mod( "simple_church_season_{$i}_primary_color", $d['primary_color'] ),
+				'secondary_color'        => get_theme_mod( "simple_church_season_{$i}_secondary_color", $d['secondary_color'] ),
 				'overlay_bg_color'       => get_theme_mod( "simple_church_season_{$i}_overlay_bg_color", $d['overlay_bg_color'] ),
 				'overlay_link_color'     => get_theme_mod( "simple_church_season_{$i}_overlay_link_color", $d['overlay_link_color'] ),
 				'overlay_hover_color'    => get_theme_mod( "simple_church_season_{$i}_overlay_hover_color", $d['overlay_hover_color'] ),
@@ -961,8 +976,9 @@ function simple_church_seasonal_inline_css() {
 		}
 
 		// Calendar accordion event cards.
-		// Resolve primary accent color with fallback to dark_bg_color.
-		$primary = ! empty( $season['primary_color'] ) ? esc_attr( $season['primary_color'] ) : ( $season['dark_bg_color'] ? esc_attr( $season['dark_bg_color'] ) : '' );
+		// Resolve accent colors with fallbacks.
+		$primary   = ! empty( $season['primary_color'] ) ? esc_attr( $season['primary_color'] ) : ( $season['dark_bg_color'] ? esc_attr( $season['dark_bg_color'] ) : '' );
+		$secondary = ! empty( $season['secondary_color'] ) ? esc_attr( $season['secondary_color'] ) : ( $season['text_color'] ? esc_attr( $season['text_color'] ) : '' );
 
 		if ( $season['text_color'] ) {
 			$tc = esc_attr( $season['text_color'] );
@@ -985,17 +1001,20 @@ function simple_church_seasonal_inline_css() {
 			$lc = esc_attr( $season['link_color'] );
 			$css .= "body.seasonal-theme-active .pco-accordion-register-btn { background: " . $lc . "; }\n";
 		}
-		// Primary accent — all date badge states derived from one color.
-		// 75% = nearest resting, 100% = nearest hover, 35% = other resting, 50% = other hover.
+		// Primary accent — nearest event date badge: 60% resting, 100% hover.
 		if ( $primary ) {
-			$css .= "body.seasonal-theme-active .pco-accordion-date-badge:not(.pco-accordion-date-badge--light) { background: " . $primary . "bf; }\n";
+			$css .= "body.seasonal-theme-active .pco-accordion-date-badge:not(.pco-accordion-date-badge--light) { background: " . $primary . "99; }\n";
 			$css .= "body.seasonal-theme-active .pco-accordion-row:hover .pco-accordion-date-badge:not(.pco-accordion-date-badge--light) { background: " . $primary . "; }\n";
-			$css .= "body.seasonal-theme-active .pco-accordion-date-badge--light { background: " . $primary . "59; color: #ffffff; }\n";
-			$css .= "body.seasonal-theme-active .pco-accordion-row:hover .pco-accordion-date-badge--light { background: " . $primary . "80; color: #ffffff; }\n";
 		}
 		if ( $season['dark_text_color'] ) {
 			$dtc = esc_attr( $season['dark_text_color'] );
 			$css .= "body.seasonal-theme-active .pco-accordion-date-badge:not(.pco-accordion-date-badge--light) { color: " . $dtc . "; }\n";
+		}
+		// Secondary accent — other event date badges: 60% resting, 100% hover.
+		// Falls back to text_color if not set.
+		if ( $secondary ) {
+			$css .= "body.seasonal-theme-active .pco-accordion-date-badge--light { background: " . $secondary . "99; color: #ffffff; }\n";
+			$css .= "body.seasonal-theme-active .pco-accordion-row:hover .pco-accordion-date-badge--light { background: " . $secondary . "; color: #ffffff; }\n";
 		}
 	}
 
