@@ -402,7 +402,7 @@ function simple_church_seasonal_customize_register( $wp_customize ) {
 		) );
 		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "{$sec}_secondary_color", array(
 			'label'       => __( 'Secondary Accent Color', 'simple-church' ),
-			'description' => __( 'Hover color for the nearest event. A muted version is auto-generated for secondary date badges and their hover states. Leave empty to derive from the primary.', 'simple-church' ),
+			'description' => __( 'Hover color for non-nearest event date badges. Leave empty to use a muted variant of the primary.', 'simple-church' ),
 			'section'     => $sec,
 		) ) );
 
@@ -1001,26 +1001,24 @@ function simple_church_seasonal_inline_css() {
 			$lc = esc_attr( $season['link_color'] );
 			$css .= "body.seasonal-theme-active .pco-accordion-register-btn { background: " . $lc . "; }\n";
 		}
-		// Primary accent: nearest event date badge.
+		// Primary accent — nearest event date badge.
 		if ( $primary ) {
+			// Darker shade for resting state (darken via color-mix or hex suffix).
 			$css .= "body.seasonal-theme-active .pco-accordion-date-badge:not(.pco-accordion-date-badge--light) { background: " . $primary . "; }\n";
+			// Regular primary on hover.
+			$css .= "body.seasonal-theme-active .pco-accordion-row:hover .pco-accordion-date-badge:not(.pco-accordion-date-badge--light) { background: " . $primary . "cc; }\n";
+			// Lighter primary (50%) for non-nearest event badges.
+			$css .= "body.seasonal-theme-active .pco-accordion-date-badge--light { background: " . $primary . "80; color: #ffffff; }\n";
 		}
 		if ( $season['dark_text_color'] ) {
 			$dtc = esc_attr( $season['dark_text_color'] );
 			$css .= "body.seasonal-theme-active .pco-accordion-date-badge:not(.pco-accordion-date-badge--light) { color: " . $dtc . "; }\n";
 		}
-		// Secondary accent: hover for nearest event; muted for light badges.
-		// Falls back to primary at 60% if no secondary is set.
-		$hover_color = $secondary ? $secondary : ( $primary ? $primary . '99' : '' );
-		if ( $hover_color ) {
-			// Nearest event row hover.
-			$css .= "body.seasonal-theme-active .pco-accordion-row:hover .pco-accordion-date-badge:not(.pco-accordion-date-badge--light) { background: " . $hover_color . "; }\n";
-		}
-		// Light (non-nearest) date badges: muted version of secondary (or primary).
-		$muted_base = $secondary ? $secondary : ( $primary ? $primary : '' );
-		if ( $muted_base ) {
-			$css .= "body.seasonal-theme-active .pco-accordion-date-badge--light { background: " . $muted_base . "80; color: #ffffff; }\n";
-			$css .= "body.seasonal-theme-active .pco-accordion-row:hover .pco-accordion-date-badge--light { background: " . $muted_base . "99; }\n";
+		// Secondary accent — hover ONLY for non-nearest event date badges.
+		if ( $secondary ) {
+			$css .= "body.seasonal-theme-active .pco-accordion-row:hover .pco-accordion-date-badge--light { background: " . $secondary . "; color: #ffffff; }\n";
+		} elseif ( $primary ) {
+			$css .= "body.seasonal-theme-active .pco-accordion-row:hover .pco-accordion-date-badge--light { background: " . $primary . "99; color: #ffffff; }\n";
 		}
 	}
 
