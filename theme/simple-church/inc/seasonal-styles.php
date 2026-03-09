@@ -20,6 +20,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Lightweight Customizer control that renders a section heading / divider.
+ * Used to visually group controls inside a single section without creating
+ * separate sections for each group.
+ */
+if ( class_exists( 'WP_Customize_Control' ) ) {
+	class Simple_Church_Heading_Control extends WP_Customize_Control {
+		public $type = 'sc_heading';
+
+		public function render_content() {
+			if ( $this->label ) {
+				echo '<hr style="margin:16px 0 8px;border:0;border-top:1px solid #ddd;">';
+				echo '<span class="customize-control-title" style="margin-bottom:0;font-size:14px;">' . esc_html( $this->label ) . '</span>';
+			}
+			if ( $this->description ) {
+				echo '<span class="description customize-control-description">' . esc_html( $this->description ) . '</span>';
+			}
+		}
+	}
+}
+
+/**
  * Number of seasonal style slots available.
  */
 define( 'SIMPLE_CHURCH_SEASONAL_SLOT_COUNT', 5 );
@@ -188,327 +209,344 @@ function simple_church_seasonal_customize_register( $wp_customize ) {
 	for ( $i = 1; $i <= SIMPLE_CHURCH_SEASONAL_SLOT_COUNT; $i++ ) {
 		$d = $defaults[ $i ];
 
-		$season_label = $d['name']
+		$section_title = $d['name']
 			? sprintf( __( 'Season %d — %s', 'simple-church' ), $i, $d['name'] )
 			: sprintf( __( 'Season %d', 'simple-church' ), $i );
 
-		$base_priority = 10 + ( $i - 1 ) * 10;
+		$sec = "simple_church_season_{$i}";
 
-		// ── 1. Info ──────────────────────────────────────────────────
-		$wp_customize->add_section( "simple_church_season_{$i}_info", array(
-			'title'    => $season_label . ' — Info',
+		$wp_customize->add_section( $sec, array(
+			'title'    => $section_title,
 			'panel'    => 'simple_church_seasonal_panel',
-			'priority' => $base_priority,
+			'priority' => 10 + $i,
 		) );
 
+		// ── Info ─────────────────────────────────────────────────────
+
 		// Enabled.
-		$wp_customize->add_setting( "simple_church_season_{$i}_enabled", array(
+		$wp_customize->add_setting( "{$sec}_enabled", array(
 			'default'           => $d['enabled'],
 			'sanitize_callback' => 'wp_validate_boolean',
 		) );
-		$wp_customize->add_control( "simple_church_season_{$i}_enabled", array(
+		$wp_customize->add_control( "{$sec}_enabled", array(
 			'label'   => __( 'Enable This Season', 'simple-church' ),
-			'section' => "simple_church_season_{$i}_info",
+			'section' => $sec,
 			'type'    => 'checkbox',
 		) );
 
 		// Apply to All Templates.
-		$wp_customize->add_setting( "simple_church_season_{$i}_apply_all", array(
+		$wp_customize->add_setting( "{$sec}_apply_all", array(
 			'default'           => $d['apply_all'],
 			'sanitize_callback' => 'wp_validate_boolean',
 		) );
-		$wp_customize->add_control( "simple_church_season_{$i}_apply_all", array(
+		$wp_customize->add_control( "{$sec}_apply_all", array(
 			'label'       => __( 'Apply to All Templates', 'simple-church' ),
 			'description' => __( 'Extend seasonal colors to page headers, single posts, blog listings, and the navigation bar — not just the front page.', 'simple-church' ),
-			'section'     => "simple_church_season_{$i}_info",
+			'section'     => $sec,
 			'type'        => 'checkbox',
 		) );
 
 		// Season Name.
-		$wp_customize->add_setting( "simple_church_season_{$i}_name", array(
+		$wp_customize->add_setting( "{$sec}_name", array(
 			'default'           => $d['name'],
 			'sanitize_callback' => 'sanitize_text_field',
 		) );
-		$wp_customize->add_control( "simple_church_season_{$i}_name", array(
+		$wp_customize->add_control( "{$sec}_name", array(
 			'label'       => __( 'Season Name', 'simple-church' ),
 			'description' => __( 'A label for this seasonal style (e.g., "Easter", "VBS").', 'simple-church' ),
-			'section'     => "simple_church_season_{$i}_info",
+			'section'     => $sec,
 			'type'        => 'text',
 		) );
 
 		// Start Month.
-		$wp_customize->add_setting( "simple_church_season_{$i}_start_month", array(
+		$wp_customize->add_setting( "{$sec}_start_month", array(
 			'default'           => $d['start_month'],
 			'sanitize_callback' => 'absint',
 		) );
-		$wp_customize->add_control( "simple_church_season_{$i}_start_month", array(
+		$wp_customize->add_control( "{$sec}_start_month", array(
 			'label'   => __( 'Start Month', 'simple-church' ),
-			'section' => "simple_church_season_{$i}_info",
+			'section' => $sec,
 			'type'    => 'select',
 			'choices' => $month_choices,
 		) );
 
 		// Start Day.
-		$wp_customize->add_setting( "simple_church_season_{$i}_start_day", array(
+		$wp_customize->add_setting( "{$sec}_start_day", array(
 			'default'           => $d['start_day'],
 			'sanitize_callback' => 'absint',
 		) );
-		$wp_customize->add_control( "simple_church_season_{$i}_start_day", array(
+		$wp_customize->add_control( "{$sec}_start_day", array(
 			'label'   => __( 'Start Day', 'simple-church' ),
-			'section' => "simple_church_season_{$i}_info",
+			'section' => $sec,
 			'type'    => 'select',
 			'choices' => $day_choices,
 		) );
 
 		// End Month.
-		$wp_customize->add_setting( "simple_church_season_{$i}_end_month", array(
+		$wp_customize->add_setting( "{$sec}_end_month", array(
 			'default'           => $d['end_month'],
 			'sanitize_callback' => 'absint',
 		) );
-		$wp_customize->add_control( "simple_church_season_{$i}_end_month", array(
+		$wp_customize->add_control( "{$sec}_end_month", array(
 			'label'   => __( 'End Month', 'simple-church' ),
-			'section' => "simple_church_season_{$i}_info",
+			'section' => $sec,
 			'type'    => 'select',
 			'choices' => $month_choices,
 		) );
 
 		// End Day.
-		$wp_customize->add_setting( "simple_church_season_{$i}_end_day", array(
+		$wp_customize->add_setting( "{$sec}_end_day", array(
 			'default'           => $d['end_day'],
 			'sanitize_callback' => 'absint',
 		) );
-		$wp_customize->add_control( "simple_church_season_{$i}_end_day", array(
+		$wp_customize->add_control( "{$sec}_end_day", array(
 			'label'   => __( 'End Day', 'simple-church' ),
-			'section' => "simple_church_season_{$i}_info",
+			'section' => $sec,
 			'type'    => 'select',
 			'choices' => $day_choices,
 		) );
 
-		// ── 2. Light Sections ────────────────────────────────────────
-		$wp_customize->add_section( "simple_church_season_{$i}_light", array(
-			'title'    => $season_label . ' — Light',
-			'panel'    => 'simple_church_seasonal_panel',
-			'priority' => $base_priority + 1,
+		// ── Light Sections ───────────────────────────────────────────
+
+		// Heading divider.
+		$wp_customize->add_setting( "{$sec}_heading_light", array(
+			'sanitize_callback' => '__return_empty_string',
 		) );
+		$wp_customize->add_control( new Simple_Church_Heading_Control( $wp_customize, "{$sec}_heading_light", array(
+			'label'   => __( 'Light Sections', 'simple-church' ),
+			'section' => $sec,
+		) ) );
 
 		// Site Logo (Light).
-		$wp_customize->add_setting( "simple_church_season_{$i}_logo", array(
+		$wp_customize->add_setting( "{$sec}_logo", array(
 			'default'           => $d['logo'],
 			'sanitize_callback' => 'absint',
 		) );
-		$wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, "simple_church_season_{$i}_logo", array(
+		$wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, "{$sec}_logo", array(
 			'label'       => __( 'Site Logo (Light)', 'simple-church' ),
-			'description' => __( 'Logo for dark backgrounds (e.g., hero). Leave empty to keep the default logo.', 'simple-church' ),
-			'section'     => "simple_church_season_{$i}_light",
+			'description' => __( 'Logo for dark backgrounds (e.g., hero). Leave empty to keep the default.', 'simple-church' ),
+			'section'     => $sec,
 			'mime_type'   => 'image',
 		) ) );
 
 		// Font.
-		$wp_customize->add_setting( "simple_church_season_{$i}_font", array(
+		$wp_customize->add_setting( "{$sec}_font", array(
 			'default'           => $d['font'],
 			'sanitize_callback' => 'sanitize_text_field',
 		) );
-		$wp_customize->add_control( "simple_church_season_{$i}_font", array(
+		$wp_customize->add_control( "{$sec}_font", array(
 			'label'   => __( 'Font', 'simple-church' ),
-			'section' => "simple_church_season_{$i}_light",
+			'section' => $sec,
 			'type'    => 'select',
 			'choices' => $font_choices,
 		) );
 
 		// Text Color.
-		$wp_customize->add_setting( "simple_church_season_{$i}_text_color", array(
+		$wp_customize->add_setting( "{$sec}_text_color", array(
 			'default'           => $d['text_color'],
 			'sanitize_callback' => 'sanitize_hex_color',
 		) );
-		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_text_color", array(
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "{$sec}_text_color", array(
 			'label'       => __( 'Text Color', 'simple-church' ),
 			'description' => __( 'Text color for body, white, and cream-coloured sections.', 'simple-church' ),
-			'section'     => "simple_church_season_{$i}_light",
+			'section'     => $sec,
 		) ) );
 
 		// Background Color.
-		$wp_customize->add_setting( "simple_church_season_{$i}_bg_color", array(
+		$wp_customize->add_setting( "{$sec}_bg_color", array(
 			'default'           => $d['bg_color'],
 			'sanitize_callback' => 'sanitize_hex_color',
 		) );
-		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_bg_color", array(
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "{$sec}_bg_color", array(
 			'label'   => __( 'Background Color', 'simple-church' ),
-			'section' => "simple_church_season_{$i}_light",
+			'section' => $sec,
 		) ) );
 
 		// Background Image.
-		$wp_customize->add_setting( "simple_church_season_{$i}_bg_image", array(
+		$wp_customize->add_setting( "{$sec}_bg_image", array(
 			'default'           => $d['bg_image'],
 			'sanitize_callback' => 'absint',
 		) );
-		$wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, "simple_church_season_{$i}_bg_image", array(
+		$wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, "{$sec}_bg_image", array(
 			'label'       => __( 'Background Image', 'simple-church' ),
 			'description' => __( 'Overrides the background color when set.', 'simple-church' ),
-			'section'     => "simple_church_season_{$i}_light",
+			'section'     => $sec,
 			'mime_type'   => 'image',
 		) ) );
 
 		// Link Color.
-		$wp_customize->add_setting( "simple_church_season_{$i}_link_color", array(
+		$wp_customize->add_setting( "{$sec}_link_color", array(
 			'default'           => $d['link_color'],
 			'sanitize_callback' => 'sanitize_hex_color',
 		) );
-		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_link_color", array(
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "{$sec}_link_color", array(
 			'label'   => __( 'Link Color', 'simple-church' ),
-			'section' => "simple_church_season_{$i}_light",
+			'section' => $sec,
 		) ) );
 
 		// Primary Accent Color.
-		$wp_customize->add_setting( "simple_church_season_{$i}_primary_color", array(
+		$wp_customize->add_setting( "{$sec}_primary_color", array(
 			'default'           => $d['primary_color'],
 			'sanitize_callback' => 'sanitize_hex_color',
 		) );
-		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_primary_color", array(
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "{$sec}_primary_color", array(
 			'label'       => __( 'Primary Accent Color', 'simple-church' ),
-			'description' => __( 'Used for calendar date badges, buttons, and primary accents. Leave empty to use the Dark Section background color.', 'simple-church' ),
-			'section'     => "simple_church_season_{$i}_light",
+			'description' => __( 'Calendar date badges, buttons, and primary accents. Leave empty to use the Dark background color.', 'simple-church' ),
+			'section'     => $sec,
 		) ) );
 
 		// Secondary Accent Color.
-		$wp_customize->add_setting( "simple_church_season_{$i}_secondary_color", array(
+		$wp_customize->add_setting( "{$sec}_secondary_color", array(
 			'default'           => $d['secondary_color'],
 			'sanitize_callback' => 'sanitize_hex_color',
 		) );
-		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_secondary_color", array(
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "{$sec}_secondary_color", array(
 			'label'       => __( 'Secondary Accent Color', 'simple-church' ),
-			'description' => __( 'Used for secondary date badges, hover states, and lighter accents. Leave empty to use a muted variant of the primary color.', 'simple-church' ),
-			'section'     => "simple_church_season_{$i}_light",
+			'description' => __( 'Secondary date badges, hover states, and lighter accents. Leave empty to use a muted variant of the primary.', 'simple-church' ),
+			'section'     => $sec,
 		) ) );
 
-		// ── 3. Dark Sections ─────────────────────────────────────────
-		$wp_customize->add_section( "simple_church_season_{$i}_dark", array(
-			'title'    => $season_label . ' — Dark',
-			'panel'    => 'simple_church_seasonal_panel',
-			'priority' => $base_priority + 2,
+		// ── Dark Sections ────────────────────────────────────────────
+
+		// Heading divider.
+		$wp_customize->add_setting( "{$sec}_heading_dark", array(
+			'sanitize_callback' => '__return_empty_string',
 		) );
+		$wp_customize->add_control( new Simple_Church_Heading_Control( $wp_customize, "{$sec}_heading_dark", array(
+			'label'   => __( 'Dark Sections', 'simple-church' ),
+			'section' => $sec,
+		) ) );
 
 		// Site Logo (Dark).
-		$wp_customize->add_setting( "simple_church_season_{$i}_logo_dark", array(
+		$wp_customize->add_setting( "{$sec}_logo_dark", array(
 			'default'           => $d['logo_dark'],
 			'sanitize_callback' => 'absint',
 		) );
-		$wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, "simple_church_season_{$i}_logo_dark", array(
+		$wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, "{$sec}_logo_dark", array(
 			'label'       => __( 'Site Logo (Dark)', 'simple-church' ),
-			'description' => __( 'Logo for light backgrounds (e.g., scrolled nav). Leave empty to keep the default logo.', 'simple-church' ),
-			'section'     => "simple_church_season_{$i}_dark",
+			'description' => __( 'Logo for light backgrounds (e.g., scrolled nav). Leave empty to keep the default.', 'simple-church' ),
+			'section'     => $sec,
 			'mime_type'   => 'image',
 		) ) );
 
-		// Text Color.
-		$wp_customize->add_setting( "simple_church_season_{$i}_dark_text_color", array(
+		// Dark Text Color.
+		$wp_customize->add_setting( "{$sec}_dark_text_color", array(
 			'default'           => $d['dark_text_color'],
 			'sanitize_callback' => 'sanitize_hex_color',
 		) );
-		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_dark_text_color", array(
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "{$sec}_dark_text_color", array(
 			'label'       => __( 'Text Color', 'simple-church' ),
-			'description' => __( 'Text color for dark contrast bands, parallax breaks, and page headers.', 'simple-church' ),
-			'section'     => "simple_church_season_{$i}_dark",
+			'description' => __( 'Text color for dark bands, parallax breaks, and page headers.', 'simple-church' ),
+			'section'     => $sec,
 		) ) );
 
-		// Background Color.
-		$wp_customize->add_setting( "simple_church_season_{$i}_dark_bg_color", array(
+		// Dark Background Color.
+		$wp_customize->add_setting( "{$sec}_dark_bg_color", array(
 			'default'           => $d['dark_bg_color'],
 			'sanitize_callback' => 'sanitize_hex_color',
 		) );
-		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_dark_bg_color", array(
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "{$sec}_dark_bg_color", array(
 			'label'   => __( 'Background Color', 'simple-church' ),
-			'section' => "simple_church_season_{$i}_dark",
+			'section' => $sec,
 		) ) );
 
-		// ── 4. Overlay Menu ──────────────────────────────────────────
-		$wp_customize->add_section( "simple_church_season_{$i}_overlay", array(
-			'title'    => $season_label . ' — Overlay Menu',
-			'panel'    => 'simple_church_seasonal_panel',
-			'priority' => $base_priority + 3,
-		) );
+		// ── Overlay Menu ─────────────────────────────────────────────
 
-		// Background Color.
-		$wp_customize->add_setting( "simple_church_season_{$i}_overlay_bg_color", array(
+		// Heading divider.
+		$wp_customize->add_setting( "{$sec}_heading_overlay", array(
+			'sanitize_callback' => '__return_empty_string',
+		) );
+		$wp_customize->add_control( new Simple_Church_Heading_Control( $wp_customize, "{$sec}_heading_overlay", array(
+			'label'   => __( 'Overlay Menu', 'simple-church' ),
+			'section' => $sec,
+		) ) );
+
+		// Overlay Background Color.
+		$wp_customize->add_setting( "{$sec}_overlay_bg_color", array(
 			'default'           => $d['overlay_bg_color'],
 			'sanitize_callback' => 'sanitize_hex_color',
 		) );
-		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_overlay_bg_color", array(
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "{$sec}_overlay_bg_color", array(
 			'label'       => __( 'Background Color', 'simple-church' ),
 			'description' => __( 'Leave empty to use the default dark background.', 'simple-church' ),
-			'section'     => "simple_church_season_{$i}_overlay",
+			'section'     => $sec,
 		) ) );
 
-		// Link Color.
-		$wp_customize->add_setting( "simple_church_season_{$i}_overlay_link_color", array(
+		// Overlay Link Color.
+		$wp_customize->add_setting( "{$sec}_overlay_link_color", array(
 			'default'           => $d['overlay_link_color'],
 			'sanitize_callback' => 'sanitize_hex_color',
 		) );
-		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_overlay_link_color", array(
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "{$sec}_overlay_link_color", array(
 			'label'       => __( 'Link Color', 'simple-church' ),
 			'description' => __( 'Leave empty to use the default white.', 'simple-church' ),
-			'section'     => "simple_church_season_{$i}_overlay",
+			'section'     => $sec,
 		) ) );
 
-		// Link Hover Color.
-		$wp_customize->add_setting( "simple_church_season_{$i}_overlay_hover_color", array(
+		// Overlay Link Hover Color.
+		$wp_customize->add_setting( "{$sec}_overlay_hover_color", array(
 			'default'           => $d['overlay_hover_color'],
 			'sanitize_callback' => 'sanitize_hex_color',
 		) );
-		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_overlay_hover_color", array(
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "{$sec}_overlay_hover_color", array(
 			'label'       => __( 'Link Hover Color', 'simple-church' ),
 			'description' => __( 'Leave empty to use the default grey.', 'simple-church' ),
-			'section'     => "simple_church_season_{$i}_overlay",
+			'section'     => $sec,
 		) ) );
 
-		// ── 5. Footer ────────────────────────────────────────────────
-		$wp_customize->add_section( "simple_church_season_{$i}_footer", array(
-			'title'    => $season_label . ' — Footer',
-			'panel'    => 'simple_church_seasonal_panel',
-			'priority' => $base_priority + 4,
-		) );
+		// ── Footer ───────────────────────────────────────────────────
 
-		// Background Color.
-		$wp_customize->add_setting( "simple_church_season_{$i}_footer_bg_color", array(
+		// Heading divider.
+		$wp_customize->add_setting( "{$sec}_heading_footer", array(
+			'sanitize_callback' => '__return_empty_string',
+		) );
+		$wp_customize->add_control( new Simple_Church_Heading_Control( $wp_customize, "{$sec}_heading_footer", array(
+			'label'   => __( 'Footer', 'simple-church' ),
+			'section' => $sec,
+		) ) );
+
+		// Footer Background Color.
+		$wp_customize->add_setting( "{$sec}_footer_bg_color", array(
 			'default'           => $d['footer_bg_color'],
 			'sanitize_callback' => 'sanitize_hex_color',
 		) );
-		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_footer_bg_color", array(
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "{$sec}_footer_bg_color", array(
 			'label'       => __( 'Background Color', 'simple-church' ),
-			'description' => __( 'Leave empty to use the Dark Section background color.', 'simple-church' ),
-			'section'     => "simple_church_season_{$i}_footer",
+			'description' => __( 'Leave empty to use the Dark background color.', 'simple-church' ),
+			'section'     => $sec,
 		) ) );
 
-		// Text Color.
-		$wp_customize->add_setting( "simple_church_season_{$i}_footer_text_color", array(
+		// Footer Text Color.
+		$wp_customize->add_setting( "{$sec}_footer_text_color", array(
 			'default'           => $d['footer_text_color'],
 			'sanitize_callback' => 'sanitize_hex_color',
 		) );
-		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_footer_text_color", array(
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "{$sec}_footer_text_color", array(
 			'label'       => __( 'Text Color', 'simple-church' ),
-			'description' => __( 'Leave empty to use the Dark Section text color.', 'simple-church' ),
-			'section'     => "simple_church_season_{$i}_footer",
+			'description' => __( 'Leave empty to use the Dark text color.', 'simple-church' ),
+			'section'     => $sec,
 		) ) );
 
-		// Link Color.
-		$wp_customize->add_setting( "simple_church_season_{$i}_footer_link_color", array(
+		// Footer Link Color.
+		$wp_customize->add_setting( "{$sec}_footer_link_color", array(
 			'default'           => $d['footer_link_color'],
 			'sanitize_callback' => 'sanitize_hex_color',
 		) );
-		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_footer_link_color", array(
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "{$sec}_footer_link_color", array(
 			'label'       => __( 'Link Color', 'simple-church' ),
-			'description' => __( 'Leave empty to use the Dark Section text color.', 'simple-church' ),
-			'section'     => "simple_church_season_{$i}_footer",
+			'description' => __( 'Leave empty to use the Dark text color.', 'simple-church' ),
+			'section'     => $sec,
 		) ) );
 
-		// Copyright Color.
-		$wp_customize->add_setting( "simple_church_season_{$i}_footer_copyright_color", array(
+		// Footer Copyright Color.
+		$wp_customize->add_setting( "{$sec}_footer_copyright_color", array(
 			'default'           => $d['footer_copyright_color'],
 			'sanitize_callback' => 'sanitize_hex_color',
 		) );
-		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_footer_copyright_color", array(
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "{$sec}_footer_copyright_color", array(
 			'label'       => __( 'Copyright Color', 'simple-church' ),
-			'description' => __( 'Leave empty to use the Dark Section text color.', 'simple-church' ),
-			'section'     => "simple_church_season_{$i}_footer",
+			'description' => __( 'Leave empty to use the Dark text color.', 'simple-church' ),
+			'section'     => $sec,
 		) ) );
 	}
 }
