@@ -87,6 +87,8 @@ function simple_church_seasonal_defaults() {
 			'footer_text_color'      => '',
 			'footer_link_color'      => '',
 			'footer_copyright_color' => '',
+			'primary_color'          => '',
+			'secondary_color'        => '',
 			'overlay_bg_color'       => '',
 			'overlay_link_color'     => '',
 			'overlay_hover_color'    => '',
@@ -112,6 +114,8 @@ function simple_church_seasonal_defaults() {
 			'footer_text_color'      => '',
 			'footer_link_color'      => '',
 			'footer_copyright_color' => '',
+			'primary_color'          => '',
+			'secondary_color'        => '',
 			'overlay_bg_color'       => '',
 			'overlay_link_color'     => '',
 			'overlay_hover_color'    => '',
@@ -932,14 +936,13 @@ function simple_church_seasonal_inline_css() {
 			// Month/year title and navigation arrows.
 			$css .= "body.seasonal-theme-active .pco-accordion-month-title { color: " . $tc . "; }\n";
 			$css .= "body.seasonal-theme-active .pco-accordion-nav-btn { color: " . $tc . "; }\n";
+			// Location link in expanded detail — use text_color so it doesn't blend with background.
+			$css .= "body.seasonal-theme-active .page-content .pco-accordion-location-link { color: " . $tc . "; }\n";
+			$css .= "body.seasonal-theme-active .page-content .pco-accordion-detail-location strong { color: " . $tc . "; }\n";
 		}
 		if ( $season['link_color'] ) {
 			$lc = esc_attr( $season['link_color'] );
-			$css .= "body.seasonal-theme-active .pco-accordion-location-link { color: " . $lc . "; }\n";
-			$css .= "body.seasonal-theme-active .pco-accordion-detail-location strong { color: " . $lc . "; }\n";
 			$css .= "body.seasonal-theme-active .pco-accordion-register-btn { background: " . $lc . "; }\n";
-			// Location meta link in collapsed row.
-			$css .= "body.seasonal-theme-active .pco-accordion-event-meta a { color: " . $lc . "; }\n";
 		}
 		// Primary accent: nearest date badge + register button.
 		if ( $primary ) {
