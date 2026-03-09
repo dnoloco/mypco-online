@@ -388,7 +388,7 @@ function simple_church_seasonal_customize_register( $wp_customize ) {
 		) );
 		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "{$sec}_primary_color", array(
 			'label'       => __( 'Primary Accent Color', 'simple-church' ),
-			'description' => __( 'Calendar date badges and primary accents. 60% for nearest event, 100% on hover, 25% for other events, 40% on hover. Leave empty to use the Dark background color.', 'simple-church' ),
+			'description' => __( 'Calendar date badges and primary accents. 75% for nearest event, 100% on hover, 35% for other events, 50% on hover. Leave empty to use the Dark background color.', 'simple-church' ),
 			'section'     => $sec,
 		) ) );
 
@@ -986,12 +986,12 @@ function simple_church_seasonal_inline_css() {
 			$css .= "body.seasonal-theme-active .pco-accordion-register-btn { background: " . $lc . "; }\n";
 		}
 		// Primary accent — all date badge states derived from one color.
-		// 60% = nearest resting, 100% = nearest hover, 25% = other resting, 40% = other hover.
+		// 75% = nearest resting, 100% = nearest hover, 35% = other resting, 50% = other hover.
 		if ( $primary ) {
-			$css .= "body.seasonal-theme-active .pco-accordion-date-badge:not(.pco-accordion-date-badge--light) { background: " . $primary . "99; }\n";
+			$css .= "body.seasonal-theme-active .pco-accordion-date-badge:not(.pco-accordion-date-badge--light) { background: " . $primary . "bf; }\n";
 			$css .= "body.seasonal-theme-active .pco-accordion-row:hover .pco-accordion-date-badge:not(.pco-accordion-date-badge--light) { background: " . $primary . "; }\n";
-			$css .= "body.seasonal-theme-active .pco-accordion-date-badge--light { background: " . $primary . "40; color: #ffffff; }\n";
-			$css .= "body.seasonal-theme-active .pco-accordion-row:hover .pco-accordion-date-badge--light { background: " . $primary . "66; color: #ffffff; }\n";
+			$css .= "body.seasonal-theme-active .pco-accordion-date-badge--light { background: " . $primary . "59; color: #ffffff; }\n";
+			$css .= "body.seasonal-theme-active .pco-accordion-row:hover .pco-accordion-date-badge--light { background: " . $primary . "80; color: #ffffff; }\n";
 		}
 		if ( $season['dark_text_color'] ) {
 			$dtc = esc_attr( $season['dark_text_color'] );
