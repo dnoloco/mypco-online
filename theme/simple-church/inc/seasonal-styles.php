@@ -58,6 +58,8 @@ function simple_church_seasonal_defaults() {
 		'footer_text_color'      => '',
 		'footer_link_color'      => '',
 		'footer_copyright_color' => '',
+		'primary_color'          => '',
+		'secondary_color'        => '',
 		'overlay_bg_color'       => '',
 		'overlay_link_color'     => '',
 		'overlay_hover_color'    => '',
@@ -427,6 +429,30 @@ function simple_church_seasonal_customize_register( $wp_customize ) {
 			'section' => "simple_church_season_{$i}",
 		) ) );
 
+		// ── Accent Colors ─────────────────────────────────────────────
+
+		// Primary Color ────────────────────────────────────────────────
+		$wp_customize->add_setting( "simple_church_season_{$i}_primary_color", array(
+			'default'           => $d['primary_color'],
+			'sanitize_callback' => 'sanitize_hex_color',
+		) );
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_primary_color", array(
+			'label'       => __( 'Primary Accent Color', 'simple-church' ),
+			'description' => __( 'Used for calendar date badges, buttons, and primary accents. Leave empty to use the Dark Section background color.', 'simple-church' ),
+			'section'     => "simple_church_season_{$i}",
+		) ) );
+
+		// Secondary Color ──────────────────────────────────────────────
+		$wp_customize->add_setting( "simple_church_season_{$i}_secondary_color", array(
+			'default'           => $d['secondary_color'],
+			'sanitize_callback' => 'sanitize_hex_color',
+		) );
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, "simple_church_season_{$i}_secondary_color", array(
+			'label'       => __( 'Secondary Accent Color', 'simple-church' ),
+			'description' => __( 'Used for secondary date badges, hover states, and lighter accents. Leave empty to use a muted variant of the primary color.', 'simple-church' ),
+			'section'     => "simple_church_season_{$i}",
+		) ) );
+
 		// ── Overlay Menu ──────────────────────────────────────────────
 
 		// Overlay Menu Background Color ────────────────────────────────
@@ -530,6 +556,8 @@ function simple_church_get_active_season() {
 				'footer_text_color'      => get_theme_mod( "simple_church_season_{$i}_footer_text_color", $d['footer_text_color'] ),
 				'footer_link_color'      => get_theme_mod( "simple_church_season_{$i}_footer_link_color", $d['footer_link_color'] ),
 				'footer_copyright_color' => get_theme_mod( "simple_church_season_{$i}_footer_copyright_color", $d['footer_copyright_color'] ),
+				'primary_color'          => get_theme_mod( "simple_church_season_{$i}_primary_color", $d['primary_color'] ),
+				'secondary_color'        => get_theme_mod( "simple_church_season_{$i}_secondary_color", $d['secondary_color'] ),
 				'overlay_bg_color'       => get_theme_mod( "simple_church_season_{$i}_overlay_bg_color", $d['overlay_bg_color'] ),
 				'overlay_link_color'     => get_theme_mod( "simple_church_season_{$i}_overlay_link_color", $d['overlay_link_color'] ),
 				'overlay_hover_color'    => get_theme_mod( "simple_church_season_{$i}_overlay_hover_color", $d['overlay_hover_color'] ),
@@ -887,6 +915,10 @@ function simple_church_seasonal_inline_css() {
 		}
 
 		// Calendar accordion event cards.
+		// Resolve primary/secondary accent colors with fallbacks.
+		$primary   = ! empty( $season['primary_color'] ) ? esc_attr( $season['primary_color'] ) : ( $season['dark_bg_color'] ? esc_attr( $season['dark_bg_color'] ) : '' );
+		$secondary = ! empty( $season['secondary_color'] ) ? esc_attr( $season['secondary_color'] ) : '';
+
 		if ( $season['text_color'] ) {
 			$tc = esc_attr( $season['text_color'] );
 			$css .= "body.seasonal-theme-active .pco-accordion-event-name { color: " . $tc . "; }\n";
@@ -897,20 +929,32 @@ function simple_church_seasonal_inline_css() {
 			$css .= "body.seasonal-theme-active .pco-accordion-detail-body { border-top-color: " . $tc . "26; }\n";
 			$css .= "body.seasonal-theme-active .pco-accordion-detail-location span { color: " . $tc . "; }\n";
 			$css .= "body.seasonal-theme-active .pco-accordion-pin-icon { color: " . $tc . "; }\n";
+			// Month/year title and navigation arrows.
+			$css .= "body.seasonal-theme-active .pco-accordion-month-title { color: " . $tc . "; }\n";
+			$css .= "body.seasonal-theme-active .pco-accordion-nav-btn { color: " . $tc . "; }\n";
 		}
 		if ( $season['link_color'] ) {
 			$lc = esc_attr( $season['link_color'] );
 			$css .= "body.seasonal-theme-active .pco-accordion-location-link { color: " . $lc . "; }\n";
 			$css .= "body.seasonal-theme-active .pco-accordion-detail-location strong { color: " . $lc . "; }\n";
 			$css .= "body.seasonal-theme-active .pco-accordion-register-btn { background: " . $lc . "; }\n";
+			// Location meta link in collapsed row.
+			$css .= "body.seasonal-theme-active .pco-accordion-event-meta a { color: " . $lc . "; }\n";
 		}
-		if ( $season['dark_bg_color'] ) {
-			$dark_bg = esc_attr( $season['dark_bg_color'] );
-			$css .= "body.seasonal-theme-active .pco-accordion-date-badge:not(.pco-accordion-date-badge--light) { background: " . $dark_bg . "; }\n";
+		// Primary accent: nearest date badge + register button.
+		if ( $primary ) {
+			$css .= "body.seasonal-theme-active .pco-accordion-date-badge:not(.pco-accordion-date-badge--light) { background: " . $primary . "; }\n";
 		}
 		if ( $season['dark_text_color'] ) {
 			$dtc = esc_attr( $season['dark_text_color'] );
 			$css .= "body.seasonal-theme-active .pco-accordion-date-badge:not(.pco-accordion-date-badge--light) { color: " . $dtc . "; }\n";
+		}
+		// Secondary accent: light (non-nearest) date badges.
+		if ( $secondary ) {
+			$css .= "body.seasonal-theme-active .pco-accordion-date-badge--light { background: " . $secondary . "; color: #ffffff; }\n";
+		} elseif ( $primary ) {
+			// Fallback: use primary at reduced opacity for light badges.
+			$css .= "body.seasonal-theme-active .pco-accordion-date-badge--light { background: " . $primary . "80; color: #ffffff; }\n";
 		}
 	}
 
