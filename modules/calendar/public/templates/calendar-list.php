@@ -105,6 +105,7 @@ $initial_month_display = isset($events_by_month[$initial_month])
             <p><?php _e('No upcoming events scheduled.', 'mypco-online'); ?></p>
         </div>
     <?php else: ?>
+        <?php $nearest_found = false; ?>
         <?php foreach ($events_by_month as $month_key => $month_data):
             $is_active_month = ($month_key === $initial_month);
         ?>
@@ -138,7 +139,8 @@ $initial_month_display = isset($events_by_month[$initial_month])
 
                 $tag_ids_json = json_encode($event['tag_ids'] ?? []);
                 $event_name_upper = strtoupper($event['name']);
-                $is_nearest = ($event['_event_index'] === 0);
+                $is_nearest = (!$nearest_found && $event['_event_index'] === 0);
+                if ($is_nearest) $nearest_found = true;
                 $badge_class = $is_nearest ? 'pco-accordion-date-badge' : 'pco-accordion-date-badge pco-accordion-date-badge--light';
 
                 // Build Google Maps search URL from location
