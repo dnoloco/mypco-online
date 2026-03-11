@@ -260,13 +260,26 @@ class MyPCO_Series_Public {
 
     /**
      * Load a template file and return output.
+     *
+     * Checks the active theme (and child theme) for an override at
+     * mypco-online/series/{template_name}.php before falling back
+     * to the plugin's bundled template.
      */
     private function load_template($template_name, $data = []) {
         extract($data);
 
         ob_start();
 
-        $template_path = MYPCO_PLUGIN_DIR . 'modules/series/public/templates/' . $template_name . '.php';
+        $template_file = $template_name . '.php';
+
+        // Allow theme override: wp-content/themes/{theme}/mypco-online/series/{template}.php
+        $theme_template = locate_template('mypco-online/series/' . $template_file);
+
+        if ($theme_template) {
+            $template_path = $theme_template;
+        } else {
+            $template_path = MYPCO_PLUGIN_DIR . 'modules/series/public/templates/' . $template_file;
+        }
 
         if (file_exists($template_path)) {
             include $template_path;
